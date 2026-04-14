@@ -144,6 +144,10 @@ client.on('messageCreate', async message => {
     }
 });
 
-// --- TOKEN GİRİŞİ ---
-// Aşağıdaki tirnak icine kendi tokenini koy!
-client.login('SENIN_BOT_TOKENINI_BURAYA_YAPISTIR');
+const http = require('http');
+http.createServer((req, res) => {
+  res.write("Bot 7/24 Aktif!");
+  res.end();
+}).listen(process.env.PORT || 3000);
+
+client.login(process.env.TOKEN)
