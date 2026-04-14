@@ -194,10 +194,11 @@ client.on('messageCreate', async message => {
     }
 });
 
-client.login(process.env.TOKEN);
 
 const http = require('http');
 http.createServer((req, res) => {
   res.write("Bot 7/24 Aktif!");
   res.end();
 }).listen(process.env.PORT || 3000);
+
+client.login(process.env.TOKEN)
