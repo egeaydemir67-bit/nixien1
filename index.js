@@ -1,153 +1,203 @@
 const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, Partials } = require('discord.js');
+const http = require('http');
 
-// Botun ihtiyaç duyduğu izinler (Intents)
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildVoiceStates
     ],
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
 
 const prefix = "!";
-const logKanalAdi = "bot-log"; // Sunucunda bu isimde bir metin kanalı açmalısın
+const logKanalAdi = "bot-log"; 
+
+// --- SNIPE SİSTEMİ İÇİN BELLEK ---
+const snipes = new Map();
+
+// Render 7/24 Aktif Tutma Portu
+http.createServer((req, res) => {
+  res.write("Bot 7/24 Aktif!");
+  res.end();
+}).listen(process.env.PORT || 3000);
 
 client.on('ready', () => {
-    console.log(`[BAŞARILI] ${client.user.tag} ismiyle Discord'a giriş yapıldı!`);
-    client.user.setActivity('!yardım | Sizlerle beraberim!', { type: 0 }); // 0 = Playing
+    console.log(`[BAŞARILI] ${client.user.tag} aktif!`);
+    client.user.setActivity('!yardım | Snipe Aktif', { type: 0 });
 });
 
-// --- LOG SİSTEMİ (Mesaj Silinince Çalışır) ---
+// --- LOG & SNIPE KAYIT SİSTEMİ ---
 client.on('messageDelete', async message => {
-    if (message.author?.bot) return; // Botların sildiği mesajları loglama
-    
+    if (message.author?.bot || !message.guild) return;
+
+    // Snipe verisini kaydet
+    snipes.set(message.channel.id, {
+        content: message.content,
+        author: message.author,
+        image: message.attachments.first() ? message.attachments.first().proxyURL : null,
+        timestamp: Date.now()
+    });
+
+    // Klasik Log Kanalına Gönder
     const logChannel = message.guild.channels.cache.find(c => c.name === logKanalAdi);
-    if (!logChannel) return; // Eğer sunucuda bot-log kanalı yoksa hata vermeden geç
-
-    const logEmbed = new EmbedBuilder()
-        .setColor('Red')
-        .setTitle('🗑️ Bir Mesaj Silindi!')
-        .addFields(
-            { name: 'Kullanıcı', value: `${message.author.tag}`, inline: true },
-            { name: 'Kanal', value: `<#${message.channel.id}>`, inline: true },
-            { name: 'Mesaj İçeriği', value: message.content || 'İçerik bulunamadı veya medya dosyası.' }
-        )
-        .setTimestamp();
-
-    try {
-        await logChannel.send({ embeds: [logEmbed] });
-    } catch (err) {
-        console.log("Log kanalına mesaj gönderilemedi.");
+    if (logChannel) {
+        const logEmbed = new EmbedBuilder()
+            .setColor('Red')
+            .setTitle('🗑️ Mesaj Silindi')
+            .addFields(
+                { name: 'Kullanıcı', value: `${message.author.tag}`, inline: true },
+                { name: 'Kanal', value: `<#${message.channel.id}>`, inline: true },
+                { name: 'Mesaj', value: message.content || 'İçerik yok (Resim vb.)' }
+            ).setTimestamp();
+        logChannel.send({ embeds: [logEmbed] }).catch(() => {});
     }
 });
 
-// --- KOMUT SİSTEMİ ---
+// --- KOMUTLAR ---
 client.on('messageCreate', async message => {
-    // Mesajı yazan botsa veya prefix ile başlamıyorsa salla
-    if (message.author.bot || !message.content.startsWith(prefix)) return;
+    if (message.author.bot || !message.content.startsWith(prefix) || !message.guild) return;
 
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // 📌 YARDIM MENÜSÜ
+    // 🎯 SNIPE KOMUTU
+    if (command === 'snipe') {
+        const msg = snipes.get(message.channel.id);
+        if (!msg) return message.reply("Bu kanalda henüz silinen bir mesaj yakalayamadım kanka.");
+
+        const snipeEmbed = new EmbedBuilder()
+            .setAuthor({ name: msg.author.tag, iconURL: msg.author.displayAvatarURL() })
+            .setColor('Random')
+            .setDescription(msg.content || "*Mesaj içeriği yok (sadece medya olabilir)*")
+            .setFooter({ text: "Silindiği saat:" })
+            .setTimestamp(msg.timestamp);
+
+        if (msg.image) snipeEmbed.setImage(msg.image);
+
+        return message.reply({ embeds: [snipeEmbed] });
+    }
+
+    // 📌 YARDIM MENÜSÜ (GÜNCELLENDİ)
     if (command === 'yardım') {
         const yardimEmbed = new EmbedBuilder()
-            .setColor('Blue')
-            .setTitle('🤖 Bot Yardım Menüsü')
-            .setDescription('Kullanabileceğin komutlar aşağıda listelenmiştir:')
+            .setColor('DarkVividPink')
+            .setTitle('🛡️ Gelişmiş Komut Listesi')
             .addFields(
-                { name: '🎉 Eğlence', value: '`!aşkölç @kisi`, `!evlen @kisi`, `!kedisev`' },
-                { name: '🛡️ Moderasyon', value: '`!sil <sayı>`, `!kick @kisi`, `!ban @kisi`' },
-                { name: '📝 Bilgi', value: `Log sisteminin çalışması için sunucunda **${logKanalAdi}** isminde bir kanal oluşturmalısın.` }
-            )
-            .setFooter({ text: `${message.author.tag} tarafından istendi.`, iconURL: message.author.displayAvatarURL() })
-            .setTimestamp();
-
+                { name: '🎉 Eğlence & Utility', value: '`!aşkölç`, `!evlen`, `!kedisev`, `!snipe`' },
+                { name: '🛡️ Moderasyon', value: '`!sil`, `!kick`, `!ban`' },
+                { name: '🤐 Susturma', value: '`!mute`, `!unmute`, `!vmute`, `!vunmute`' }
+            ).setTimestamp();
         return message.reply({ embeds: [yardimEmbed] });
     }
 
-    // 📌 EĞLENCE KOMUTLARI
-    if (command === 'aşkölç') {
-        const target = message.mentions.users.first();
-        if (!target) return message.reply("Kiminle aşkını ölçeceksin? Birini etiketle! (!aşkölç @kullanıcı)");
-        if (target.id === message.author.id) return message.reply("Kendinle aşk yaşayamazsın kanka, başka birini etiketle!");
+    // --- YENİ SUSTURMA KOMUTLARI ---
 
-        const askYuzdesi = Math.floor(Math.random() * 101); // 0-100 arası sayı
-        let kalp = "💔";
-        if (askYuzdesi > 50) kalp = "💖";
-        if (askYuzdesi > 80) kalp = "🔥💘";
+    // 🤐 CHAT MUTE
+    if (command === 'mute') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply("Yetkin yetmiyor kanka.");
+        const target = message.mentions.members.first();
+        if (!target) return message.reply("Kimi susturacağız?");
 
-        return message.channel.send(`**${message.author.username}** ve **${target.username}** arasındaki aşk yüzdesi: **%${askYuzdesi}** ${kalp}`);
+        let muteRole = message.guild.roles.cache.find(r => r.name === "Muted");
+        if (!muteRole) {
+            try {
+                muteRole = await message.guild.roles.create({
+                    name: "Muted",
+                    permissions: []
+                });
+                message.guild.channels.cache.forEach(async (channel) => {
+                    await channel.permissionOverwrites.edit(muteRole, { SendMessages: false, AddReactions: false });
+                });
+            } catch (e) { return message.reply("Mute rolü oluşturulamadı."); }
+        }
+
+        await target.roles.add(muteRole);
+        return message.reply(`🤐 **${target.user.tag}** başarıyla metin kanallarında susturuldu.`);
     }
 
-    if (command === 'evlen') {
-        const target = message.mentions.users.first();
-        if (!target) return message.reply("Kiminle evleniyorsun kanka? Düğün davetiyesi için birini etiketle!");
-        if (target.id === message.author.id) return message.reply("Yalnızlık zor biliyorum ama kendinle evlenemezsin...");
+    // 🗣️ CHAT UNMUTE
+    if (command === 'unmute') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply("Yetkin yok.");
+        const target = message.mentions.members.first();
+        const muteRole = message.guild.roles.cache.find(r => r.name === "Muted");
+        if (!target || !muteRole) return message.reply("Kullanıcıyı etiketle veya Muted rolü yok.");
 
-        return message.channel.send(`💍 Vay canına! **${message.author.username}**, **${target.username}** ile evlenme teklifi etti! Darısı başımıza! 🎉`);
+        await target.roles.remove(muteRole);
+        return message.reply(`🔊 **${target.user.tag}** artık konuşabilir.`);
     }
 
-    if (command === 'kedisev') {
-        return message.reply("Gırr... 🐈 Kediciği sevdin ve o da sana mırıldandı! Ne kadar tatlı!");
+    // 🎙️ SESLİ MUTE (VMUTE)
+    if (command === 'vmute') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) return message.reply("Yetkin yok.");
+        const target = message.mentions.members.first();
+        if (!target || !target.voice.channel) return message.reply("Kullanıcı sesli kanalda değil!");
+
+        await target.voice.setMute(true);
+        return message.reply(`🎙️ **${target.user.tag}** sesli kanalda susturuldu.`);
     }
 
-    // 📌 MODERASYON KOMUTLARI
+    // 🔊 SESLİ UNMUTE (VUNMUTE)
+    if (command === 'vunmute') {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.MuteMembers)) return message.reply("Yetkin yok.");
+        const target = message.mentions.members.first();
+        if (!target || !target.voice.channel) return message.reply("Kullanıcı sesli kanalda değil!");
+
+        await target.voice.setMute(false);
+        return message.reply(`🎙️ **${target.user.tag}** sesli kanalda konuşması açıldı.`);
+    }
+
+    // --- ESKİ KOMUTLAR (MODERASYON & EĞLENCE) ---
     if (command === 'sil') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-            return message.reply("Bunu yapmak için `Mesajları Yönet` yetkisine sahip olmalısın kanka.");
-        }
-        
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return;
         const miktar = parseInt(args[0]);
-        if (isNaN(miktar) || miktar < 1 || miktar > 100) {
-            return message.reply("Lütfen silmek için 1 ile 100 arasında bir sayı gir. Örnek: `!sil 10`");
-        }
-
-        try {
-            await message.channel.bulkDelete(miktar, true);
-            const silindiMesaj = await message.channel.send(`🧹 Başarıyla **${miktar}** adet mesaj uzaya gönderildi!`);
-            setTimeout(() => silindiMesaj.delete().catch(()=>{}), 5000); // 5 saniye sonra silindi uyarısını da siler
-        } catch (error) {
-            console.error(error);
-            return message.reply("Mesajları silerken bir hata oluştu. 14 günden eski mesajları silemem, Discord izin vermiyor.");
-        }
+        if (isNaN(miktar) || miktar < 1 || miktar > 100) return message.reply("1-100 arası sayı gir.");
+        await message.channel.bulkDelete(miktar, true);
+        message.channel.send(`🧹 ${miktar} mesaj silindi.`).then(m => setTimeout(() => m.delete(), 3000));
     }
 
     if (command === 'kick') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) return message.reply("Bunun için `Üyeleri At` yetkin olmalı.");
+        if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) return;
         const target = message.mentions.members.first();
-        if (!target) return message.reply("Kimi sunucudan atacağız? Birini etiketle!");
-        if (!target.kickable) return message.reply("Bu kullanıcının yetkisi benden yüksek veya aynı yetkideyiz, onu atamam.");
-
-        try {
+        if (target && target.kickable) {
             await target.kick();
-            return message.reply(`👢 **${target.user.tag}** sunucudan başarıyla postalandı.`);
-        } catch (error) {
-            return message.reply("Kullanıcıyı atarken bir hata oluştu.");
+            message.reply(`👢 ${target.user.tag} atıldı.`);
         }
     }
 
     if (command === 'ban') {
-        if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return message.reply("Bunun için `Üyeleri Yasakla` yetkin olmalı.");
+        if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return;
         const target = message.mentions.members.first();
-        if (!target) return message.reply("Kimi banlayacağız? Birini etiketle!");
-        if (!target.bannable) return message.reply("Bu kullanıcının yetkisi benden yüksek, banlayamam kanka.");
-
-        try {
+        if (target && target.bannable) {
             await target.ban();
-            return message.reply(`🔨 **${target.user.tag}** sunucudan yasaklandı. Bir daha dönemez!`);
-        } catch (error) {
-            return message.reply("Kullanıcıyı banlarken bir hata oluştu.");
+            message.reply(`🔨 ${target.user.tag} banlandı.`);
         }
     }
+
+    if (command === 'aşkölç') {
+        const target = message.mentions.users.first();
+        if (!target) return message.reply("Birisini etiketle.");
+        const yuzde = Math.floor(Math.random() * 101);
+        message.channel.send(`💘 **${message.author.username}** & **${target.username}**: %${yuzde} aşk!`);
+    }
+
+    if (command === 'evlen') {
+        const target = message.mentions.users.first();
+        if (!target) return message.reply("Birisini etiketle.");
+        message.channel.send(`💍 **${message.author.username}** ve **${target.username}** evlendi!`);
+    }
+
+    if (command === 'kedisev') {
+        message.reply("🐈 Meow! Çok tatlı bir kedi sevdin.");
+    }
 });
+
+client.login(process.env.TOKEN);
 
 const http = require('http');
 http.createServer((req, res) => {
   res.write("Bot 7/24 Aktif!");
   res.end();
 }).listen(process.env.PORT || 3000);
-
-client.login(process.env.TOKEN)
