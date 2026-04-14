@@ -1,5 +1,4 @@
 const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, Partials } = require('discord.js');
-const http = require('http');
 
 const client = new Client({
     intents: [
