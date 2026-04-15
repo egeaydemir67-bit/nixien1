@@ -65,7 +65,7 @@ http.createServer((req, res) => {
 
 client.on('ready', () => {
     console.log(`[BAŞARILI] ${client.user.tag} aktif!`);
-    client.user.setActivity('.yardım | Profesyonel Sistem', { type: 0 });
+    client.user.setActivity('a!yardım | Ace System', { type: 0 });
 });
 
 // --- 4. SNIPE VE LOG SİSTEMİ ---
@@ -316,7 +316,7 @@ client.on('messageCreate', async message => {
 
                 await i.update({ content: `🎉 Tebrikler! **${message.author.username}** ve **${target.username}** artık resmen evli! 💍`, components: [] });
             } else {
-                await i.update({ content: `💔 Ouch! **${target.username}**, evlilik teklifini reddetti. Geçmiş olsun...`, components: [] });
+                await i.update({ content: `💔 Ahbeee! **${target.username}**, evlilik teklifini reddetti. Geçmiş olsun...`, components: [] });
             }
         });
 
