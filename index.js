@@ -429,6 +429,8 @@ client.on('messageCreate', async message => {
     }
 
 if (command === 'gojovssukuna') {
+    // Discord'un cachelemesini engellemek için ufak bir hile fonksiyonu
+    const fix = (url) => `${url}?v=${Math.random()}`;
 
     const anaMesaj = await message.reply({
         embeds: [
@@ -436,7 +438,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('https://c.tenor.com/D_8h82R3hYAAAAC/sukuna-gojo.gif') 
+                .setImage(fix('https://media.tenor.com/D_8h82R3hYAAAAAC/sukuna-gojo.gif')) 
                 .setFooter({ text: 'Hazırlık... ⏳' })
         ]
     });
@@ -449,11 +451,11 @@ if (command === 'gojovssukuna') {
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
                     .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
                     .setColor('#00aaff')
-                    .setImage('https://c.tenor.com/O6L60p-Mv-QAAAAC/gojo-vs-sukuna.gif')
+                    .setImage(fix('https://media.tenor.com/O6L60p-Mv-QAAAAC/gojo-vs-sukuna.gif'))
                     .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
             ]
         }).catch(() => null);
-    }, 3000);
+    }, 3500); // Süreyi yarım saniye artırdım, render süresi tanısın
 
     // ⏱️ AŞAMA 2
     setTimeout(async () => {
@@ -463,11 +465,11 @@ if (command === 'gojovssukuna') {
                     .setTitle('💥 İLK TEMAS!')
                     .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
                     .setColor('#ff5500')
-                    .setImage('https://c.tenor.com/X_F_X_X0k6kAAAAC/gojo-vs-sukuna.gif')
+                    .setImage(fix('https://media.tenor.com/X_F_X_X0k6kAAAAC/gojo-vs-sukuna.gif'))
                     .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
             ]
         }).catch(() => null);
-    }, 6000);
+    }, 7000);
 
     // ⏱️ AŞAMA 3
     setTimeout(async () => {
@@ -477,11 +479,11 @@ if (command === 'gojovssukuna') {
                     .setTitle('🌀 DOMAIN EXPANSION!')
                     .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
                     .setColor('#8A2BE2')
-                    .setImage('https://c.tenor.com/R3Z5A0N1XvQAAAAC/gojo-satoru-domain-expansion.gif')
+                    .setImage(fix('https://media.tenor.com/R3Z5A0N1XvQAAAAC/gojo-satoru-domain-expansion.gif'))
                     .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
             ]
         }).catch(() => null);
-    }, 10000);
+    }, 11000);
 
     // ⏱️ AŞAMA 4
     setTimeout(async () => {
@@ -491,11 +493,11 @@ if (command === 'gojovssukuna') {
                     .setTitle('🔥 SON TEKNİKLER!')
                     .setDescription('Gojo: **Hollow Purple**\nSukuna: **Cleave & Dismantle**\n\nHer şey bu saldırıya bağlı!')
                     .setColor('#ff00ff')
-                    .setImage('https://c.tenor.com/6XyU6q4p4r8AAAAC/hollow-purple-gojo.gif')
+                    .setImage(fix('https://media.tenor.com/6XyU6q4p4r8AAAAC/hollow-purple-gojo.gif'))
                     .setFooter({ text: 'Final yaklaşırken... ⚔️' })
             ]
         }).catch(() => null);
-    }, 14000);
+    }, 15000);
 
     // ⏱️ FINAL
     setTimeout(async () => {
@@ -505,14 +507,14 @@ if (command === 'gojovssukuna') {
                 renk: '#00D1FF',
                 baslik: '🏆 GOJO KAZANDI!',
                 aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
-                resim: 'https://c.tenor.com/p_L_N0_Wp6YAAAAC/gojo-satoru.gif'
+                resim: fix('https://media.tenor.com/p_L_N0_Wp6YAAAAC/gojo-satoru.gif')
             },
             {
                 kazanan: 'Ryomen Sukuna',
                 renk: '#FF0000',
                 baslik: '💀 SUKUNA KAZANDI!',
                 aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
-                resim: 'https://c.tenor.com/L_y-Y-6vV4kAAAAC/sukuna-smile.gif'
+                resim: fix('https://media.tenor.com/L_y-Y-6vV4kAAAAC/sukuna-smile.gif')
             }
         ];
 
@@ -533,7 +535,7 @@ if (command === 'gojovssukuna') {
             ]
         }).catch(() => null);
 
-    }, 18000);
+    }, 19000);
 }
     
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
