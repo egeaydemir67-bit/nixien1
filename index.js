@@ -4,6 +4,15 @@ const mongoose = require('mongoose');
 const ms = require('ms'); // Süre hesaplamaları için
 const Canvas = require('canvas'); // Resimli aşk ölçer için
 
+const statSchema = new mongoose.Schema({
+    guildID: String,
+    userID: String,
+    messageCount: { type: Number, default: 0 },
+    voiceTime: { type: Number, default: 0 }, // Milisaniye cinsinden
+    lastVoiceJoin: { type: Number, default: 0 }
+});
+const Stats = mongoose.model('Stats', statSchema);
+
 // --- 1. ROL VE KULLANICI AYARLARI ---
 const prefix = "a!";
 const logKanalAdi = "bot-log";
@@ -68,6 +77,42 @@ client.on('ready', () => {
     client.user.setActivity('a!yardım | Ace System', { type: 0 });
 });
 
+// Mesaj Sayar
+client.on('messageCreate', async (message) => {
+    if (message.author.bot || !message.guild) return;
+    await Stats.findOneAndUpdate(
+        { guildID: message.guild.id, userID: message.author.id },
+        { $inc: { messageCount: 1 } },
+        { upsert: true }
+    );
+});
+
+// Ses Süresi Sayar
+client.on('voiceStateUpdate', async (oldState, newState) => {
+    const userID = oldState.id || newState.id;
+    const guildID = oldState.guild.id;
+
+    // Kanala katıldıysa
+    if (!oldState.channelId && newState.channelId) {
+        await Stats.findOneAndUpdate(
+            { guildID, userID },
+            { lastVoiceJoin: Date.now() },
+            { upsert: true }
+        );
+    }
+    // Kanaldan ayrıldıysa
+    else if (oldState.channelId && !newState.channelId) {
+        const data = await Stats.findOne({ guildID, userID });
+        if (data && data.lastVoiceJoin > 0) {
+            const diff = Date.now() - data.lastVoiceJoin;
+            await Stats.findOneAndUpdate(
+                { guildID, userID },
+                { $inc: { voiceTime: diff }, lastVoiceJoin: 0 }
+            );
+        }
+    }
+});
+
 // --- 4. SNIPE VE LOG SİSTEMİ ---
 client.on('messageDelete', async message => {
     if (message.author?.bot || !message.guild) return;
@@ -122,8 +167,8 @@ client.on('messageCreate', async message => {
             )
             .addFields(
                 { 
-                    name: '🎭 Eğlence Komutları', 
-                    value: '```fix\na!aşkölç | a!evlen | a!kedisev | a!evlilik```', 
+                    name: '🎭 Üye/Eğlence Komutları', 
+                    value: '```fix\na!aşkölç | a!evlen | a!kedisev | a!stat | a!evlilik```', 
                     inline: false 
                 },
                 { 
@@ -356,6 +401,31 @@ client.on('messageCreate', async message => {
         const tarih = Math.floor(kayit.tarih.getTime() / 1000); // Discord timestamp formatına çevirme
         
         return message.reply(`💍 <@${partnerID}> ile <t:${tarih}:R> evlendin!`);
+    }
+
+    if (command === 'stat') {
+        const target = message.mentions.users.first() || message.author;
+        const data = await Stats.findOne({ guildID: message.guild.id, userID: target.id });
+
+        if (!data) return message.reply("⚠️ Henüz kaydedilmiş bir istatistik bulunamadı.");
+
+        // Süreyi okunabilir formata çevirme (Saat/Dakika)
+        const toplamSaniye = Math.floor(data.voiceTime / 1000);
+        const saat = Math.floor(toplamSaniye / 3600);
+        const dakika = Math.floor((toplamSaniye % 3600) / 60);
+
+        const statEmbed = new EmbedBuilder()
+            .setColor('#5865F2')
+            .setAuthor({ name: `${target.username} Kullanıcı İstatistikleri`, iconURL: target.displayAvatarURL({ dynamic: true }) })
+            .setThumbnail(target.displayAvatarURL({ dynamic: true, size: 512 }))
+            .addFields(
+                { name: '💬 Mesaj İstatistiği', value: `\`\`\`fix\n${data.messageCount} Mesaj\`\`\``, inline: true },
+                { name: '🔊 Ses İstatistiği', value: `\`\`\`fix\n${saat} Saat, ${dakika} Dakika\`\`\``, inline: true }
+            )
+            .setFooter({ text: 'Veriler anlık olarak güncellenmektedir.' })
+            .setTimestamp();
+
+        return message.reply({ embeds: [statEmbed] });
     }
 
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
