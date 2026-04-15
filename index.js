@@ -436,7 +436,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('https://media.tenor.com/X80LhsTgNTAAAAPo/sukuna-gojo.gif')
+                .setImage('https://images-ext-1.discordapp.net/external/QISlvpXV9AfF618ktdtC1KyLkRSb-KLJqteV1VLlSOM/https/media.tenor.com/X80LhsTgNTAAAAPo/sukuna-gojo.mp4')
                 .setFooter({ text: 'Hazırlık... ⏳' })
         ]
     });
