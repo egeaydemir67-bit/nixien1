@@ -439,7 +439,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU SHOWDOWN')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki efsane karşı karşıya... Kim kazanacak?')
                 .setColor('#0a0a0a')
-                .setImage(fix('https://tenor.com/view/sukuna-gojo-gojo-vs-sukuna-jujutsu-kaisen-jjk-gif-6903186477285389616'))
+                .setImage(fix('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWI4NXA4cGQ3NXhnNW0wYmRyamk0ZDhxaXFvaTY5MXJiZ2NyemljciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/qQC8JPGoSvNWZ4GI26/giphy.gif'))
                 .setFooter({ text: 'Savaş başlıyor... ⏳' })
         ]
     });
@@ -452,7 +452,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('⚡ GÜÇLER UYANIYOR')
                     .setDescription('Gojo göz bandını indiriyor... Sukuna sırıtıyor.\nCursed energy Shinjuku’yu sarıyor!')
                     .setColor('#00ccff')
-                    .setImage(fix('https://tenor.com/view/gojo-vs-sukuna-gif-13008238981497827832'))
+                    .setImage(fix('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWI4NXA4cGQ3NXhnNW0wYmRyamk0ZDhxaXFvaTY5MXJiZ2NyemljciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xxSprBorM4fVvhjeFQ/giphy.gif'))
                     .setFooter({ text: 'Enerji patlaması yaklaşıyor... ⚡' })
             ]
         }).catch(() => {});
@@ -466,7 +466,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('💥 İLK ÇARPIŞMA')
                     .setDescription('Yumruklar, tekme ve teknikler havada!\nBinalar yerle bir oluyor...')
                     .setColor('#ff3300')
-                    .setImage(fix('https://tenor.com/view/gojo-vs-sukuna-scarlet-x1-gif-13006840071755129020'))
+                    .setImage(fix('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWI4NXA4cGQ3NXhnNW0wYmRyamk0ZDhxaXFvaTY5MXJiZ2NyemljciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/QSwBid1bso4h5ePFnN/giphy.gif'))
                     .setFooter({ text: 'Şok dalgaları her yeri yıkıyor... 💥' })
             ]
         }).catch(() => {});
@@ -480,7 +480,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('🌀 DOMAIN EXPANSION ÇARPIŞMASI')
                     .setDescription('**Infinite Void** vs **Malevolent Shrine**\nGerçeklik parçalanıyor!')
                     .setColor('#9933ff')
-                    .setImage(fix('https://tenor.com/view/gojo-gif-5394791839932995860'))
+                    .setImage(fix('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cDE5NzhpZTFvODZlbWI4d2Q2eXdmemluenpkdHRoOHVjYmtyY2FsZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Nz0Pr7zKU459KXwbwb/giphy.gif'))
                     .setFooter({ text: 'Alanlar birbirini yok ediyor... 🌀' })
             ]
         }).catch(() => {});
@@ -494,7 +494,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('🔥 FİNAL TEKNİKLER')
                     .setDescription('**Gojo:** Hollow Purple\n**Sukuna:** World Slash + Cleave\nHer şey bu anda belli olacak!')
                     .setColor('#cc00ff')
-                    .setImage(fix('https://tenor.com/view/gojo-satoru-gif-5693910167950695427')) // Hollow Purple için en iyi alternatif (daha iyi GIF bulursam değiştiririz)
+                    .setImage(fix('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm92b2Fzc3p1YmNsZGVvOGFjNmpkMWFjeXJvcXR5bWVrMHc4d2NleSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/r77sc23Jo1AhlB0uQh/giphy.gif')) // Hollow Purple için en iyi alternatif (daha iyi GIF bulursam değiştiririz)
                     .setFooter({ text: 'Son darbe geliyor... ⚔️' })
             ]
         }).catch(() => {});
@@ -508,14 +508,14 @@ if (command === 'gojovssukuna') {
                 renk: '#00f0ff',
                 baslik: '🏆 GOJO KAZANDI!',
                 aciklama: '**"Throughout Heaven and Earth, I alone am the Honored One."**\nSix Eyes ve Limitless üstün geldi!',
-                resim: fix('https://tenor.com/view/gojo-satoru-satoru-gojo-gojo-satoru-cursed-energy-gif-15498847897516427329') // Gojo temalı
+                resim: fix('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ejRmdDRhdXY4Y2h1OXUzODdhOTdibXpnanBlenhkaGwxamN1bWI1aSZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/nBEup7jCb7ZQw1jmP3/giphy.gif') // Gojo temalı
             },
             {
                 kazanan: 'Ryomen Sukuna',
                 renk: '#ff2222',
                 baslik: '💀 SUKUNA KAZANDI!',
                 aciklama: '**"Know your place, brat."**\nLanetlerin Kralı yine hükmünü verdi!',
-                resim: fix('https://tenor.com/view/sukuna-sukuna-laugh-sukuna-kills-gojo-sukuna-defeats-gojo-gojo-satoru-gif-14680103525656661336') // Sukuna temalı
+                resim: fix('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMW5uczgzcDAyOTh3eWZ3emtsb2I2aXZmejVkaTh5NThpZWliZ2xqdyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hoYXVjUeuWkDU7tgpP/giphy.gif') // Sukuna temalı
             }
         ];
 
