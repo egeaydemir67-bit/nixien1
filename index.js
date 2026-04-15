@@ -428,53 +428,59 @@ client.on('messageCreate', async message => {
         return message.reply({ embeds: [statEmbed] });
     }
 
- if (command === 'gojovssukuna') {
-        
-        const savasSenaryolari = [
-            {
-                kazanan: 'Satoru Gojo',
-                renk: '#00D1FF', 
-                baslik: '🤞 KAZANAN: GOJO SATORU!',
-                aciklama: 'Gojo, "Hollow Purple" ile tüm alanı toz duman etti! Sukuna\'nın savunması paramparça oldu. \n\n*"Ağlama Sukuna, sadece benden daha zayıftın."*',
-                gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q1M2JjZjJlMzg4NjA5MzRkMzZmODMzMjM4MjYyODg3NjJkMzBlZiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/1Zwxk1lZ0I3fI4rBq6/giphy.gif'
-            },
-            {
-                kazanan: 'Ryomen Sukuna',
-                renk: '#FF0000', 
-                baslik: '⛩️ KAZANAN: RYOMEN SUKUNA!',
-                aciklama: 'Sukuna, dünyayı kesen saldırısıyla (World Slash) Gojo\'yu ikiye böldü! Modern çağın en güçlü büyücüsü yere yığılıyor. \n\n*"Seni asla unutmayacağım, Satoru Gojo."*',
-                gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjMyOWI0YTYyZDYzMjBlYTNlYTNkZTk3NDJlZDY2YzM2MTE1YzVlYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/4lu5TEcgOaKHzVqlbM/giphy.gif'
-            },
-            {
-                kazanan: 'Berabere / Kaos',
-                renk: '#8A2BE2', 
-                baslik: '💥 DÜNYA SARSILIYOR: YENİŞEMEDİLER!',
-                aciklama: 'İki taraf da son hamlelerini yaptı! Patlamanın şiddetiyle Shinjuku haritadan silindi. İkisi de ağır yaralı ama hala ayakta, savaşın sonu görünmüyor!',
-                gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcm5kZjZscW5ueXU4Zmx4Z2phN3N6NjhqZ3JyeG5kNXpjeGZ4Z3Y0ZSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/UgV8Y7p0qK7pLDXD29/giphy.gif'
-            }
-        ];
+if (command === 'gojovssukuna') {
+        // Başlangıç mesajı
+        const hazirlikEmbed = new EmbedBuilder()
+            .setTitle('⚔️ SHINJUKU HESAPLAŞMASI BAŞLIYOR... ⚔️')
+            .setDescription('**Gojo Satoru** ve **Ryomen Sukuna** karşı karşıya geliyor. Hava ağırlaşıyor, binalar titriyor...')
+            .setColor('#2F3136')
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHIycXh3YjR3eXh3eXh3eXh3eXh3eXh3eXh3eXh3eXh3JnB0PWdhYm9vJmN0PWc/Uo8vXf0V7lYV7lYV7lY/giphy.gif'); // Çarpışma başlangıç GIF
 
-        // Rastgele bir senaryo seç
-        const sonuc = savasSenaryolari[Math.floor(Math.random() * savasSenaryolari.length)];
+        const baslangicMesaji = await message.reply({ embeds: [hazirlikEmbed] });
 
-        // Embed oluşturma
-        const embed = new EmbedBuilder()
-            .setTitle('⚔️ DESTANSI HESAPLAŞMA ⚔️')
-            .setDescription('Gojo Satoru ve Ryomen Sukuna arasındaki savaşın sonucu belirlendi!')
-            .setColor(sonuc.renk)
-            .setThumbnail('https://i.imgur.com/8pY6X0s.png') // Buraya küçük bir vs ikonu koydum
-            .addFields(
-                { name: sonuc.baslik, value: sonuc.aciklama },
-                { name: '🏆 Maçın Sonucu:', value: `**${sonuc.kazanan}**` }
-            )
-            .setImage(sonuc.gif) // GIF burada çıkacak
-            .setFooter({ 
-                text: `${message.author.username} savaşı izledi.`, 
-                iconURL: message.author.displayAvatarURL({ dynamic: true }) 
-            })
-            .setTimestamp();
+        // 5 saniye sonra "Domain Expansion" aşamasına geçiş (Gerilim artırma)
+        setTimeout(async () => {
+            const domainEmbed = new EmbedBuilder()
+                .setTitle('🔮 ALAN GENİŞLETME! 🔮')
+                .setDescription('İki taraf da aynı anda en güçlü tekniklerini kullandı! Alanlar çarpışıyor...')
+                .setColor('#8A2BE2')
+                .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnIxcXh3YjR3eXh3eXh3eXh3eXh3eXh3eXh3eXh3eXh3JnB0PWdhYm9vJmN0PWc/L8K9Uv1mw8QxP8Z0X8/giphy.gif'); // Alan çarpışma GIF
+            
+            await baslangicMesaji.edit({ embeds: [domainEmbed] });
 
-        message.reply({ embeds: [embed] });
+            // 7 saniye sonra final sonucu (Toplam süreç 20-30 sn hissettirir)
+            setTimeout(async () => {
+                const senaryolar = [
+                    {
+                        kazanan: 'Satoru Gojo',
+                        renk: '#00D1FF',
+                        baslik: '🤞 SONUÇ: SONSUZLUĞUN ZAFERİ!',
+                        aciklama: 'Gojo, "Hollow Purple" ile Sukuna\'nın vücudunun yarısını yok etti! Sukuna yenilgiyi kabul ediyor.\n\n*"Özür dilerim Sukuna, seninle oynamak eğlenceliydi."*',
+                        gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmIxeXh3YjR3eXh3eXh3eXh3eXh3eXh3eXh3eXh3eXh3JnB0PWdhYm9vJmN0PWc/1Zwxk1lZ0I3fI4rBq6/giphy.gif'
+                    },
+                    {
+                        kazanan: 'Ryomen Sukuna',
+                        renk: '#FF0000',
+                        baslik: '⛩️ SONUÇ: LANETLERİN KRALI KAZANDI!',
+                        aciklama: 'Sukuna, dünyayı kesen o meşhur hamleyi yaptı. Gojo ikiye bölündü ve yere yığıldı. Shinjuku sessizliğe büründü...\n\n*"Seni hayatım boyunca unutmayacağım Satoru Gojo."*',
+                        gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmkxYnh3YjR3eXh3eXh3eXh3eXh3eXh3eXh3eXh3eXh3JnB0PWdhYm9vJmN0PWc/4lu5TEcgOaKHzVqlbM/giphy.gif'
+                    }
+                ];
+
+                const sonuc = senaryolar[Math.floor(Math.random() * senaryolar.length)];
+
+                const finalEmbed = new EmbedBuilder()
+                    .setTitle(sonuc.baslik)
+                    .setDescription(sonuc.aciklama)
+                    .setColor(sonuc.renk)
+                    .setImage(sonuc.gif)
+                    .setFooter({ text: 'Savaş sona erdi.', iconURL: message.author.displayAvatarURL() })
+                    .setTimestamp();
+
+                await baslangicMesaji.edit({ embeds: [finalEmbed] });
+
+            }, 7000); 
+        }, 5000);
     }
     
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
