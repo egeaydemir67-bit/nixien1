@@ -168,7 +168,7 @@ client.on('messageCreate', async message => {
             .addFields(
                 { 
                     name: '🎭 Üye/Eğlence Komutları', 
-                    value: '```fix\na!aşkölç | a!evlen | a!kedisev | a!stat | a!evlilik```', 
+                    value: '```fix\na!aşkölç | a!evlen | a!kedisev | a!stat | a!boşan | a!patlat | a!gojovssukuna | a!evlilik```', 
                     inline: false 
                 },
                 { 
@@ -401,6 +401,84 @@ client.on('messageCreate', async message => {
         const tarih = Math.floor(kayit.tarih.getTime() / 1000); // Discord timestamp formatına çevirme
         
         return message.reply(`💍 <@${partnerID}> ile <t:${tarih}:R> evlendin!`);
+    }
+
+        // ====================== BOŞAN KOMUTU ======================
+    if (command === 'boşan') {
+        const kayit = await Evlilik.findOne({ 
+            $or: [
+                { kullanici1: message.author.id }, 
+                { kullanici2: message.author.id }
+            ] 
+        });
+
+        if (!kayit) {
+            return message.reply("😕 Zaten evli değilsin ki boşanalım?");
+        }
+
+        const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
+        const partner = await message.guild.members.fetch(partnerID).catch(() => null);
+
+        // Onay butonları
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('evet_bosan')
+                .setLabel('Evet, Boşanalım')
+                .setStyle(ButtonStyle.Danger)
+                .setEmoji('💔'),
+            new ButtonBuilder()
+                .setCustomId('hayir_bosan')
+                .setLabel('Hayır, Vazgeçtim')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('❤️')
+        );
+
+        const bosanMsg = await message.reply({
+            content: `💔 **${message.author.username}**, <@${partnerID}> ile boşanmak istediğini söylüyor.\n\nGerçekten boşanmak istiyor musun?`,
+            components: [row]
+        });
+
+        const filter = i => i.user.id === message.author.id;
+        const collector = bosanMsg.createMessageComponentCollector({ filter, time: 60000 });
+
+        collector.on('collect', async i => {
+            if (i.customId === 'evet_bosan') {
+                // Evlilik kaydını sil
+                await Evlilik.deleteOne({ _id: kayit._id });
+
+                // Evli rolünü kaldır
+                const evliRol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
+                if (evliRol) {
+                    // Kendinden rolü kaldır
+                    message.member.roles.remove(evliRol).catch(() => {});
+                    
+                    // Partnerden de rolü kaldır
+                    if (partner) {
+                        partner.roles.remove(evliRol).catch(() => {});
+                    }
+                }
+
+                await i.update({
+                    content: `💔 **${message.author.username}** ve <@${partnerID}> resmen boşandı...\n\nUmarım bir gün tekrar bir araya gelirsiniz ❤️`,
+                    components: []
+                });
+
+            } else {
+                await i.update({
+                    content: `❤️ Boşanma iptal edildi. Hâlâ evlisin! 💍`,
+                    components: []
+                });
+            }
+        });
+
+        collector.on('end', collected => {
+            if (collected.size === 0) {
+                bosanMsg.edit({
+                    content: "⏳ Boşanma talebi zaman aşımına uğradı.",
+                    components: []
+                }).catch(() => {});
+            }
+        });
     }
 
     if (command === 'stat') {
