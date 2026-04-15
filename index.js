@@ -456,7 +456,7 @@ if (command === 'gojovssukuna') {
                     .setFooter({ text: 'Enerji patlaması yaklaşıyor... ⚡' })
             ]
         }).catch(() => {});
-    }, 4000);
+    }, 3000);
 
     // AŞAMA 2 - 4s → 9s
     setTimeout(async () => {
@@ -470,7 +470,7 @@ if (command === 'gojovssukuna') {
                     .setFooter({ text: 'Şok dalgaları her yeri yıkıyor... 💥' })
             ]
         }).catch(() => {});
-    }, 9000);
+    }, 6000);
 
     // AŞAMA 3 - 9s → 14s (En epik kısım)
     setTimeout(async () => {
@@ -484,7 +484,7 @@ if (command === 'gojovssukuna') {
                     .setFooter({ text: 'Alanlar birbirini yok ediyor... 🌀' })
             ]
         }).catch(() => {});
-    }, 14000);
+    }, 12000);
 
     // AŞAMA 4 - 14s → 19s
     setTimeout(async () => {
@@ -498,7 +498,7 @@ if (command === 'gojovssukuna') {
                     .setFooter({ text: 'Son darbe geliyor... ⚔️' })
             ]
         }).catch(() => {});
-    }, 19000);
+    }, 18000);
 
     // FINAL - ~20.5 saniye
     setTimeout(async () => {
