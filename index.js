@@ -436,7 +436,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('https://media.tenor.com/D_8h82R3hYAAAAAC/sukuna-gojo.gif') 
+                .setImage('https://c.tenor.com/D_8h82R3hYAAAAC/sukuna-gojo.gif') 
                 .setFooter({ text: 'Hazırlık... ⏳' })
         ]
     });
@@ -449,10 +449,10 @@ if (command === 'gojovssukuna') {
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
                     .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
                     .setColor('#00aaff')
-                    .setImage('https://media.tenor.com/O6L60p-Mv-QAAAAC/gojo-vs-sukuna.gif')
+                    .setImage('https://c.tenor.com/O6L60p-Mv-QAAAAC/gojo-vs-sukuna.gif')
                     .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
             ]
-        }).catch(err => console.error("Mesaj düzenlenemedi:", err));
+        }).catch(() => null);
     }, 3000);
 
     // ⏱️ AŞAMA 2
@@ -463,10 +463,10 @@ if (command === 'gojovssukuna') {
                     .setTitle('💥 İLK TEMAS!')
                     .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
                     .setColor('#ff5500')
-                    .setImage('https://media.tenor.com/X_F_X_X0k6kAAAAC/gojo-vs-sukuna.gif')
+                    .setImage('https://c.tenor.com/X_F_X_X0k6kAAAAC/gojo-vs-sukuna.gif')
                     .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
             ]
-        }).catch(err => console.error("Mesaj düzenlenemedi:", err));
+        }).catch(() => null);
     }, 6000);
 
     // ⏱️ AŞAMA 3
@@ -477,10 +477,10 @@ if (command === 'gojovssukuna') {
                     .setTitle('🌀 DOMAIN EXPANSION!')
                     .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
                     .setColor('#8A2BE2')
-                    .setImage('https://media.tenor.com/R3Z5A0N1XvQAAAAC/gojo-satoru-domain-expansion.gif')
+                    .setImage('https://c.tenor.com/R3Z5A0N1XvQAAAAC/gojo-satoru-domain-expansion.gif')
                     .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
             ]
-        }).catch(err => console.error("Mesaj düzenlenemedi:", err));
+        }).catch(() => null);
     }, 10000);
 
     // ⏱️ AŞAMA 4
@@ -491,10 +491,10 @@ if (command === 'gojovssukuna') {
                     .setTitle('🔥 SON TEKNİKLER!')
                     .setDescription('Gojo: **Hollow Purple**\nSukuna: **Cleave & Dismantle**\n\nHer şey bu saldırıya bağlı!')
                     .setColor('#ff00ff')
-                    .setImage('https://media.tenor.com/6XyU6q4p4r8AAAAC/hollow-purple-gojo.gif')
+                    .setImage('https://c.tenor.com/6XyU6q4p4r8AAAAC/hollow-purple-gojo.gif')
                     .setFooter({ text: 'Final yaklaşırken... ⚔️' })
             ]
-        }).catch(err => console.error("Mesaj düzenlenemedi:", err));
+        }).catch(() => null);
     }, 14000);
 
     // ⏱️ FINAL
@@ -505,14 +505,14 @@ if (command === 'gojovssukuna') {
                 renk: '#00D1FF',
                 baslik: '🏆 GOJO KAZANDI!',
                 aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
-                resim: 'https://media.tenor.com/p_L_N0_Wp6YAAAAC/gojo-satoru.gif'
+                resim: 'https://c.tenor.com/p_L_N0_Wp6YAAAAC/gojo-satoru.gif'
             },
             {
                 kazanan: 'Ryomen Sukuna',
                 renk: '#FF0000',
                 baslik: '💀 SUKUNA KAZANDI!',
                 aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
-                resim: 'https://media.tenor.com/L_y-Y-6vV4kAAAAC/sukuna-smile.gif'
+                resim: 'https://c.tenor.com/L_y-Y-6vV4kAAAAC/sukuna-smile.gif'
             }
         ];
 
@@ -531,7 +531,7 @@ if (command === 'gojovssukuna') {
                     })
                     .setTimestamp()
             ]
-        }).catch(err => console.error("Final mesajı düzenlenemedi:", err));
+        }).catch(() => null);
 
     }, 18000);
 }
