@@ -603,17 +603,16 @@ if (command === 'gojovssukuna') {
 if (command === 'patlat') {
     const { EmbedBuilder } = require('discord.js');
 
-    // Rastgele 8 üye seç (botları hariç tutuyoruz)
     const uyeler = message.guild.members.cache
         .filter(m => !m.user.bot)
         .random(8);
 
     let patlayanlar = uyeler.length > 0 
         ? uyeler.map(u => `💥 **${u.user.username}** PATLADI! 🔥`).join('\n')
-        : 'Kimse kalmadı... herkes uçtu gitti! 💨';
+        : 'Herkes çoktan uçtu gitti! 💨';
 
     const embed = new EmbedBuilder()
-        .setColor('#FF0000') // Kırmızı patlama rengi
+        .setColor('#FF0000')
         .setTitle('💥 **SUNUCU VE ÜYELER PATLADI!** 💥')
         .setDescription(
             `**${message.author} sunucuyu infilak ettirdi!**\n\n` +
@@ -622,35 +621,25 @@ if (command === 'patlat') {
             `Üyeler havada uçuşuyor!\n\n` +
             `**Patlayanlar:**\n${patlayanlar}\n\n` +
             `**Tüm sunucu yok oldu!**\n` +
-            `*(Şaka lan şaka 😂 Sunucu hala ayakta, korkmayın)*`
+            `*(Şaka lan şaka 😂 Sunucu hala ayakta)*`
         )
-        .setThumbnail('https://i.imgur.com/9Qe6v0K.gif') // Patlama GIF (isteğe bağlı değiştirebilirsin)
+        .setThumbnail('https://i.imgur.com/9Qe6v0K.gif')
         .setFooter({ 
             text: `Patlatan: ${message.author.username} • Sunucu: ${message.guild.name}`,
             iconURL: message.author.displayAvatarURL({ dynamic: true })
         })
         .setTimestamp();
 
-    // Komutu patlatma hissi versin diye mesajı silip embed atıyoruz
+    // Mesajı silip embed atıyoruz
     await message.delete().catch(() => {});
     
-    // Embed'i gönder
     const patlamaMesaji = await message.channel.send({ embeds: [embed] });
 
-    // Ekstra patlama efekti (biraz gecikmeli mesajlar)
-    setTimeout(() => {
-        message.channel.send('💥 **BOOOOOOM!** 💥').catch(() => {});
-    }, 800);
+    // Ekstra patlama efektleri
+    setTimeout(() => { message.channel.send('💥 **BOOOOOOM!** 💥').catch(() => {}); }, 800);
+    setTimeout(() => { message.channel.send('🔥 **HER ŞEY YANDI!** 🔥').catch(() => {}); }, 1600);
+    setTimeout(() => { message.channel.send('☠️ **SUNUCU BİTTİ...** ☠️ *(yeniden doğuyor)*').catch(() => {}); }, 2500);
 
-    setTimeout(() => {
-        message.channel.send('🔥 **HER ŞEY YANDI!** 🔥').catch(() => {});
-    }, 1600);
-
-    setTimeout(() => {
-        message.channel.send('☠️ **SUNUCU BİTTİ...** ☠️ *(yeniden doğuyor)*').catch(() => {});
-    }, 2500);
-
-    // Patlama mesajına emoji ekleyelim
     patlamaMesaji.react('💥').catch(() => {});
     patlamaMesaji.react('🔥').catch(() => {});
 }
