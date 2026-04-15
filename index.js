@@ -429,80 +429,95 @@ client.on('messageCreate', async message => {
     }
 
 if (command === 'gojovssukuna') {
+    // AŞAMA 1: Giriş
+    const file1 = new AttachmentBuilder('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpwaWF6ZTh3ZmR2ZndndXN3bm53eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/f6P27IQ57JDS906JpY/giphy.gif', { name: 'giris.gif' });
 
     const anaMesaj = await message.reply({
         embeds: [
             new EmbedBuilder()
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
-                .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
+                .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor... Gerçeklik titriyor!')
                 .setColor('#111111')
-                .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpwaWF6ZTh3ZmR2ZndndXN3bm53eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/f6P27IQ57JDS906JpY/giphy.gif') 
-                .setFooter({ text: 'Hazırlık... ⏳' })
-        ]
+                .setImage('attachment://giris.gif')
+                .setFooter({ text: 'Hazırlık yapılıyor... ⏳' })
+        ],
+        files: [file1]
     });
 
-    // ⏱️ AŞAMA 1
+    // ⏱️ AŞAMA 2: Güç Yükselmesi (3 Saniye Sonra)
     setTimeout(async () => {
+        const file2 = new AttachmentBuilder('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXd6eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/1X7Ag7hzpC0rC/giphy.gif', { name: 'guc.gif' });
+        
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
-                    .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
+                    .setDescription('Gojo altı gözü açıyor, Sukuna lanetli enerjisini serbest bırakıyor!\n\n*"Öleceksin, Lanetlerin Kralı."*')
                     .setColor('#00aaff')
-                    .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXd6eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/1X7Ag7hzpC0rC/giphy.gif')
-                    .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
-            ]
+                    .setImage('attachment://guc.gif')
+                    .setFooter({ text: 'Enerji yoğunluğu kritik seviyede! ⚡' })
+            ],
+            files: [file2]
         }).catch(() => null);
-    }, 3000);
+    }, 4000);
 
-    // ⏱️ AŞAMA 2
+    // ⏱️ AŞAMA 3: İlk Çarpışma (7 Saniye Sonra)
     setTimeout(async () => {
+        const file3 = new AttachmentBuilder('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/pWf6v0XbI36W5zXySk/giphy.gif', { name: 'darbe.gif' });
+        
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
                     .setTitle('💥 İLK TEMAS!')
-                    .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
+                    .setDescription('Hızları ses duvarını aşıyor! Şehir binaları kağıt gibi parçalanıyor.\n\nKimse gözünü bile kırpamıyor!')
                     .setColor('#ff5500')
-                    .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/pWf6v0XbI36W5zXySk/giphy.gif')
-                    .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
-            ]
+                    .setImage('attachment://darbe.gif')
+                    .setFooter({ text: 'Şok dalgaları tüm Tokyo\'dan hissediliyor... 💥' })
+            ],
+            files: [file3]
         }).catch(() => null);
-    }, 6000);
+    }, 8000);
 
-    // ⏱️ AŞAMA 3
+    // ⏱️ AŞAMA 4: Alan Genişletme (12 Saniye Sonra)
     setTimeout(async () => {
+        const file4 = new AttachmentBuilder('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3h4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/UGm67jHOnW9iM/giphy.gif', { name: 'alan.gif' });
+        
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
                     .setTitle('🌀 DOMAIN EXPANSION!')
-                    .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
+                    .setDescription('**Infinite Void** 🆚 **Malevolent Shrine**\n\nİki alan birbirini yok etmeye çalışıyor. Mutlak boşluk, mutlak kesişe karşı!')
                     .setColor('#8A2BE2')
-                    .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3h4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/UGm67jHOnW9iM/giphy.gif')
-                    .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
-            ]
+                    .setImage('attachment://alan.gif')
+                    .setFooter({ text: 'Gerçeklik bükülüyor... 🌀' })
+            ],
+            files: [file4]
         }).catch(() => null);
-    }, 10000);
+    }, 13000);
 
-    // ⏱️ FINAL
+    // ⏱️ FINAL AŞAMASI (18 Saniye Sonra)
     setTimeout(async () => {
         const sonuclar = [
             {
                 kazanan: 'Gojo Satoru',
                 renk: '#00D1FF',
                 baslik: '🏆 GOJO KAZANDI!',
-                aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
-                resim: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3h4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/H3fJOI6o0Je67y76Ut/giphy.gif'
+                aciklama: 'Kırmızı ve Mavinin birleşimi... Mor her şeyi sildi!\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
+                resim: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3h4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/H3fJOI6o0Je67y76Ut/giphy.gif',
+                isim: 'gojo_victory.gif'
             },
             {
                 kazanan: 'Ryomen Sukuna',
                 renk: '#FF0000',
                 baslik: '💀 SUKUNA KAZANDI!',
-                aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
-                resim: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/vS7pWAt3F2xInY4R2h/giphy.gif'
+                aciklama: 'Dünyayı kesen saldırı... Gojo Satoru ikiye bölündü.\n\n*"Know your place, enlighten one. You were just another fish on my cutting board."*',
+                resim: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/vS7pWAt3F2xInY4R2h/giphy.gif',
+                isim: 'sukuna_victory.gif'
             }
         ];
 
         const final = sonuclar[Math.floor(Math.random() * sonuclar.length)];
+        const finalFile = new AttachmentBuilder(final.resim, { name: final.isim });
 
         await anaMesaj.edit({
             embeds: [
@@ -510,16 +525,17 @@ if (command === 'gojovssukuna') {
                     .setTitle(final.baslik)
                     .setDescription(final.aciklama)
                     .setColor(final.renk)
-                    .setImage(final.resim)
+                    .setImage(`attachment://${final.isim}`)
                     .setFooter({ 
-                        text: `Savaşı başlatan: ${message.author.username}`, 
+                        text: `Savaşı başlatan: ${message.author.username} | Kazanan Belirlendi!`, 
                         iconURL: message.author.displayAvatarURL() 
                     })
                     .setTimestamp()
-            ]
+            ],
+            files: [finalFile]
         }).catch(() => null);
 
-    }, 14000); // Süreyi biraz kısalttım akıcılık için
+    }, 18000);
 }
     
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
