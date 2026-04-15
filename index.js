@@ -458,7 +458,7 @@ if (command === 'gojovssukuna') {
                         renk: '#00D1FF',
                         baslik: '🏆 ZAFER: GÖKYÜZÜNÜN HAKİMİ GOJO!',
                         aciklama: 'Gojo, imkansızı başardı ve Sukuna\'yı köşeye sıkıştırdı! Altı Göz\'ün gücü galip geldi.\n\n*"Endişelenme, ben en güçlüyüm."*',
-                        resim: 'hhttps://imgur.com/yT3szsG.gif' // Gojo zafer pozu
+                        resim: 'https://imgur.com/yT3szsG.gif' // Gojo zafer pozu
                     },
                     {
                         kazanan: 'Ryomen Sukuna',
