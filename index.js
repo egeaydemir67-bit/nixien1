@@ -123,7 +123,7 @@ client.on('messageCreate', async message => {
             .addFields(
                 { 
                     name: '🎭 Eğlence Komutları', 
-                    value: '```fix\na!aşkölç | a!evlen | a!evlilik```', 
+                    value: '```fix\na!aşkölç | a!evlen | a!kedisev | a!evlilik```', 
                     inline: false 
                 },
                 { 
@@ -323,6 +323,29 @@ client.on('messageCreate', async message => {
         collector.on('end', collected => {
             if (collected.size === 0) teklifMsg.edit({ content: "⏳ Evlilik teklifi zaman aşımına uğradı.", components: [] });
         });
+    }
+
+    // --- EĞLENCE: KEDİ SEV ---
+    if (command === 'kedisev') {
+        try {
+            // Ücretsiz kedi fotoğrafı API'sinden veri çekiyoruz
+            const res = await fetch('https://api.thecatapi.com/v1/images/search');
+            const data = await res.json();
+            const kediUrl = data[0].url;
+
+            const kediEmbed = new EmbedBuilder()
+                .setColor('#f39c12')
+                .setTitle('🐈 Kediciği Çok Sevdin!')
+                .setDescription(`> **${message.author.username}**, bir kediciği başını okşayarak sevdin. O da sana teşekkür etmek için bir fotoğrafını gönderdi!`)
+                .setImage(kediUrl)
+                .setFooter({ text: 'Miyav! ~ Meow!', iconURL: client.user.displayAvatarURL() })
+                .setTimestamp();
+
+            return message.reply({ embeds: [kediEmbed] });
+        } catch (error) {
+            // Eğer internette/API'de sorun çıkarsa yedek mesaj
+            return message.reply("🐈 Kediciği tam sevecektin ki kaçtı! (Fotoğraf yüklenemedi, ama o seni seviyor.)");
+        }
     }
 
     if (command === 'evlilik') {
