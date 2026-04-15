@@ -105,18 +105,54 @@ client.on('messageCreate', async message => {
         return message.author.id === message.guild.ownerId || message.author.id === OWNER_ID || message.member.roles.cache.has(rolID);
     };
 
-    // --- YARDIM ---
+// --- YARDIM ---
     if (command === 'yardım') {
-        const embed = new EmbedBuilder()
-            .setColor('DarkVividPink')
-            .setTitle('🛡️ Profesyonel Bot Altyapısı')
+        const elitEmbed = new EmbedBuilder()
+            .setColor('#2b2d31') // Discord'un koyu temasıyla uyumlu elit bir renk
+            .setAuthor({ 
+                name: `${client.user.username} • Komut Menüsü`, 
+                iconURL: client.user.displayAvatarURL() 
+            })
+            .setThumbnail(message.guild.iconURL({ dynamic: true }))
+            .setDescription(
+                `> 🛡️ **Güvenlik ve eğlence sistemine hoş geldin.**\n` +
+                `> Aşağıdaki kategorilerden botun özelliklerini inceleyebilirsin.\n\n` +
+                `**✨ İstatistikler:**\n` +
+                `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
+            )
             .addFields(
-                { name: '🎉 Eğlence', value: '`!aşkölç @kişi`, `!evlen @kişi`, `!evlilik`' },
-                { name: '🛡️ Moderasyon', value: '`!mute @kişi <süre> <sebep>`, `!vmute @kişi <süre> <sebep>`, `!ban @kişi <sebep>`, `!kick @kişi <sebep>`' },
-                { name: '📋 Sistem', value: '`!sicil @kişi`, `!sil <sayı>`, `!snipe`' }
-            );
-        if (message.author.id === OWNER_ID) embed.addFields({ name: '👑 Sahip', value: '`!ceza-menü`' });
-        return message.reply({ embeds: [embed] });
+                { 
+                    name: '🎭 Eğlence Komutları', 
+                    value: '```fix\n.aşkölç | .evlen | .evlilik```', 
+                    inline: false 
+                },
+                { 
+                    name: '🛡️ Moderasyon Sistemi', 
+                    value: '```yaml\n.mute  [süre] [sebep]\n.vmute [süre] [sebep]\n.ban   [sebep]\n.kick  [sebep]```', 
+                    inline: false 
+                },
+                { 
+                    name: '⚙️ Yönetim & Sistem', 
+                    value: '```diff\n+ .sicil | .sil | .snipe```', 
+                    inline: false 
+                }
+            )
+            .setFooter({ 
+                text: `${message.author.username} tarafından istendi.`, 
+                iconURL: message.author.displayAvatarURL({ dynamic: true }) 
+            })
+            .setTimestamp();
+
+        // Eğer komutu yazan sensen (OWNER), en alta özel bir alan ekle
+        if (message.author.id === OWNER_ID) {
+            elitEmbed.addFields({ 
+                name: '👑 Kurucu Özel', 
+                value: '` .ceza-menü ` (Sadece sana özel panel)', 
+                inline: false 
+            });
+        }
+
+        return message.reply({ embeds: [elitEmbed] });
     }
 
     // --- SİL VE SNIPE ---
