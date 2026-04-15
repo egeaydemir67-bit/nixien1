@@ -5,7 +5,7 @@ const ms = require('ms'); // Süre hesaplamaları için
 const Canvas = require('canvas'); // Resimli aşk ölçer için
 
 // --- 1. ROL VE KULLANICI AYARLARI ---
-const prefix = ".";
+const prefix = "a!";
 const logKanalAdi = "bot-log";
 const OWNER_ID = "983015347105976390"; // Senin ID'n
 
@@ -123,17 +123,17 @@ client.on('messageCreate', async message => {
             .addFields(
                 { 
                     name: '🎭 Eğlence Komutları', 
-                    value: '```fix\n.aşkölç | .evlen | .evlilik```', 
+                    value: '```fix\na!aşkölç | a!evlen | a!evlilik```', 
                     inline: false 
                 },
                 { 
                     name: '🛡️ Moderasyon Sistemi', 
-                    value: '```yaml\n.mute  [süre] [sebep]\n.vmute [süre] [sebep]\n.ban   [sebep]\n.kick  [sebep]```', 
+                    value: '```yaml\na!mute  [süre] [sebep]\na!vmute [süre] [sebep]\na!ban   [sebep]\na!kick  [sebep]```', 
                     inline: false 
                 },
                 { 
                     name: '⚙️ Yönetim & Sistem', 
-                    value: '```diff\n+ .sicil | .sil | .snipe```', 
+                    value: '```diff\n+ a!sicil | a!sil | a!snipe```', 
                     inline: false 
                 }
             )
@@ -146,8 +146,8 @@ client.on('messageCreate', async message => {
         // Eğer komutu yazan sensen (OWNER), en alta özel bir alan ekle
         if (message.author.id === OWNER_ID) {
             elitEmbed.addFields({ 
-                name: '👑 Kurucu Özel', 
-                value: '` .ceza-menü ` (Sadece sana özel panel)', 
+                name: '👑 Bot Developer Özel', 
+                value: '` a!ceza-menü ` (Sadece Aceye özel panel)', 
                 inline: false 
             });
         }
