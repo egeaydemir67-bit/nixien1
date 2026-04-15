@@ -436,7 +436,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('https://tenor.com/view/sukuna-gojo-gojo-vs-sukuna-jujutsu-kaisen-jjk-gif-6903186477285389616.gif') // FIXED
+                .setImage('https://tenor.com/view/sukuna-gojo-gojo-vs-sukuna-jujutsu-kaisen-jjk-gif-6903186477285389616') // FIXED
                 .setFooter({ text: 'Hazırlık... ⏳' })
         ]
     });
@@ -449,7 +449,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
                     .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
                     .setColor('#00aaff')
-                    .setImage('https://tenor.com/view/gojo-vs-sukuna-gif-13008238981497827832.gif')
+                    .setImage('https://tenor.com/view/gojo-vs-sukuna-gif-13008238981497827832')
                     .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
             ]
         });
@@ -463,7 +463,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('💥 İLK TEMAS!')
                     .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
                     .setColor('#ff5500')
-                    .setImage('https://tenor.com/view/gojo-vs-sukuna-scarlet-x1-gif-13006840071755129020.gif')
+                    .setImage('https://tenor.com/view/gojo-vs-sukuna-scarlet-x1-gif-13006840071755129020')
                     .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
             ]
         });
@@ -477,7 +477,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('🌀 DOMAIN EXPANSION!')
                     .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
                     .setColor('#8A2BE2')
-                    .setImage('https://tenor.com/view/gojo-gif-5394791839932995860.gif')
+                    .setImage('https://tenor.com/view/gojo-gif-5394791839932995860')
                     .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
             ]
         });
