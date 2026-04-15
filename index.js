@@ -72,7 +72,7 @@ http.createServer((req, res) => {
     res.end();
 }).listen(process.env.PORT || 3000);
 
-client.on('ready', () => {
+client.on('clientReady', () => {
     console.log(`[BAŞARILI] ${client.user.tag} aktif!`);
     client.user.setActivity('a!yardım | Ace System', { type: 0 });
 });
@@ -434,7 +434,7 @@ if (command === 'gojovssukuna') {
             .setTitle('⚔️ SHINJUKU: ZİRVENİN SAVAŞI BAŞLIYOR!')
             .setDescription('**Gojo Satoru** ve **Ryomen Sukuna** karşı karşıya! Atmosfer gergin, tüm büyü dünyası bu anı izliyor...')
             .setColor('#2F3136')
-            .setImage('https://tenor.com/view/sukuna-gojo-gojo-vs-sukuna-jujutsu-kaisen-jjk-gif-6903186477285389616.gif') // İkonik VS kapak resmi
+            .setImage('https://imgur.com/5PYQMin.gif') // İkonik VS kapak resmi
             .setFooter({ text: 'Savaş hazırlanıyor... ⏳' });
 
         const anaMesaj = await message.reply({ embeds: [baslangicEmbed] });
@@ -445,7 +445,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('💥 ALANLAR ÇARPIŞIYOR!')
                 .setDescription('**Infinite Void** vs **Malevolent Shrine**! İki taraf da sınırlarını zorluyor. Kimse gözünü kırpamıyor!')
                 .setColor('#8A2BE2')
-                .setImage('https://tenor.com/view/sukuna-sukuna-vs-gojo-gojo-gojo-satoru-gojo-domain-expansion-gif-15863208524156955346.gif') // Alan genişletme sahnesi
+                .setImage('https://imgur.com/hHT1suj.gif') // Alan genişletme sahnesi
                 .setFooter({ text: 'Karar anına son saniyeler... ⚡' });
 
             await anaMesaj.edit({ embeds: [aksiyonEmbed] });
@@ -458,14 +458,14 @@ if (command === 'gojovssukuna') {
                         renk: '#00D1FF',
                         baslik: '🏆 ZAFER: GÖKYÜZÜNÜN HAKİMİ GOJO!',
                         aciklama: 'Gojo, imkansızı başardı ve Sukuna\'yı köşeye sıkıştırdı! Altı Göz\'ün gücü galip geldi.\n\n*"Endişelenme, ben en güçlüyüm."*',
-                        resim: 'https://tenor.com/view/satoru-gojo-gif-15821239126738319440.gif' // Gojo zafer pozu
+                        resim: 'hhttps://imgur.com/yT3szsG.gif' // Gojo zafer pozu
                     },
                     {
                         kazanan: 'Ryomen Sukuna',
                         renk: '#FF0000',
                         baslik: '💀 SONUÇ: LANETLERİN KRALI HÜKMEDİYOR!',
                         aciklama: 'Sukuna, tarihin en büyük kesişini yaptı. Gojo Satoru\'nun dönemi burada sona eriyor...\n\n*"Seni asla unutmayacağım, Satoru Gojo."*',
-                        resim: 'https://tenor.com/view/sukuna-sukuna-laugh-sukuna-kills-gojo-sukuna-defeats-gojo-gojo-satoru-gif-14680103525656661336.gif' // Sukuna zafer/Gojo mağlubiyet sahnesi
+                        resim: 'https://imgur.com/hO9pRyq.gif' // Sukuna zafer/Gojo mağlubiyet sahnesi
                     }
                 ];
 
