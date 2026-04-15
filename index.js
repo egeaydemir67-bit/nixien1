@@ -428,56 +428,52 @@ client.on('messageCreate', async message => {
         return message.reply({ embeds: [statEmbed] });
     }
 
-   if (command === 'gojovssukuna') {
+ if (command === 'gojovssukuna') {
         
-        // Savaş senaryoları ve detayları
         const savasSenaryolari = [
             {
                 kazanan: 'Satoru Gojo',
-                renk: '#5b92e5', 
-                baslik: '🤞 Domain Expansion: Infinite Void!',
-                aciklama: '**Gojo**, Sukuna\'yı Sonsuz Hiçlik\'in içine hapsetti! Sukuna\'nın beyni sonsuz bilgi akışından dolayı felç oldu. Gojo işi bitirmek için devasa bir **Hollow Purple** ateşledi ve arenayı yerle bir etti!\n\n*"Endişelenme. Ben en güçlüyüm."*',
-                resim: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q1M2JjZjJlMzg4NjA5MzRkMzZmODMzMjM4MjYyODg3NjJkMzBlZiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/1Zwxk1lZ0I3fI4rBq6/giphy.gif'
+                renk: '#00D1FF', 
+                baslik: '🤞 KAZANAN: GOJO SATORU!',
+                aciklama: 'Gojo, "Hollow Purple" ile tüm alanı toz duman etti! Sukuna\'nın savunması paramparça oldu. \n\n*"Ağlama Sukuna, sadece benden daha zayıftın."*',
+                gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q1M2JjZjJlMzg4NjA5MzRkMzZmODMzMjM4MjYyODg3NjJkMzBlZiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/1Zwxk1lZ0I3fI4rBq6/giphy.gif'
             },
             {
                 kazanan: 'Ryomen Sukuna',
-                renk: '#ff0000', 
-                baslik: '⛩️ Domain Expansion: Malevolent Shrine!',
-                aciklama: '**Sukuna**, Kötülük Tapınağı\'nı açarak Gojo\'nun sonsuzluğunu aşmayı başardı! Aralıksız gelen acımasız *Cleave* ve *Dismantle* saldırılarıyla dünyayı ikiye böldü.\n\n*"Beni büyüledin, Satoru Gojo. Hayatta olduğum sürece seni asla unutmayacağım."*',
-                resim: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjMyOWI0YTYyZDYzMjBlYTNlYTNkZTk3NDJlZDY2YzM2MTE1YzVlYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/4lu5TEcgOaKHzVqlbM/giphy.gif'
+                renk: '#FF0000', 
+                baslik: '⛩️ KAZANAN: RYOMEN SUKUNA!',
+                aciklama: 'Sukuna, dünyayı kesen saldırısıyla (World Slash) Gojo\'yu ikiye böldü! Modern çağın en güçlü büyücüsü yere yığılıyor. \n\n*"Seni asla unutmayacağım, Satoru Gojo."*',
+                gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjMyOWI0YTYyZDYzMjBlYTNlYTNkZTk3NDJlZDY2YzM2MTE1YzVlYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/4lu5TEcgOaKHzVqlbM/giphy.gif'
             },
             {
-                kazanan: 'Berabere',
-                renk: '#800080', 
-                baslik: '💥 Domain Çarpışması!',
-                aciklama: '**Infinite Void** ve **Malevolent Shrine** aynı anda açıldı! İki devasa alanın inanılmaz baskısı birbirini anında nötrledi. İki efsane son gücüyle yumruk yumruğa birbirine girdi ama yenişemediler. Bütün şehir harabeye döndü!\n\n*Lanetlerin ve büyücülerin zirvesindeki iki ismin savaşı dünyayı sarsıyor...*'
+                kazanan: 'Berabere / Kaos',
+                renk: '#8A2BE2', 
+                baslik: '💥 DÜNYA SARSILIYOR: YENİŞEMEDİLER!',
+                aciklama: 'İki taraf da son hamlelerini yaptı! Patlamanın şiddetiyle Shinjuku haritadan silindi. İkisi de ağır yaralı ama hala ayakta, savaşın sonu görünmüyor!',
+                gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcm5kZjZscW5ueXU4Zmx4Z2phN3N6NjhqZ3JyeG5kNXpjeGZ4Z3Y0ZSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/UgV8Y7p0qK7pLDXD29/giphy.gif'
             }
         ];
 
         // Rastgele bir senaryo seç
         const sonuc = savasSenaryolari[Math.floor(Math.random() * savasSenaryolari.length)];
 
-        // Embed mesajını oluştur
+        // Embed oluşturma
         const embed = new EmbedBuilder()
-            .setTitle('⚔️ GOJO VS SUKUNA ⚔️')
-            .setDescription('Kader ağlarını örüyor... Shinjuku hesaplaşması başladı!')
+            .setTitle('⚔️ DESTANSI HESAPLAŞMA ⚔️')
+            .setDescription('Gojo Satoru ve Ryomen Sukuna arasındaki savaşın sonucu belirlendi!')
             .setColor(sonuc.renk)
+            .setThumbnail('https://i.imgur.com/8pY6X0s.png') // Buraya küçük bir vs ikonu koydum
             .addFields(
                 { name: sonuc.baslik, value: sonuc.aciklama },
-                { name: '🏆 Sonuç:', value: `**${sonuc.kazanan}**`, inline: false }
+                { name: '🏆 Maçın Sonucu:', value: `**${sonuc.kazanan}**` }
             )
+            .setImage(sonuc.gif) // GIF burada çıkacak
             .setFooter({ 
-                text: `Savaşı başlatan: ${message.author.username}`, 
+                text: `${message.author.username} savaşı izledi.`, 
                 iconURL: message.author.displayAvatarURL({ dynamic: true }) 
             })
             .setTimestamp();
 
-        // Eğer senaryoda resim varsa ekle
-        if (sonuc.resim) {
-            embed.setImage(sonuc.resim);
-        }
-
-        // Kanala gönder
         message.reply({ embeds: [embed] });
     }
     
