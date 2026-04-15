@@ -429,61 +429,113 @@ client.on('messageCreate', async message => {
     }
 
 if (command === 'gojovssukuna') {
-        // AŞAMA 1: KARŞILAŞMA
-        const baslangicEmbed = new EmbedBuilder()
-            .setTitle('⚔️ SHINJUKU: ZİRVENİN SAVAŞI BAŞLIYOR!')
-            .setDescription('**Gojo Satoru** ve **Ryomen Sukuna** karşı karşıya! Atmosfer gergin, tüm büyü dünyası bu anı izliyor...')
-            .setColor('#2F3136')
-            .setImage('https://images-ext-1.discordapp.net/external/QISlvpXV9AfF618ktdtC1KyLkRSb-KLJqteV1VLlSOM/https/media.tenor.com/X80LhsTgNTAAAAPo/sukuna-gojo.gif') // İkonik VS kapak resmi
-            .setFooter({ text: 'Savaş hazırlanıyor... ⏳' });
 
-        const anaMesaj = await message.reply({ embeds: [baslangicEmbed] });
+    const anaMesaj = await message.reply({
+        embeds: [
+            new EmbedBuilder()
+                .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
+                .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
+                .setColor('#111111')
+                .setImage('https://media.tenor.com/X80LhsTgNTAAAAPo/sukuna-gojo.gif')
+                .setFooter({ text: 'Hazırlık... ⏳' })
+        ]
+    });
 
-        // 4 saniye sonra AŞAMA 2: KRİTİK AN
-        setTimeout(async () => {
-            const aksiyonEmbed = new EmbedBuilder()
-                .setTitle('💥 ALANLAR ÇARPIŞIYOR!')
-                .setDescription('**Infinite Void** vs **Malevolent Shrine**! İki taraf da sınırlarını zorluyor. Kimse gözünü kırpamıyor!')
-                .setColor('#8A2BE2')
-                .setImage('https://imgur.com/hHT1suj.gif') // Alan genişletme sahnesi
-                .setFooter({ text: 'Karar anına son saniyeler... ⚡' });
+    // ⏱️ AŞAMA 1 (3 sn) - Aura yükseliyor
+    setTimeout(async () => {
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle('⚡ GÜÇLER YÜKSELİYOR')
+                    .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
+                    .setColor('#00aaff')
+                    .setImage('https://media.tenor.com/3z4rXy9nF6kAAAAC/gojo-satoru.gif')
+                    .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
+            ]
+        });
+    }, 3000);
 
-            await anaMesaj.edit({ embeds: [aksiyonEmbed] });
+    // ⏱️ AŞAMA 2 (6 sn) - İlk çarpışma
+    setTimeout(async () => {
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle('💥 İLK TEMAS!')
+                    .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
+                    .setColor('#ff5500')
+                    .setImage('https://media.tenor.com/6c8Xn6vX5qgAAAAC/gojo-vs-sukuna.gif')
+                    .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
+            ]
+        });
+    }, 6000);
 
-            // 6 saniye sonra AŞAMA 3: FİNAL (Ölüm/Zafer sahneleri)
-            setTimeout(async () => {
-                const sonuclar = [
-                    {
-                        kazanan: 'Gojo Satoru',
-                        renk: '#00D1FF',
-                        baslik: '🏆 ZAFER: GÖKYÜZÜNÜN HAKİMİ GOJO!',
-                        aciklama: 'Gojo, imkansızı başardı ve Sukuna\'yı köşeye sıkıştırdı! Altı Göz\'ün gücü galip geldi.\n\n*"Endişelenme, ben en güçlüyüm."*',
-                        resim: 'https://imgur.com/yT3szsG.gif' // Gojo zafer pozu
-                    },
-                    {
-                        kazanan: 'Ryomen Sukuna',
-                        renk: '#FF0000',
-                        baslik: '💀 SONUÇ: LANETLERİN KRALI HÜKMEDİYOR!',
-                        aciklama: 'Sukuna, tarihin en büyük kesişini yaptı. Gojo Satoru\'nun dönemi burada sona eriyor...\n\n*"Seni asla unutmayacağım, Satoru Gojo."*',
-                        resim: 'https://imgur.com/hO9pRyq.gif' // Sukuna zafer/Gojo mağlubiyet sahnesi
-                    }
-                ];
+    // ⏱️ AŞAMA 3 (10 sn) - Domain Clash
+    setTimeout(async () => {
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle('🌀 DOMAIN EXPANSION!')
+                    .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
+                    .setColor('#8A2BE2')
+                    .setImage('https://media.tenor.com/0tvbKQK9s2gAAAAC/domain-expansion.gif')
+                    .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
+            ]
+        });
+    }, 10000);
 
-                const final = sonuclar[Math.floor(Math.random() * sonuclar.length)];
+    // ⏱️ AŞAMA 4 (14 sn) - Özel saldırılar
+    setTimeout(async () => {
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle('🔥 SON TEKNİKLER!')
+                    .setDescription('Gojo: **Hollow Purple**\nSukuna: **Cleave & Dismantle**\n\nHer şey bu saldırıya bağlı!')
+                    .setColor('#ff00ff')
+                    .setImage('https://media.tenor.com/jmYx8fK8L6sAAAAC/hollow-purple.gif')
+                    .setFooter({ text: 'Final yaklaşırken... ⚔️' })
+            ]
+        });
+    }, 14000);
 
-                const finalEmbed = new EmbedBuilder()
+    // ⏱️ AŞAMA 5 (18-20 sn) - FINAL
+    setTimeout(async () => {
+
+        const sonuclar = [
+            {
+                kazanan: 'Gojo Satoru',
+                renk: '#00D1FF',
+                baslik: '🏆 GOJO KAZANDI!',
+                aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
+                resim: 'https://media.tenor.com/8n6r9Z0k9XcAAAAC/gojo-win.gif'
+            },
+            {
+                kazanan: 'Ryomen Sukuna',
+                renk: '#FF0000',
+                baslik: '💀 SUKUNA KAZANDI!',
+                aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
+                resim: 'https://media.tenor.com/l3cW7H0kC3AAAAAC/sukuna-smile.gif'
+            }
+        ];
+
+        const final = sonuclar[Math.floor(Math.random() * sonuclar.length)];
+
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
                     .setTitle(final.baslik)
                     .setDescription(final.aciklama)
                     .setColor(final.renk)
                     .setImage(final.resim)
-                    .setFooter({ text: `Savaşı tetikleyen: ${message.author.username}`, iconURL: message.author.displayAvatarURL() })
-                    .setTimestamp();
+                    .setFooter({ 
+                        text: `Savaşı başlatan: ${message.author.username}`, 
+                        iconURL: message.author.displayAvatarURL() 
+                    })
+                    .setTimestamp()
+            ]
+        });
 
-                await anaMesaj.edit({ embeds: [finalEmbed] });
-
-            }, 6000); 
-        }, 4000);
-    }
+    }, 18000);
+}
     
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
     if (command === 'aşkölç') {
