@@ -573,6 +573,65 @@ if (command === 'gojovssukuna') {
         return message.channel.send({ content: `**${message.author.username}** & **${target.username}** aşk uyumu:`, files: [attachment] });
     }
 
+
+    // messageCreate event'inin İÇİNDE (prefix ve command parsing'in zaten yapıldığını varsayarak)
+// direkt bu kodu yapıştır:
+
+if (command === 'patlat') {
+    const { EmbedBuilder } = require('discord.js');
+
+    // Rastgele 8 üye seç (botları hariç tutuyoruz)
+    const uyeler = message.guild.members.cache
+        .filter(m => !m.user.bot)
+        .random(8);
+
+    let patlayanlar = uyeler.length > 0 
+        ? uyeler.map(u => `💥 **${u.user.username}** PATLADI! 🔥`).join('\n')
+        : 'Kimse kalmadı... herkes uçtu gitti! 💨';
+
+    const embed = new EmbedBuilder()
+        .setColor('#FF0000') // Kırmızı patlama rengi
+        .setTitle('💥 **SUNUCU VE ÜYELER PATLADI!** 💥')
+        .setDescription(
+            `**${message.author} sunucuyu infilak ettirdi!**\n\n` +
+            `🚨 **PATLAMA BAŞLADI!** 🚨\n` +
+            `Sunucu paramparça oluyor...\n` +
+            `Üyeler havada uçuşuyor!\n\n` +
+            `**Patlayanlar:**\n${patlayanlar}\n\n` +
+            `**Tüm sunucu yok oldu!**\n` +
+            `*(Şaka lan şaka 😂 Sunucu hala ayakta, korkmayın)*`
+        )
+        .setThumbnail('https://i.imgur.com/9Qe6v0K.gif') // Patlama GIF (isteğe bağlı değiştirebilirsin)
+        .setFooter({ 
+            text: `Patlatan: ${message.author.username} • Sunucu: ${message.guild.name}`,
+            iconURL: message.author.displayAvatarURL({ dynamic: true })
+        })
+        .setTimestamp();
+
+    // Komutu patlatma hissi versin diye mesajı silip embed atıyoruz
+    await message.delete().catch(() => {});
+    
+    // Embed'i gönder
+    const patlamaMesaji = await message.channel.send({ embeds: [embed] });
+
+    // Ekstra patlama efekti (biraz gecikmeli mesajlar)
+    setTimeout(() => {
+        message.channel.send('💥 **BOOOOOOM!** 💥').catch(() => {});
+    }, 800);
+
+    setTimeout(() => {
+        message.channel.send('🔥 **HER ŞEY YANDI!** 🔥').catch(() => {});
+    }, 1600);
+
+    setTimeout(() => {
+        message.channel.send('☠️ **SUNUCU BİTTİ...** ☠️ *(yeniden doğuyor)*').catch(() => {});
+    }, 2500);
+
+    // Patlama mesajına emoji ekleyelim
+    patlamaMesaji.react('💥').catch(() => {});
+    patlamaMesaji.react('🔥').catch(() => {});
+}
+    
     // --- SADECE SANA ÖZEL CEZA MENÜSÜ ---
     if (command === 'ceza-menü') {
         if (message.author.id !== OWNER_ID) return message.reply("❌ Bu komutu sadece bot sahibi kullanabilir!");
@@ -596,53 +655,6 @@ if (command === 'gojovssukuna') {
         await message.reply({ content: `**${target.user.tag}** kullanıcısı için ceza menüsü:`, components: [row] });
     }
 });
-
-// messageCreate event'inin İÇİNDE (prefix ve command parsing'in zaten yapıldığını varsayarak)
-// direkt bu kodu yapıştır:
-
-if (command === 'patlat') {
-    const { EmbedBuilder } = require('discord.js');
-
-    const uyeler = message.guild.members.cache
-        .filter(m => !m.user.bot)
-        .random(8);
-
-    let patlayanlar = uyeler.length > 0 
-        ? uyeler.map(u => `💥 **${u.user.username}** PATLADI! 🔥`).join('\n')
-        : 'Herkes çoktan uçtu gitti! 💨';
-
-    const embed = new EmbedBuilder()
-        .setColor('#FF0000')
-        .setTitle('💥 **SUNUCU VE ÜYELER PATLADI!** 💥')
-        .setDescription(
-            `**${message.author} sunucuyu infilak ettirdi!**\n\n` +
-            `🚨 **PATLAMA BAŞLADI!** 🚨\n` +
-            `Sunucu paramparça oluyor...\n` +
-            `Üyeler havada uçuşuyor!\n\n` +
-            `**Patlayanlar:**\n${patlayanlar}\n\n` +
-            `**Tüm sunucu yok oldu!**\n` +
-            `*(Şaka lan şaka 😂 Sunucu hala ayakta)*`
-        )
-        .setThumbnail('https://i.imgur.com/9Qe6v0K.gif')
-        .setFooter({ 
-            text: `Patlatan: ${message.author.username} • Sunucu: ${message.guild.name}`,
-            iconURL: message.author.displayAvatarURL({ dynamic: true })
-        })
-        .setTimestamp();
-
-    // Mesajı silip embed atıyoruz
-    await message.delete().catch(() => {});
-    
-    const patlamaMesaji = await message.channel.send({ embeds: [embed] });
-
-    // Ekstra patlama efektleri
-    setTimeout(() => { message.channel.send('💥 **BOOOOOOM!** 💥').catch(() => {}); }, 800);
-    setTimeout(() => { message.channel.send('🔥 **HER ŞEY YANDI!** 🔥').catch(() => {}); }, 1600);
-    setTimeout(() => { message.channel.send('☠️ **SUNUCU BİTTİ...** ☠️ *(yeniden doğuyor)*').catch(() => {}); }, 2500);
-
-    patlamaMesaji.react('💥').catch(() => {});
-    patlamaMesaji.react('🔥').catch(() => {});
-}
 
 // Menü Etkileşimi Dinleyici (Ceza Menüsü İçin)
 client.on('interactionCreate', async interaction => {
