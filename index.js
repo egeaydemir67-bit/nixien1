@@ -432,122 +432,48 @@ const { AttachmentBuilder, EmbedBuilder } = require('discord.js');
 const path = require('path');
 
 if (command === 'gojovssukuna') {
-    const resimKlasoru = path.join(__dirname, 'resimler');
 
-    // --- AŞAMA 0: BAŞLANGIÇ ---
-    const file0 = new AttachmentBuilder(path.join(resimKlasoru, 'baslangic.gif'), { name: 'baslangic.gif' });
     const anaMesaj = await message.reply({
         embeds: [
             new EmbedBuilder()
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('attachment://baslangic.gif')
+                // DİKKAT: Linkin sonu .gif ile bitiyor, Tenor sayfası değil!
+                .setImage('https://media.tenor.com/7YV8Q0Zp6m8AAAAC/sukuna-gojo.gif') 
                 .setFooter({ text: 'Hazırlık... ⏳' })
-        ],
-        files: [file0]
+        ]
     });
 
-    // --- AŞAMA 1: GÜÇLER ---
+    // ⏱️ AŞAMA 1 - GÜÇLER
     setTimeout(async () => {
-        const file1 = new AttachmentBuilder(path.join(resimKlasoru, 'guc.gif'), { name: 'guc.gif' });
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
-                    .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
+                    .setDescription('Gojo göz bandını kaldırıyor... Enerji tüm şehri sarıyor!')
                     .setColor('#00aaff')
-                    .setImage('attachment://guc.gif')
+                    .setImage('https://media.tenor.com/V7T6yZl9_8UAAAAC/gojo-vs-sukuna.gif')
                     .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
-            ],
-            files: [file1]
-        }).catch(() => null);
-    }, 3500);
+            ]
+        });
+    }, 3000);
 
-    // --- AŞAMA 2: TEMAS ---
+    // ⏱️ AŞAMA 2 - İLK TEMAS
     setTimeout(async () => {
-        const file2 = new AttachmentBuilder(path.join(resimKlasoru, 'temas.gif'), { name: 'temas.gif' });
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
                     .setTitle('💥 İLK TEMAS!')
-                    .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
+                    .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!')
                     .setColor('#ff5500')
-                    .setImage('attachment://temas.gif')
+                    .setImage('https://media.tenor.com/L-jS_P6C6m8AAAAC/gojo-sukuna-fight.gif')
                     .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
-            ],
-            files: [file2]
-        }).catch(() => null);
-    }, 7000);
+            ]
+        });
+    }, 6000);
 
-    // --- AŞAMA 3: DOMAIN ---
-    setTimeout(async () => {
-        const file3 = new AttachmentBuilder(path.join(resimKlasoru, 'alan.gif'), { name: 'alan.gif' });
-        await anaMesaj.edit({
-            embeds: [
-                new EmbedBuilder()
-                    .setTitle('🌀 DOMAIN EXPANSION!')
-                    .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
-                    .setColor('#8A2BE2')
-                    .setImage('attachment://alan.gif')
-                    .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
-            ],
-            files: [file3]
-        }).catch(() => null);
-    }, 11000);
-
-    // --- AŞAMA 4: SON TEKNİK ---
-    setTimeout(async () => {
-        const file4 = new AttachmentBuilder(path.join(resimKlasoru, 'final_teknik.gif'), { name: 'final_teknik.gif' });
-        await anaMesaj.edit({
-            embeds: [
-                new EmbedBuilder()
-                    .setTitle('🔥 SON TEKNİKLER!')
-                    .setDescription('Gojo: **Hollow Purple**\nSukuna: **Cleave & Dismantle**\n\nHer şey bu saldırıya bağlı!')
-                    .setColor('#ff00ff')
-                    .setImage('attachment://final_teknik.gif')
-                    .setFooter({ text: 'Final yaklaşırken... ⚔️' })
-            ],
-            files: [file4]
-        }).catch(() => null);
-    }, 15000);
-
-    // --- FINAL ---
-    setTimeout(async () => {
-        const sonuclar = [
-            {
-                baslik: '🏆 GOJO KAZANDI!',
-                aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
-                renk: '#00D1FF',
-                dosya: 'gojo_win.gif'
-            },
-            {
-                baslik: '💀 SUKUNA KAZANDI!',
-                aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
-                renk: '#FF0000',
-                dosya: 'sukuna_win.gif'
-            }
-        ];
-
-        const final = sonuclar[Math.floor(Math.random() * sonuclar.length)];
-        const finalFile = new AttachmentBuilder(path.join(resimKlasoru, final.dosya), { name: final.dosya });
-
-        await anaMesaj.edit({
-            embeds: [
-                new EmbedBuilder()
-                    .setTitle(final.baslik)
-                    .setDescription(final.aciklama)
-                    .setColor(final.renk)
-                    .setImage(`attachment://${final.dosya}`)
-                    .setFooter({ 
-                        text: `Savaşı başlatan: ${message.author.username}`, 
-                        iconURL: message.author.displayAvatarURL() 
-                    })
-                    .setTimestamp()
-            ],
-            files: [finalFile]
-        }).catch(() => null);
-    }, 19000);
+    // FINAL KISMINI DA BU MANTIKLA (media.tenor.com...gif) GÜNCELLEYEBİLİRSİN
 }
     
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
