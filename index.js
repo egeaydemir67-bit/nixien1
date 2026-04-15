@@ -434,7 +434,7 @@ if (command === 'gojovssukuna') {
             .setTitle('⚔️ SHINJUKU: ZİRVENİN SAVAŞI BAŞLIYOR!')
             .setDescription('**Gojo Satoru** ve **Ryomen Sukuna** karşı karşıya! Atmosfer gergin, tüm büyü dünyası bu anı izliyor...')
             .setColor('#2F3136')
-            .setImage('https://imgur.com/5PYQMin.gif') // İkonik VS kapak resmi
+            .setImage('https://images-ext-1.discordapp.net/external/QISlvpXV9AfF618ktdtC1KyLkRSb-KLJqteV1VLlSOM/https/media.tenor.com/X80LhsTgNTAAAAPo/sukuna-gojo.gif') // İkonik VS kapak resmi
             .setFooter({ text: 'Savaş hazırlanıyor... ⏳' });
 
         const anaMesaj = await message.reply({ embeds: [baslangicEmbed] });
