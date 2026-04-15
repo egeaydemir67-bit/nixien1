@@ -436,12 +436,12 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('https://images-ext-1.discordapp.net/external/QISlvpXV9AfF618ktdtC1KyLkRSb-KLJqteV1VLlSOM/https/media.tenor.com/X80LhsTgNTAAAAPo/sukuna-gojo.mp4')
+                .setImage('https://i.imgur.com/8nQwK0S.gif') // FIXED
                 .setFooter({ text: 'Hazırlık... ⏳' })
         ]
     });
 
-    // ⏱️ AŞAMA 1 (3 sn) - Aura yükseliyor
+    // ⏱️ AŞAMA 1
     setTimeout(async () => {
         await anaMesaj.edit({
             embeds: [
@@ -449,13 +449,13 @@ if (command === 'gojovssukuna') {
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
                     .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
                     .setColor('#00aaff')
-                    .setImage('https://media.tenor.com/3z4rXy9nF6kAAAAC/gojo-satoru.gif')
+                    .setImage('https://i.imgur.com/3ZQ3Z4v.gif')
                     .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
             ]
         });
     }, 3000);
 
-    // ⏱️ AŞAMA 2 (6 sn) - İlk çarpışma
+    // ⏱️ AŞAMA 2
     setTimeout(async () => {
         await anaMesaj.edit({
             embeds: [
@@ -463,13 +463,13 @@ if (command === 'gojovssukuna') {
                     .setTitle('💥 İLK TEMAS!')
                     .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
                     .setColor('#ff5500')
-                    .setImage('https://media.tenor.com/6c8Xn6vX5qgAAAAC/gojo-vs-sukuna.gif')
+                    .setImage('https://i.imgur.com/JpQZ7YB.gif')
                     .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
             ]
         });
     }, 6000);
 
-    // ⏱️ AŞAMA 3 (10 sn) - Domain Clash
+    // ⏱️ AŞAMA 3
     setTimeout(async () => {
         await anaMesaj.edit({
             embeds: [
@@ -477,13 +477,13 @@ if (command === 'gojovssukuna') {
                     .setTitle('🌀 DOMAIN EXPANSION!')
                     .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
                     .setColor('#8A2BE2')
-                    .setImage('https://media.tenor.com/0tvbKQK9s2gAAAAC/domain-expansion.gif')
+                    .setImage('https://i.imgur.com/W6XKZpR.gif')
                     .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
             ]
         });
     }, 10000);
 
-    // ⏱️ AŞAMA 4 (14 sn) - Özel saldırılar
+    // ⏱️ AŞAMA 4
     setTimeout(async () => {
         await anaMesaj.edit({
             embeds: [
@@ -491,13 +491,13 @@ if (command === 'gojovssukuna') {
                     .setTitle('🔥 SON TEKNİKLER!')
                     .setDescription('Gojo: **Hollow Purple**\nSukuna: **Cleave & Dismantle**\n\nHer şey bu saldırıya bağlı!')
                     .setColor('#ff00ff')
-                    .setImage('https://media.tenor.com/jmYx8fK8L6sAAAAC/hollow-purple.gif')
+                    .setImage('https://i.imgur.com/yhK8G7x.gif')
                     .setFooter({ text: 'Final yaklaşırken... ⚔️' })
             ]
         });
     }, 14000);
 
-    // ⏱️ AŞAMA 5 (18-20 sn) - FINAL
+    // ⏱️ FINAL
     setTimeout(async () => {
 
         const sonuclar = [
@@ -506,14 +506,14 @@ if (command === 'gojovssukuna') {
                 renk: '#00D1FF',
                 baslik: '🏆 GOJO KAZANDI!',
                 aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
-                resim: 'https://media.tenor.com/8n6r9Z0k9XcAAAAC/gojo-win.gif'
+                resim: 'https://i.imgur.com/1XbXQ9D.gif'
             },
             {
                 kazanan: 'Ryomen Sukuna',
                 renk: '#FF0000',
                 baslik: '💀 SUKUNA KAZANDI!',
                 aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
-                resim: 'https://media.tenor.com/l3cW7H0kC3AAAAAC/sukuna-smile.gif'
+                resim: 'https://i.imgur.com/Z6XKZrE.gif'
             }
         ];
 
