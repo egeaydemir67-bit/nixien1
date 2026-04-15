@@ -428,7 +428,7 @@ client.on('messageCreate', async message => {
         return message.reply({ embeds: [statEmbed] });
     }
 
-    if (message.content.toLowerCase() === '.gojovssukuna') {
+   if (command === 'gojovssukuna') {
         
         // Savaş senaryoları ve detayları
         const savasSenaryolari = [
