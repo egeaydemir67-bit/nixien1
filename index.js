@@ -436,7 +436,7 @@ if (command === 'gojovssukuna') {
                 .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
                 .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
                 .setColor('#111111')
-                .setImage('https://i.imgur.com/8nQwK0S.gif') // FIXED
+                .setImage('https://tenor.com/view/sukuna-gojo-gojo-vs-sukuna-jujutsu-kaisen-jjk-gif-6903186477285389616.gif') // FIXED
                 .setFooter({ text: 'Hazırlık... ⏳' })
         ]
     });
@@ -449,7 +449,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('⚡ GÜÇLER YÜKSELİYOR')
                     .setDescription('Gojo göz bandını kaldırıyor... Sukuna sırıtıyor.\n\nEnerji tüm şehri sarıyor!')
                     .setColor('#00aaff')
-                    .setImage('https://i.imgur.com/3ZQ3Z4v.gif')
+                    .setImage('https://tenor.com/view/gojo-vs-sukuna-gif-13008238981497827832.gif')
                     .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
             ]
         });
@@ -463,7 +463,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('💥 İLK TEMAS!')
                     .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!\n\nHiçbiri geri çekilmiyor!')
                     .setColor('#ff5500')
-                    .setImage('https://i.imgur.com/JpQZ7YB.gif')
+                    .setImage('https://tenor.com/view/gojo-vs-sukuna-scarlet-x1-gif-13006840071755129020.gif')
                     .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
             ]
         });
@@ -477,7 +477,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('🌀 DOMAIN EXPANSION!')
                     .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik parçalanıyor...')
                     .setColor('#8A2BE2')
-                    .setImage('https://i.imgur.com/W6XKZpR.gif')
+                    .setImage('https://tenor.com/view/gojo-gif-5394791839932995860.gif')
                     .setFooter({ text: 'Alanlar çarpışıyor... 🌀' })
             ]
         });
@@ -491,7 +491,7 @@ if (command === 'gojovssukuna') {
                     .setTitle('🔥 SON TEKNİKLER!')
                     .setDescription('Gojo: **Hollow Purple**\nSukuna: **Cleave & Dismantle**\n\nHer şey bu saldırıya bağlı!')
                     .setColor('#ff00ff')
-                    .setImage('https://i.imgur.com/yhK8G7x.gif')
+                    .setImage('https://tenor.com/view/gojo-satoru-gif-5693910167950695427.gif')
                     .setFooter({ text: 'Final yaklaşırken... ⚔️' })
             ]
         });
@@ -506,14 +506,14 @@ if (command === 'gojovssukuna') {
                 renk: '#00D1FF',
                 baslik: '🏆 GOJO KAZANDI!',
                 aciklama: '**En güçlü büyücü kazandı.**\n\n*"Throughout Heaven and Earth, I alone am the honored one."*',
-                resim: 'https://i.imgur.com/1XbXQ9D.gif'
+                resim: 'https://tenor.com/view/gojo-satoru-satoru-gojo-gojo-satoru-cursed-energy-gif-15498847897516427329.gif'
             },
             {
                 kazanan: 'Ryomen Sukuna',
                 renk: '#FF0000',
                 baslik: '💀 SUKUNA KAZANDI!',
                 aciklama: '**Lanetlerin kralı hükmünü verdi.**\n\n*"Know your place, human."*',
-                resim: 'https://i.imgur.com/Z6XKZrE.gif'
+                resim: 'https://tenor.com/view/sukuna-sukuna-laugh-sukuna-kills-gojo-sukuna-defeats-gojo-gojo-satoru-gif-14680103525656661336.gif'
             }
         ];
 
