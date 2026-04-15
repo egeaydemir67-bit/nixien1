@@ -432,48 +432,112 @@ const { AttachmentBuilder, EmbedBuilder } = require('discord.js');
 const path = require('path');
 
 if (command === 'gojovssukuna') {
+    // Cache'i kırmak için daha güçlü fix
+    const fix = (url) => `${url}?v=${Date.now()}${Math.floor(Math.random() * 100000)}`;
 
     const anaMesaj = await message.reply({
         embeds: [
             new EmbedBuilder()
-                .setTitle('⚔️ SHINJUKU: SAVAŞ BAŞLIYOR')
-                .setDescription('**Gojo Satoru** vs **Ryomen Sukuna**\n\nİki tanrı karşı karşıya geliyor...')
-                .setColor('#111111')
-                // DİKKAT: Linkin sonu .gif ile bitiyor, Tenor sayfası değil!
-                .setImage('https://media.tenor.com/7YV8Q0Zp6m8AAAAC/sukuna-gojo.gif') 
-                .setFooter({ text: 'Hazırlık... ⏳' })
+                .setTitle('⚔️ SHINJUKU SHOWDOWN')
+                .setDescription('**Gojo Satoru** × **Ryomen Sukuna**\n\nEn güçlü iki varlık karşı karşıya...\nKim kazanacak?')
+                .setColor('#0a0a0a')
+                .setImage(fix('https://media.tenor.com/D_8h82R3hYAAAAAC/sukuna-gojo.gif')) // Başlangıç
+                .setFooter({ text: 'Savaş başlıyor... ⏳' })
         ]
     });
 
-    // ⏱️ AŞAMA 1 - GÜÇLER
+    // AŞAMA 1 - 0s → 4s
     setTimeout(async () => {
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle('⚡ GÜÇLER YÜKSELİYOR')
-                    .setDescription('Gojo göz bandını kaldırıyor... Enerji tüm şehri sarıyor!')
-                    .setColor('#00aaff')
-                    .setImage('https://media.tenor.com/V7T6yZl9_8UAAAAC/gojo-vs-sukuna.gif')
-                    .setFooter({ text: 'Enerji yoğunluğu artıyor... ⚡' })
+                    .setTitle('⚡ GÜÇLER UYANIYOR')
+                    .setDescription('Gojo göz bandını yavaşça indiriyor...\nSukuna ise o meşhur sırıtışıyla bakıyor.\nHava elektrikle dolu!')
+                    .setColor('#00ccff')
+                    .setImage(fix('https://media.tenor.com/O6L60p-Mv-QAAAAC/gojo-vs-sukuna.gif'))
+                    .setFooter({ text: 'Cursed Energy yükseliyor... ⚡' })
             ]
-        });
-    }, 3000);
+        }).catch(() => {});
+    }, 4000);
 
-    // ⏱️ AŞAMA 2 - İLK TEMAS
+    // AŞAMA 2 - 4s → 9s
     setTimeout(async () => {
         await anaMesaj.edit({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle('💥 İLK TEMAS!')
-                    .setDescription('Yumruklar çarpışıyor! Şehir parçalanıyor!')
-                    .setColor('#ff5500')
-                    .setImage('https://media.tenor.com/L-jS_P6C6m8AAAAC/gojo-sukuna-fight.gif')
-                    .setFooter({ text: 'Şok dalgaları yayılıyor... 💥' })
+                    .setTitle('💥 İLK ÇARPIŞMA')
+                    .setDescription('Yumruklar, tekme ve cursed teknikler havada uçuşuyor!\nShinjuku yerle bir oluyor...')
+                    .setColor('#ff3300')
+                    .setImage(fix('https://media.tenor.com/X_F_X_X0k6kAAAAC/gojo-vs-sukuna.gif'))
+                    .setFooter({ text: 'Şok dalgaları her yeri sarsıyor... 💥' })
             ]
-        });
-    }, 6000);
+        }).catch(() => {});
+    }, 9000);
 
-    // FINAL KISMINI DA BU MANTIKLA (media.tenor.com...gif) GÜNCELLEYEBİLİRSİN
+    // AŞAMA 3 - 9s → 14s (Domain Expansion çarpışması)
+    setTimeout(async () => {
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle('🌀 DOMAIN EXPANSION ÇARPIŞMASI')
+                    .setDescription('**Infinite Void** vs **Malevolent Shrine**\n\nGerçeklik ikiye bölünüyor...\nKimin alanı üstün gelecek?')
+                    .setColor('#9933ff')
+                    .setImage(fix('https://media.tenor.com/R3Z5A0N1XvQAAAAC/gojo-satoru-domain-expansion.gif'))
+                    .setFooter({ text: 'Alanlar birbirini yutuyor... 🌀' })
+            ]
+        }).catch(() => {});
+    }, 14000);
+
+    // AŞAMA 4 - 14s → 19s
+    setTimeout(async () => {
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle('🔥 FİNAL TEKNİKLER')
+                    .setDescription('**Gojo:** Hollow Purple\n**Sukuna:** Cleave & Dismantle + World Slash\n\nHer şey bu anda belli olacak!')
+                    .setColor('#cc00ff')
+                    .setImage(fix('https://media.tenor.com/6XyU6q4p4r8AAAAC/hollow-purple-gojo.gif'))
+                    .setFooter({ text: 'Son darbe yaklaşıyor... ⚔️' })
+            ]
+        }).catch(() => {});
+    }, 19000);
+
+    // FINAL - 19s+
+    setTimeout(async () => {
+        const sonuclar = [
+            {
+                kazanan: 'Gojo Satoru',
+                renk: '#00f0ff',
+                baslik: '🏆 GOJO KAZANDI!',
+                aciklama: '**"Throughout Heaven and Earth, I alone am the Honored One."**\n\nSınırsız güç ve Six Eyes üstün geldi.',
+                resim: fix('https://media.tenor.com/p_L_N0_Wp6YAAAAC/gojo-satoru.gif')
+            },
+            {
+                kazanan: 'Ryomen Sukuna',
+                renk: '#ff2222',
+                baslik: '💀 SUKUNA KAZANDI!',
+                aciklama: '**"Know your place, brat."**\n\nLanetlerin Kralı bir kez daha hükmünü verdi.',
+                resim: fix('https://media.tenor.com/L_y-Y-6vV4kAAAAC/sukuna-smile.gif')
+            }
+        ];
+
+        const final = sonuclar[Math.floor(Math.random() * sonuclar.length)];
+
+        await anaMesaj.edit({
+            embeds: [
+                new EmbedBuilder()
+                    .setTitle(final.baslik)
+                    .setDescription(final.aciklama)
+                    .setColor(final.renk)
+                    .setImage(final.resim)
+                    .setFooter({
+                        text: `Savaşı başlatan: ${message.author.username}`,
+                        iconURL: message.author.displayAvatarURL({ dynamic: true })
+                    })
+                    .setTimestamp()
+            ]
+        }).catch(() => {});
+    }, 20500); // Toplam ~20.5 saniye
 }
     
     // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
