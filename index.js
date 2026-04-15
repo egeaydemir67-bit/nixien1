@@ -65,7 +65,7 @@ http.createServer((req, res) => {
 
 client.on('ready', () => {
     console.log(`[BAŞARILI] ${client.user.tag} aktif!`);
-    client.user.setActivity('!yardım | Profesyonel Sistem', { type: 0 });
+    client.user.setActivity('.yardım | Profesyonel Sistem', { type: 0 });
 });
 
 // --- 4. SNIPE VE LOG SİSTEMİ ---
