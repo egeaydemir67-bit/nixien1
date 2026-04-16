@@ -561,7 +561,7 @@ client.on('messageCreate', async message => {
                     .setFooter({ text: 'Şok dalgaları her yeri yıkıyor... 💥' })
             ]
         }).catch(() => {});
-    }, 11000);
+    }, 9000);
 
     // AŞAMA 3 - 9s → 14s (En epik kısım)
     setTimeout(async () => {
@@ -575,7 +575,7 @@ client.on('messageCreate', async message => {
                     .setFooter({ text: 'Alanlar birbirini yok ediyor... 🌀' })
             ]
         }).catch(() => {});
-    }, 21000);
+    }, 14000);
 
     // AŞAMA 4 - 14s → 19s
     setTimeout(async () => {
@@ -589,7 +589,7 @@ client.on('messageCreate', async message => {
                     .setFooter({ text: 'Son darbe geliyor... ⚔️' })
             ]
         }).catch(() => {});
-    }, 30000);
+    }, 20000);
 
     // FINAL - ~20.5 saniye
     setTimeout(async () => {
@@ -626,7 +626,7 @@ client.on('messageCreate', async message => {
                     .setTimestamp()
             ]
         }).catch(() => {});
-    }, 20500);
+    }, 25000);
 }
     
     if (command === 'aşkölç') {
