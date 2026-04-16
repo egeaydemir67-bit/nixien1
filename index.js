@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, Partials, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, AttachmentBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, Partials, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const http = require('http');
 const mongoose = require('mongoose');
 const ms = require('ms');
@@ -682,62 +682,125 @@ client.on('messageCreate', async message => {
         patlamaMesaji.react('🔥').catch(() => {});
     }
     
-    // ====================== CEZA MENÜSÜ ======================
+// ====================== GELİŞMİŞ CEZA MENÜSÜ (FULL PAKET) ======================
     if (command === 'ceza-menü') {
         if (message.author.id !== OWNER_ID) return message.reply("❌ Bu komutu sadece Ace kullanabilir!\n*🛡️ Ace System*");
 
         const target = message.mentions.members.first();
         if (!target) return message.reply("İşlem yapılacak kişiyi etiketle: `a!ceza-menü @kişi`");
 
+        // Kişinin ID'sini customId içine gömüyoruz ki menüden seçince kim olduğunu bilelim
         const row = new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
-                .setCustomId('ceza_select')
+                .setCustomId(`ceza_${target.id}`)
                 .setPlaceholder('Uygulanacak cezayı seçin (Ace System)')
                 .addOptions([
-                    { label: 'Chat Mute (10 Dk)', description: 'Kullanıcıyı 10 dk susturur.', value: 'mute_10m' },
-                    { label: 'Voice Mute (1 Saat)', description: 'Kullanıcıyı 1 saat seste susturur.', value: 'vmute_1h' },
-                    { label: 'Sunucudan At (Kick)', description: 'Kullanıcıyı sunucudan atar.', value: 'kick' },
-                    { label: 'Sunucudan Yasakla (Ban)', description: 'Kullanıcıyı kalıcı banlar.', value: 'ban' },
+                    { label: 'Chat Mute', description: 'Özel süre ve sebep belirterek metin kanallarında sustur.', value: 'mute', emoji: '🤐' },
+                    { label: 'Voice Mute', description: 'Özel süre ve sebep belirterek ses kanallarında sustur.', value: 'vmute', emoji: '🎙️' },
+                    { label: 'Kick (At)', description: 'Sunucudan belirtilen sebeple at.', value: 'kick', emoji: '👢' },
+                    { label: 'Ban (Yasakla)', description: 'Sunucudan kalıcı olarak yasakla.', value: 'ban', emoji: '🔨' },
                 ]),
         );
 
-        await message.reply({ content: `**${target.user.tag}** kullanıcısı için Ace Ceza Menüsü:`, components: [row] });
+        await message.reply({ content: `👑 **${target.user.tag}** kullanıcısı için Ace Gelişmiş Ceza Menüsü:`, components: [row] });
     }
-});
+}); // messageCreate bitişi
 
+// ====================== AÇILIR PENCERE (MODAL) VE MENÜ DİNLEYİCİSİ ======================
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isStringSelectMenu()) return;
+    
+    // 1. AŞAMA: MENÜDEN CEZA SEÇİLDİĞİNDE AÇILIR PENCERE (MODAL) ÇIKARTMA
+    if (interaction.isStringSelectMenu() && interaction.customId.startsWith('ceza_')) {
+        if (interaction.user.id !== OWNER_ID) return interaction.reply({ content: "Buna dokunamazsın! Bu panel sadece Ace'e aittir.", ephemeral: true });
 
-    if (interaction.customId === 'ceza_select') {
-        if (interaction.user.id !== OWNER_ID) return interaction.reply({ content: "Buna dokunamazsın! Bu menü sadece Ace'e aittir.", ephemeral: true });
+        const targetID = interaction.customId.split('_')[1]; // Gömülü ID'yi alıyoruz
+        const islem = interaction.values[0]; // mute, vmute, kick, ban
 
-        const targetMention = interaction.message.content.match(/<@!?(\d+)>/);
-        if (!targetMention) return interaction.reply({ content: "Kullanıcı bulunamadı.", ephemeral: true });
+        // Modal oluşturuyoruz
+        const modal = new ModalBuilder()
+            .setCustomId(`modal_${islem}_${targetID}`)
+            .setTitle(`Ceza Uygula: ${islem.toUpperCase()}`);
+
+        // Sebep Giriş Alanı (Hepsi için ortak)
+        const sebepInput = new TextInputBuilder()
+            .setCustomId('sebep')
+            .setLabel("Ceza Sebebi Nedir?")
+            .setStyle(TextInputStyle.Paragraph)
+            .setPlaceholder("Örn: Sunucu kurallarına uymamak")
+            .setRequired(true);
+
+        // Süre Giriş Alanı (Sadece Mute ve VMute için)
+        const sureInput = new TextInputBuilder()
+            .setCustomId('sure')
+            .setLabel("Süre (Örn: 10m, 1h, 1d)")
+            .setStyle(TextInputStyle.Short)
+            .setPlaceholder("10m (Dakika), 1h (Saat), 1d (Gün)")
+            .setRequired(true);
+
+        const actionRow1 = new ActionRowBuilder().addComponents(sebepInput);
         
-        const target = interaction.guild.members.cache.get(targetMention[1]);
-        if (!target) return interaction.reply({ content: "Kullanıcı sunucuda değil.", ephemeral: true });
+        // Eğer işlem kick veya ban değilse süreyi de ekle
+        if (islem === 'mute' || islem === 'vmute') {
+            const actionRow2 = new ActionRowBuilder().addComponents(sureInput);
+            modal.addComponents(actionRow2, actionRow1); // Önce süre, sonra sebep gözüksün
+        } else {
+            modal.addComponents(actionRow1); // Kick ve Ban'da sadece sebep sorar
+        }
 
-        const islem = interaction.values[0];
+        // Modalı kullanıcıya göster
+        await interaction.showModal(modal);
+    }
+
+    // 2. AŞAMA: KULLANICI PENCEREYİ DOLDURUP GÖNDERDİĞİNDE CEZAYI UYGULAMA
+    if (interaction.isModalSubmit() && interaction.customId.startsWith('modal_')) {
+        const parts = interaction.customId.split('_');
+        const islem = parts[1]; // mute, vmute, vb.
+        const targetID = parts[2]; // hedefin ID'si
+
+        const target = interaction.guild.members.cache.get(targetID);
+        if (!target) return interaction.reply({ content: "Bu kullanıcı artık sunucuda değil kaçmış!", ephemeral: true });
+
+        const sebep = interaction.fields.getTextInputValue('sebep');
+        let sure = "Sınırsız";
+        
+        // Süreyi sadece mute/vmute için al ve doğrula
+        if (islem === 'mute' || islem === 'vmute') {
+            sure = interaction.fields.getTextInputValue('sure');
+            if (!ms(sure)) return interaction.reply({ content: "❌ Geçersiz süre formatı girdin! (Geçerli olanlar: 10m, 1h, 1d)", ephemeral: true });
+        }
 
         try {
-            if (islem === 'mute_10m') {
-                await target.timeout(10 * 60 * 1000, "Sahip Menüsü");
-                await interaction.reply(`✅ ${target.user.tag} 10 dakika susturuldu.\n*🛡️ Ace System*`);
-            } else if (islem === 'vmute_1h') {
-                if(target.voice.channel) await target.voice.setMute(true, "Sahip Menüsü");
-                await interaction.reply(`✅ ${target.user.tag} seste 1 saat susturuldu.\n*🛡️ Ace System*`);
-                setTimeout(() => { if (target.voice.channel) target.voice.setMute(false); }, 3600000);
+            if (islem === 'mute') {
+                await target.timeout(ms(sure), `Ace Panel: ${sebep}`);
+                await new Sicil({ kullaniciID: target.id, yetkiliID: interaction.user.id, islem: 'Chat Mute', sebep: sebep, sure: sure }).save();
+                
+                await interaction.reply(`✅ **${target.user.tag}** adlı kullanıcı metin kanallarında \`${sure}\` boyunca susturuldu.\n📝 Sebep: ${sebep}\n\n🔥 **Ace sikti attı!** 🚀\n*🛡️ Ace System*`);
+                
+            } else if (islem === 'vmute') {
+                if (target.voice.channel) {
+                    await target.voice.setMute(true, `Ace Panel: ${sebep}`);
+                    setTimeout(() => { if (target.voice.channel) target.voice.setMute(false); }, ms(sure));
+                }
+                await new Sicil({ kullaniciID: target.id, yetkiliID: interaction.user.id, islem: 'Voice Mute', sebep: sebep, sure: sure }).save();
+                
+                await interaction.reply(`🎙️ **${target.user.tag}** adlı kullanıcı ses kanallarında \`${sure}\` boyunca susturuldu.\n📝 Sebep: ${sebep}\n\n🔥 **Ace sikti attı!** 🚀\n*🛡️ Ace System*`);
+                
             } else if (islem === 'kick') {
-                await target.kick("Sahip Menüsü");
-                await interaction.reply(`✅ ${target.user.tag} sunucudan atıldı.\n*🛡️ Ace System*`);
+                await target.kick(`Ace Panel: ${sebep}`);
+                await new Sicil({ kullaniciID: target.id, yetkiliID: interaction.user.id, islem: 'Kick', sebep: sebep, sure: '-' }).save();
+                
+                await interaction.reply(`👢 **${target.user.tag}** adlı kullanıcı sunucudan şutlandı.\n📝 Sebep: ${sebep}\n\n🔥 **Ace sikti attı!** 🚀\n*🛡️ Ace System*`);
+                
             } else if (islem === 'ban') {
-                await target.ban({ reason: "Sahip Menüsü" });
-                await interaction.reply(`✅ ${target.user.tag} sunucudan yasaklandı.\n*🛡️ Ace System*`);
+                await target.ban({ reason: `Ace Panel: ${sebep}` });
+                await new Sicil({ kullaniciID: target.id, yetkiliID: interaction.user.id, islem: 'Ban', sebep: sebep, sure: 'Sınırsız' }).save();
+                
+                await interaction.reply(`🔨 **${target.user.tag}** adlı kullanıcının fişi çekildi ve kalıcı banlandı.\n📝 Sebep: ${sebep}\n\n🔥 **Ace sikti attı!** 🚀\n*🛡️ Ace System*`);
             }
         } catch (e) {
-            await interaction.reply({ content: "İşlem başarısız, yetkim yetmiyor olabilir.", ephemeral: true });
+            console.log(e);
+            await interaction.reply({ content: "İşlem başarısız oldu, kullanıcının rolü benim rolümden yüksek olabilir.", ephemeral: true });
         }
     }
 });
-
 client.login(process.env.TOKEN);
