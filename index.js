@@ -1,14 +1,14 @@
 const { Client, GatewayIntentBits, EmbedBuilder, Partials, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, AttachmentBuilder } = require('discord.js');
 const http = require('http');
 const mongoose = require('mongoose');
-const ms = require('ms'); // Süre hesaplamaları için
-const Canvas = require('canvas'); // Resimli aşk ölçer için
+const ms = require('ms');
+const Canvas = require('canvas');
 
 const statSchema = new mongoose.Schema({
     guildID: String,
     userID: String,
     messageCount: { type: Number, default: 0 },
-    voiceTime: { type: Number, default: 0 }, // Milisaniye cinsinden
+    voiceTime: { type: Number, default: 0 },
     lastVoiceJoin: { type: Number, default: 0 }
 });
 const Stats = mongoose.model('Stats', statSchema);
@@ -16,7 +16,7 @@ const Stats = mongoose.model('Stats', statSchema);
 // --- 1. ROL VE KULLANICI AYARLARI ---
 const prefix = "a!";
 const logKanalAdi = "bot-log";
-const OWNER_ID = "983015347105976390"; // Senin ID'n
+const OWNER_ID = "983015347105976390"; 
 
 // Yetki Rolleri
 const PERMS = {
@@ -31,21 +31,20 @@ const PERMS = {
 
 // --- 2. VERİTABANI (MONGODB) MODELLERİ ---
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("[MongoDB] Veritabanı bağlandı!"))
+    .then(() => console.log("[MongoDB] Veritabanı bağlandı! Ace System Aktif!"))
     .catch(err => console.error("[MongoDB] Hata:", err));
 
 // Sicil Şeması
 const sicilSchema = new mongoose.Schema({
     kullaniciID: String,
     yetkiliID: String,
-    islem: String, // Mute, Vmute, Kick, Ban
+    islem: String, // Chat Mute, Voice Mute, Kick, Ban
     sebep: String,
     sure: String,
     tarih: { type: Date, default: Date.now }
 });
 const Sicil = mongoose.model('Sicil', sicilSchema);
 
-// Evlilik Şeması
 const evlilikSchema = new mongoose.Schema({
     kullanici1: String,
     kullanici2: String,
@@ -68,13 +67,13 @@ const client = new Client({
 const snipes = new Map();
 
 http.createServer((req, res) => {
-    res.write("Bot 7/24 Aktif!");
+    res.write("Bot 7/24 Aktif! - Ace System");
     res.end();
 }).listen(process.env.PORT || 3000);
 
 client.on('clientReady', () => {
-    console.log(`[BAŞARILI] ${client.user.tag} aktif!`);
-    client.user.setActivity('a!yardım | Ace System', { type: 0 });
+    console.log(`[BAŞARILI] ${client.user.tag} aktif! (Ace System)`);
+    client.user.setActivity('a!yardım | 🛡️ Ace System', { type: 0 });
 });
 
 // Mesaj Sayar
@@ -92,15 +91,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     const userID = oldState.id || newState.id;
     const guildID = oldState.guild.id;
 
-    // Kanala katıldıysa
     if (!oldState.channelId && newState.channelId) {
-        await Stats.findOneAndUpdate(
-            { guildID, userID },
-            { lastVoiceJoin: Date.now() },
-            { upsert: true }
-        );
+        await Stats.findOneAndUpdate({ guildID, userID }, { lastVoiceJoin: Date.now() }, { upsert: true });
     }
-    // Kanaldan ayrıldıysa
     else if (oldState.channelId && !newState.channelId) {
         const data = await Stats.findOne({ guildID, userID });
         if (data && data.lastVoiceJoin > 0) {
@@ -127,13 +120,15 @@ client.on('messageDelete', async message => {
     const logChannel = message.guild.channels.cache.find(c => c.name === logKanalAdi);
     if (logChannel) {
         const logEmbed = new EmbedBuilder()
-            .setColor('Red')
+            .setColor('#ff3333')
             .setTitle('🗑️ Mesaj Silindi')
             .addFields(
                 { name: 'Kullanıcı', value: `${message.author.tag}`, inline: true },
                 { name: 'Kanal', value: `<#${message.channel.id}>`, inline: true },
                 { name: 'Mesaj', value: message.content || 'İçerik yok (Resim vb.)' }
-            ).setTimestamp();
+            )
+            .setFooter({ text: '🛡️ Ace System Logger', iconURL: client.user.displayAvatarURL() })
+            .setTimestamp();
         logChannel.send({ embeds: [logEmbed] }).catch(() => {});
     }
 });
@@ -145,22 +140,18 @@ client.on('messageCreate', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // Yetki Kontrol Fonksiyonu (Sunucu sahibi veya rol)
     const yetkiVarMi = (rolID) => {
         return message.author.id === message.guild.ownerId || message.author.id === OWNER_ID || message.member.roles.cache.has(rolID);
     };
 
-// --- YARDIM ---
+    // ====================== YARDIM ======================
     if (command === 'yardım') {
         const elitEmbed = new EmbedBuilder()
-            .setColor('#2b2d31') // Discord'un koyu temasıyla uyumlu elit bir renk
-            .setAuthor({ 
-                name: `${client.user.username} • Komut Menüsü`, 
-                iconURL: client.user.displayAvatarURL() 
-            })
+            .setColor('#2b2d31') 
+            .setAuthor({ name: `${client.user.username} • Komut Menüsü`, iconURL: client.user.displayAvatarURL() })
             .setThumbnail(message.guild.iconURL({ dynamic: true }))
             .setDescription(
-                `> 🛡️ **Güvenlik ve eğlence sistemine hoş geldin.**\n` +
+                `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
                 `> Aşağıdaki kategorilerden botun özelliklerini inceleyebilirsin.\n\n` +
                 `**✨ İstatistikler:**\n` +
                 `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
@@ -168,12 +159,12 @@ client.on('messageCreate', async message => {
             .addFields(
                 { 
                     name: '🎭 Üye/Eğlence Komutları', 
-                    value: '```fix\na!aşkölç | a!evlen | a!kedisev | a!stat | a!boşan | a!patlat | a!gojovssukuna | a!evlilik```', 
+                    value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat```', 
                     inline: false 
                 },
                 { 
-                    name: '🛡️ Moderasyon Sistemi', 
-                    value: '```yaml\na!mute  [süre] [sebep]\na!vmute [süre] [sebep]\na!ban   [sebep]\na!kick  [sebep]```', 
+                    name: '🛡️ Moderasyon Sistemi (Gelişmiş)', 
+                    value: '```yaml\na!mute [süre] [sebep]   | a!unmute [@kişi]\na!vmute [süre] [sebep]  | a!unvmute [@kişi]\na!ban [sebep]           | a!unban [ID]\na!kick [sebep]```', 
                     inline: false 
                 },
                 { 
@@ -182,85 +173,90 @@ client.on('messageCreate', async message => {
                     inline: false 
                 }
             )
-            .setFooter({ 
-                text: `${message.author.username} tarafından istendi.`, 
-                iconURL: message.author.displayAvatarURL({ dynamic: true }) 
-            })
+            .setFooter({ text: `🛡️ Ace System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
             .setTimestamp();
 
-        // Eğer komutu yazan sensen (OWNER), en alta özel bir alan ekle
         if (message.author.id === OWNER_ID) {
-            elitEmbed.addFields({ 
-                name: '👑 Bot Developer Özel', 
-                value: '` a!ceza-menü ` (Sadece Aceye özel panel)', 
-                inline: false 
-            });
+            elitEmbed.addFields({ name: '👑 Ace Özel', value: '` a!ceza-menü ` (Sadece sana özel panel)', inline: false });
         }
 
         return message.reply({ embeds: [elitEmbed] });
     }
 
-    // --- SİL VE SNIPE ---
+    // ====================== SİL VE SNIPE ======================
     if (command === 'sil') {
-        if (!yetkiVarMi(PERMS.SIL_SNIPE)) return message.reply("Bu komutu kullanmak için yetkin yok.");
+        if (!yetkiVarMi(PERMS.SIL_SNIPE)) return message.reply("❌ Bu komutu kullanmak için yetkin yok.\n*🛡️ Ace System*");
         const miktar = parseInt(args[0]);
-        if (isNaN(miktar) || miktar < 1 || miktar > 100) return message.reply("1-100 arası sayı gir.");
+        if (isNaN(miktar) || miktar < 1 || miktar > 100) return message.reply("Lütfen 1-100 arası geçerli bir sayı gir.");
         await message.channel.bulkDelete(miktar, true);
-        return message.channel.send(`🧹 ${miktar} mesaj temizlendi.`).then(m => setTimeout(() => m.delete(), 3000));
+        return message.channel.send(`🧹 **${miktar}** mesaj temizlendi!\n*🛡️ Ace System*`).then(m => setTimeout(() => m.delete(), 3000));
     }
 
     if (command === 'snipe') {
-        if (!yetkiVarMi(PERMS.SIL_SNIPE)) return message.reply("Bu komutu kullanmak için yetkin yok.");
+        if (!yetkiVarMi(PERMS.SIL_SNIPE)) return message.reply("❌ Bu komutu kullanmak için yetkin yok.");
         const msg = snipes.get(message.channel.id);
         if (!msg) return message.reply("Burada henüz silinen bir mesaj yok.");
 
         const snipeEmbed = new EmbedBuilder()
             .setAuthor({ name: msg.author.tag, iconURL: msg.author.displayAvatarURL() })
-            .setColor('Random')
-            .setDescription(msg.content || "*Mesaj içeriği yok*")
+            .setColor('#2b2d31')
+            .setDescription(`**Mesaj İçeriği:**\n${msg.content || "*İçerik yok*"}`)
+            .setFooter({ text: '🛡️ Ace System Snipe Arşivi' })
             .setTimestamp(msg.timestamp);
 
         if (msg.image) snipeEmbed.setImage(msg.image);
         return message.reply({ embeds: [snipeEmbed] });
     }
 
-    // --- MODERASYON: MUTE ---
+    // ====================== MODERASYON: MUTE & UNMUTE ======================
     if (command === 'mute') {
-        if (!yetkiVarMi(PERMS.MUTE)) return message.reply("Yetkin yok aslanım.");
+        if (!yetkiVarMi(PERMS.MUTE)) return message.reply("❌ Yetkin yok aslanım.");
         const target = message.mentions.members.first();
         const sure = args[1];
-        const sebep = args.slice(2).join(' ');
+        const sebep = args.slice(2).join(' ') || "Belirtilmedi";
 
-        if (!target) return message.reply("Kimi susturacağız? `!mute @kişi 10m Küfür`");
+        if (!target) return message.reply("Kimi susturacağız? `a!mute @kişi 10m Küfür`");
         if (!sure || !ms(sure)) return message.reply("Geçerli bir süre gir (Örn: 10m, 1h, 1d).");
-        if (!sebep) return message.reply("Lütfen bir sebep belirtin!");
 
         try {
-            await target.timeout(ms(sure), sebep); // Discord'un orijinal TimeOut sistemini kullanır (Daha güvenli)
+            await target.timeout(ms(sure), sebep); 
             await new Sicil({ kullaniciID: target.id, yetkiliID: message.author.id, islem: 'Chat Mute', sebep, sure }).save();
-            return message.reply(`🤐 **${target.user.tag}** adlı kullanıcı **${sure}** boyunca susturuldu. \n📝 Sebep: ${sebep}`);
+            return message.reply(`🤐 **${target.user.tag}** adlı kullanıcı **${sure}** boyunca susturuldu. \n📝 Sebep: ${sebep}\n*🛡️ Ace System*`);
         } catch (e) {
             return message.reply("Kullanıcıyı susturamıyorum, yetkim ondan düşük olabilir.");
         }
     }
 
-    // --- MODERASYON: VMUTE ---
+    if (command === 'unmute') {
+        if (!yetkiVarMi(PERMS.MUTE)) return message.reply("❌ Yetkin yok aslanım.");
+        const target = message.mentions.members.first();
+        if (!target) return message.reply("Kimin susturmasını açacağız? `a!unmute @kişi`");
+
+        try {
+            await target.timeout(null, "Unmute by " + message.author.tag);
+            // Sicilden en son atılan Chat Mute cezasını sil
+            await Sicil.findOneAndDelete({ kullaniciID: target.id, islem: 'Chat Mute' }, { sort: { tarih: -1 } });
+            return message.reply(`✅ **${target.user.tag}** adlı kullanıcının metin susturması kaldırıldı ve sicilinden temizlendi!\n*🛡️ Ace System*`);
+        } catch (e) {
+            return message.reply("İşlem başarısız.");
+        }
+    }
+
+    // ====================== MODERASYON: VMUTE & UNVMUTE ======================
     if (command === 'vmute') {
-        if (!yetkiVarMi(PERMS.VMUTE)) return message.reply("Sesli mute yetkin yok.");
+        if (!yetkiVarMi(PERMS.VMUTE)) return message.reply("❌ Sesli mute yetkin yok.");
         const target = message.mentions.members.first();
         const sure = args[1];
-        const sebep = args.slice(2).join(' ');
+        const sebep = args.slice(2).join(' ') || "Belirtilmedi";
 
-        if (!target) return message.reply("Kimi susturacağız? `!vmute @kişi 10m Trol`");
+        if (!target) return message.reply("Kimi susturacağız? `a!vmute @kişi 10m Trol`");
         if (!sure || !ms(sure)) return message.reply("Geçerli bir süre gir (Örn: 10m, 1h).");
-        if (!sebep) return message.reply("Lütfen bir sebep belirtin!");
 
         if (target.voice.channel) {
             await target.voice.setMute(true, sebep);
             await new Sicil({ kullaniciID: target.id, yetkiliID: message.author.id, islem: 'Voice Mute', sebep, sure }).save();
-            message.reply(`🎙️ **${target.user.tag}** seste **${sure}** boyunca susturuldu.\n📝 Sebep: ${sebep}`);
+            message.reply(`🎙️ **${target.user.tag}** seste **${sure}** boyunca susturuldu.\n📝 Sebep: ${sebep}\n*🛡️ Ace System*`);
             
-            // Süre bitince aç
             setTimeout(() => {
                 if (target.voice.channel) target.voice.setMute(false);
             }, ms(sure));
@@ -269,66 +265,126 @@ client.on('messageCreate', async message => {
         }
     }
 
-    // --- MODERASYON: BAN & KICK ---
-    if (command === 'ban') {
-        if (!yetkiVarMi(PERMS.BAN)) return message.reply("Ban yetkin yok.");
+    if (command === 'unvmute') {
+        if (!yetkiVarMi(PERMS.VMUTE)) return message.reply("❌ Sesli mute yetkin yok.");
         const target = message.mentions.members.first();
-        const sebep = args.slice(1).join(' ');
+        if (!target) return message.reply("Kimin ses susturmasını açacağız? `a!unvmute @kişi`");
+
+        if (target.voice.channel) {
+            await target.voice.setMute(false, "Unvmute by " + message.author.tag);
+        }
+        await Sicil.findOneAndDelete({ kullaniciID: target.id, islem: 'Voice Mute' }, { sort: { tarih: -1 } });
+        return message.reply(`✅ **${target.user.tag}** adlı kullanıcının ses susturması kaldırıldı ve sicilinden temizlendi!\n*🛡️ Ace System*`);
+    }
+
+    // ====================== MODERASYON: BAN & UNBAN & KICK ======================
+    if (command === 'ban') {
+        if (!yetkiVarMi(PERMS.BAN)) return message.reply("❌ Ban yetkin yok.");
+        const target = message.mentions.members.first();
+        const sebep = args.slice(1).join(' ') || "Belirtilmedi";
         
         if (!target) return message.reply("Kimi banlayacağız?");
-        if (!sebep) return message.reply("Lütfen bir sebep belirtin!");
-
+        
         await target.ban({ reason: sebep });
         await new Sicil({ kullaniciID: target.id, yetkiliID: message.author.id, islem: 'Ban', sebep, sure: 'Sınırsız' }).save();
-        return message.reply(`🔨 **${target.user.tag}** sunucudan yasaklandı. Sebep: ${sebep}`);
+        return message.reply(`🔨 **${target.user.tag}** sunucudan yasaklandı. \n📝 Sebep: ${sebep}\n*🛡️ Ace System*`);
+    }
+
+    if (command === 'unban') {
+        if (!yetkiVarMi(PERMS.BAN)) return message.reply("❌ Ban yetkin yok.");
+        const targetID = args[0];
+        
+        if (!targetID) return message.reply("Banını açacağın kişinin ID'sini girmelisin. `a!unban <ID>`");
+
+        try {
+            await message.guild.members.unban(targetID);
+            await Sicil.findOneAndDelete({ kullaniciID: targetID, islem: 'Ban' }, { sort: { tarih: -1 } });
+            return message.reply(`✅ \`${targetID}\` ID'li kullanıcının banı başarıyla açıldı ve sicilinden temizlendi!\n*🛡️ Ace System*`);
+        } catch (err) {
+            return message.reply("Bu ID'ye sahip banlı bir kullanıcı bulamadım veya yetkim yetmiyor.");
+        }
     }
 
     if (command === 'kick') {
-        if (!yetkiVarMi(PERMS.KICK)) return message.reply("Kick yetkin yok.");
+        if (!yetkiVarMi(PERMS.KICK)) return message.reply("❌ Kick yetkin yok.");
         const target = message.mentions.members.first();
-        const sebep = args.slice(1).join(' ');
+        const sebep = args.slice(1).join(' ') || "Belirtilmedi";
         
         if (!target) return message.reply("Kimi atacağız?");
-        if (!sebep) return message.reply("Lütfen bir sebep belirtin!");
 
         await target.kick(sebep);
         await new Sicil({ kullaniciID: target.id, yetkiliID: message.author.id, islem: 'Kick', sebep, sure: '-' }).save();
-        return message.reply(`👢 **${target.user.tag}** sunucudan atıldı. Sebep: ${sebep}`);
+        return message.reply(`👢 **${target.user.tag}** sunucudan atıldı. \n📝 Sebep: ${sebep}\n*🛡️ Ace System*`);
     }
 
-    // --- SİCİL SİSTEMİ ---
+    // ====================== GELİŞMİŞ SİCİL SİSTEMİ ======================
     if (command === 'sicil') {
-        if (!yetkiVarMi(PERMS.SICIL)) return message.reply("Sicil görüntüleme yetkin yok.");
+        if (!yetkiVarMi(PERMS.SICIL)) return message.reply("❌ Sicil görüntüleme yetkin yok.");
         const target = message.mentions.users.first() || message.author;
 
         const data = await Sicil.find({ kullaniciID: target.id }).sort({ tarih: -1 }).limit(10);
-        if (!data || data.length === 0) return message.reply("Bu kullanıcının sicili tertemiz!");
+        const totalCeza = await Sicil.countDocuments({ kullaniciID: target.id });
+
+        if (!data || data.length === 0) {
+            return message.reply({ 
+                embeds: [new EmbedBuilder().setColor('#00ff00').setDescription(`✨ **${target.username}** adlı kullanıcının sicili tertemiz!`).setFooter({ text: '🛡️ Ace System', iconURL: client.user.displayAvatarURL() })]
+            });
+        }
 
         const embed = new EmbedBuilder()
-            .setColor('Blurple')
-            .setTitle(`📂 ${target.username} Adlı Kullanıcının Sicili`)
-            .setDescription("Son 10 ceza kaydı aşağıda listelenmiştir:");
-
-        data.forEach((kayit, index) => {
-            const yetkili = message.guild.members.cache.get(kayit.yetkiliID);
-            const yetkiliAd = yetkili ? yetkili.user.tag : "Bilinmeyen Yetkili";
-            const tarih = new Date(kayit.tarih).toLocaleDateString('tr-TR');
-            embed.addFields({ 
-                name: `${index + 1}. ${kayit.islem}`, 
-                value: `**Sebep:** ${kayit.sebep}\n**Süre:** ${kayit.sure}\n**Yetkili:** ${yetkiliAd}\n**Tarih:** ${tarih}` 
-            });
-        });
+            .setColor('#2b2d31')
+            .setAuthor({ name: `${target.username} Adlı Kullanıcının Sicil Kaydı`, iconURL: target.displayAvatarURL() })
+            .setDescription(`> ⚠️ Kullanıcının veritabanında toplam **${totalCeza}** ceza kaydı bulunuyor. Son 10 kayıt aşağıda listelenmiştir:\n\n` + 
+                data.map((kayit, index) => {
+                    const yetkili = message.guild.members.cache.get(kayit.yetkiliID);
+                    const yetkiliAd = yetkili ? `<@${yetkili.id}>` : "Bilinmeyen Yetkili";
+                    const icon = kayit.islem.includes('Mute') ? '🤐' : kayit.islem === 'Ban' ? '🔨' : '👢';
+                    return `**${index + 1}.** ${icon} **[${kayit.islem}]**\n┕ **Yetkili:** ${yetkiliAd} | **Süre:** \`${kayit.sure}\` | **Tarih:** <t:${Math.floor(new Date(kayit.tarih).getTime() / 1000)}:R>\n┕ **Sebep:** *${kayit.sebep}*`;
+                }).join('\n\n')
+            )
+            .setFooter({ text: '🛡️ Ace System • Modern Moderasyon', iconURL: client.user.displayAvatarURL() })
+            .setTimestamp();
 
         return message.reply({ embeds: [embed] });
     }
 
-    // --- EĞLENCE: EVLENME SİSTEMİ ---
+    // ====================== YENİ EĞLENCE: KAÇ CM, ZAR AT, YAZI TURA ======================
+    if (command === 'kaçcm') {
+        const target = message.mentions.users.first() || message.author;
+        const uzunluk = Math.floor(Math.random() * 35) + 1; // 1 ile 35 arası
+        
+        let yorum = "";
+        if(uzunluk <= 5) yorum = "Büyü de gel aslanım... 🔬";
+        else if(uzunluk <= 10) yorum = "İdare eder kardeşim, sıkma canını. 🤏";
+        else if(uzunluk <= 16) yorum = "Ortalama, ideal. 😎";
+        else if(uzunluk <= 23) yorum = "Oha, maşallah! 😳";
+        else yorum = "Silah taşıma ruhsatı alman lazım usta! 🚀";
+
+        const cmEmbed = new EmbedBuilder()
+            .setColor('Random')
+            .setTitle('📏 Ölçüm Sonucu')
+            .setDescription(`> **${target.username}** adlı kişinin aleti tam olarak **${uzunluk} CM!**\n\n${yorum}`)
+            .setFooter({ text: '🛡️ Ace System • Sadece Eğlence Amaçlıdır', iconURL: client.user.displayAvatarURL() });
+
+        return message.reply({ embeds: [cmEmbed] });
+    }
+
+    if (command === 'zarat') {
+        const zar = Math.floor(Math.random() * 6) + 1;
+        return message.reply(`🎲 Zarları fırlattın ve **${zar}** geldi!\n*🛡️ Ace System*`);
+    }
+
+    if (command === 'yazıtura') {
+        const sonuc = Math.random() < 0.5 ? "Yazı 🪙" : "Tura 🦅";
+        return message.reply(`Havaya bir bozuk para attın...\nVe sonuç: **${sonuc}**\n*🛡️ Ace System*`);
+    }
+
+    // ====================== EĞLENCE (ESKİLER) ======================
     if (command === 'evlen') {
         const target = message.mentions.users.first();
         if (!target) return message.reply("Kiminle evlenmek istiyorsun?");
         if (target.id === message.author.id) return message.reply("Kendi kendinle evlenemezsin!");
 
-        // Zaten evli mi kontrolü
         const evliMi = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
         if (evliMi) return message.reply("Zaten evlisin!");
         const karsiEvliMi = await Evlilik.findOne({ $or: [{ kullanici1: target.id }, { kullanici2: target.id }] });
@@ -351,17 +407,16 @@ client.on('messageCreate', async message => {
             if (i.customId === 'evet_evlen') {
                 await new Evlilik({ kullanici1: message.author.id, kullanici2: target.id }).save();
                 
-                // Evli rolü ver
                 const rol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
                 if (rol) {
-                    message.member.roles.add(rol).catch(()=>console.log("Rol verme hatası"));
+                    message.member.roles.add(rol).catch(()=>{});
                     const targetMember = message.guild.members.cache.get(target.id);
-                    if (targetMember) targetMember.roles.add(rol).catch(()=>console.log("Rol verme hatası"));
+                    if (targetMember) targetMember.roles.add(rol).catch(()=>{});
                 }
 
-                await i.update({ content: `🎉 Tebrikler! **${message.author.username}** ve **${target.username}** artık resmen evli! 💍`, components: [] });
+                await i.update({ content: `🎉 Tebrikler! **${message.author.username}** ve **${target.username}** artık resmen evli! 💍\n*🛡️ Ace System*`, components: [] });
             } else {
-                await i.update({ content: `💔 Ahbeee! **${target.username}**, evlilik teklifini reddetti. Geçmiş olsun...`, components: [] });
+                await i.update({ content: `💔 Ahbeee! **${target.username}**, evlilik teklifini reddetti. Geçmiş olsun...\n*🛡️ Ace System*`, components: [] });
             }
         });
 
@@ -370,71 +425,23 @@ client.on('messageCreate', async message => {
         });
     }
 
-    // --- EĞLENCE: KEDİ SEV ---
-    if (command === 'kedisev') {
-        try {
-            // Ücretsiz kedi fotoğrafı API'sinden veri çekiyoruz
-            const res = await fetch('https://api.thecatapi.com/v1/images/search');
-            const data = await res.json();
-            const kediUrl = data[0].url;
-
-            const kediEmbed = new EmbedBuilder()
-                .setColor('#f39c12')
-                .setTitle('🐈 Kediciği Çok Sevdin!')
-                .setDescription(`> **${message.author.username}**, bir kediciği başını okşayarak sevdin. O da sana teşekkür etmek için bir fotoğrafını gönderdi!`)
-                .setImage(kediUrl)
-                .setFooter({ text: 'Miyav! ~ Meow!', iconURL: client.user.displayAvatarURL() })
-                .setTimestamp();
-
-            return message.reply({ embeds: [kediEmbed] });
-        } catch (error) {
-            // Eğer internette/API'de sorun çıkarsa yedek mesaj
-            return message.reply("🐈 Kediciği tam sevecektin ki kaçtı! (Fotoğraf yüklenemedi, ama o seni seviyor.)");
-        }
-    }
-
-    if (command === 'evlilik') {
-        const kayit = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
-        if (!kayit) return message.reply("Şu an kimseyle evli değilsin.");
-
-        const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
-        const tarih = Math.floor(kayit.tarih.getTime() / 1000); // Discord timestamp formatına çevirme
-        
-        return message.reply(`💍 <@${partnerID}> ile <t:${tarih}:R> evlendin!`);
-    }
-
-        // ====================== BOŞAN KOMUTU ======================
     if (command === 'boşan') {
         const kayit = await Evlilik.findOne({ 
-            $or: [
-                { kullanici1: message.author.id }, 
-                { kullanici2: message.author.id }
-            ] 
+            $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] 
         });
 
-        if (!kayit) {
-            return message.reply("😕 Zaten evli değilsin ki boşanalım?");
-        }
+        if (!kayit) return message.reply("😕 Zaten evli değilsin ki boşanalım?");
 
         const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
         const partner = await message.guild.members.fetch(partnerID).catch(() => null);
 
-        // Onay butonları
         const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId('evet_bosan')
-                .setLabel('Evet, Boşanalım')
-                .setStyle(ButtonStyle.Danger)
-                .setEmoji('💔'),
-            new ButtonBuilder()
-                .setCustomId('hayir_bosan')
-                .setLabel('Hayır, Vazgeçtim')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('❤️')
+            new ButtonBuilder().setCustomId('evet_bosan').setLabel('Evet, Boşanalım').setStyle(ButtonStyle.Danger).setEmoji('💔'),
+            new ButtonBuilder().setCustomId('hayir_bosan').setLabel('Hayır, Vazgeçtim').setStyle(ButtonStyle.Secondary).setEmoji('❤️')
         );
 
         const bosanMsg = await message.reply({
-            content: `💔 **${message.author.username}**, <@${partnerID}> ile boşanmak istediğini söylüyor.\n\nGerçekten boşanmak istiyor musun?`,
+            content: `💔 **${message.author.username}**, <@${partnerID}> ile boşanmak istediğini söylüyor.\nGerçekten boşanmak istiyor musun?`,
             components: [row]
         });
 
@@ -443,42 +450,49 @@ client.on('messageCreate', async message => {
 
         collector.on('collect', async i => {
             if (i.customId === 'evet_bosan') {
-                // Evlilik kaydını sil
                 await Evlilik.deleteOne({ _id: kayit._id });
 
-                // Evli rolünü kaldır
                 const evliRol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
                 if (evliRol) {
-                    // Kendinden rolü kaldır
                     message.member.roles.remove(evliRol).catch(() => {});
-                    
-                    // Partnerden de rolü kaldır
-                    if (partner) {
-                        partner.roles.remove(evliRol).catch(() => {});
-                    }
+                    if (partner) partner.roles.remove(evliRol).catch(() => {});
                 }
 
-                await i.update({
-                    content: `💔 **${message.author.username}** ve <@${partnerID}> resmen boşandı...\n\nUmarım bir gün tekrar bir araya gelirsiniz ❤️`,
-                    components: []
-                });
-
+                await i.update({ content: `💔 **${message.author.username}** ve <@${partnerID}> resmen boşandı...\n*🛡️ Ace System*`, components: [] });
             } else {
-                await i.update({
-                    content: `❤️ Boşanma iptal edildi. Hâlâ evlisin! 💍`,
-                    components: []
-                });
+                await i.update({ content: `❤️ Boşanma iptal edildi. Hâlâ evlisin! 💍\n*🛡️ Ace System*`, components: [] });
             }
         });
 
         collector.on('end', collected => {
-            if (collected.size === 0) {
-                bosanMsg.edit({
-                    content: "⏳ Boşanma talebi zaman aşımına uğradı.",
-                    components: []
-                }).catch(() => {});
-            }
+            if (collected.size === 0) bosanMsg.edit({ content: "⏳ Boşanma talebi zaman aşımına uğradı.", components: [] }).catch(() => {});
         });
+    }
+
+    if (command === 'evlilik') {
+        const kayit = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
+        if (!kayit) return message.reply("Şu an kimseyle evli değilsin.");
+
+        const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
+        const tarih = Math.floor(kayit.tarih.getTime() / 1000); 
+        return message.reply(`💍 <@${partnerID}> ile <t:${tarih}:R> evlendin!\n*🛡️ Ace System*`);
+    }
+
+    if (command === 'kedisev') {
+        try {
+            const res = await fetch('https://api.thecatapi.com/v1/images/search');
+            const data = await res.json();
+            const kediEmbed = new EmbedBuilder()
+                .setColor('#f39c12')
+                .setTitle('🐈 Kediciği Çok Sevdin!')
+                .setDescription(`> **${message.author.username}**, bir kediciği başını okşayarak sevdin!`)
+                .setImage(data[0].url)
+                .setFooter({ text: '🛡️ Ace System • Miyav!', iconURL: client.user.displayAvatarURL() })
+                .setTimestamp();
+            return message.reply({ embeds: [kediEmbed] });
+        } catch (error) {
+            return message.reply("🐈 Kediciği tam sevecektin ki kaçtı! (Fotoğraf yüklenemedi)");
+        }
     }
 
     if (command === 'stat') {
@@ -487,27 +501,26 @@ client.on('messageCreate', async message => {
 
         if (!data) return message.reply("⚠️ Henüz kaydedilmiş bir istatistik bulunamadı.");
 
-        // Süreyi okunabilir formata çevirme (Saat/Dakika)
         const toplamSaniye = Math.floor(data.voiceTime / 1000);
         const saat = Math.floor(toplamSaniye / 3600);
         const dakika = Math.floor((toplamSaniye % 3600) / 60);
 
         const statEmbed = new EmbedBuilder()
-            .setColor('#5865F2')
-            .setAuthor({ name: `${target.username} Kullanıcı İstatistikleri`, iconURL: target.displayAvatarURL({ dynamic: true }) })
+            .setColor('#2b2d31')
+            .setAuthor({ name: `${target.username} İstatistikleri`, iconURL: target.displayAvatarURL({ dynamic: true }) })
             .setThumbnail(target.displayAvatarURL({ dynamic: true, size: 512 }))
             .addFields(
                 { name: '💬 Mesaj İstatistiği', value: `\`\`\`fix\n${data.messageCount} Mesaj\`\`\``, inline: true },
                 { name: '🔊 Ses İstatistiği', value: `\`\`\`fix\n${saat} Saat, ${dakika} Dakika\`\`\``, inline: true }
             )
-            .setFooter({ text: 'Veriler anlık olarak güncellenmektedir.' })
+            .setFooter({ text: '🛡️ Ace System • Veriler anlıktır.', iconURL: client.user.displayAvatarURL() })
             .setTimestamp();
 
         return message.reply({ embeds: [statEmbed] });
     }
 
 
-if (command === 'gojovssukuna') {
+    if (command === 'gojovssukuna') {
     // Daha güçlü cache kırıcı (Giphy için de mükemmel çalışıyor)
     const fix = (url) => `${url}?v=${Date.now()}${Math.random().toString(36).slice(2)}`;
 
@@ -616,7 +629,6 @@ if (command === 'gojovssukuna') {
     }, 20500);
 }
     
-    // --- EĞLENCE: RESİMLİ AŞK ÖLÇER ---
     if (command === 'aşkölç') {
         const target = message.mentions.users.first();
         if (!target) return message.reply("Birisini etiketle!");
@@ -624,21 +636,17 @@ if (command === 'gojovssukuna') {
         const msg = await message.reply("💘 Aşk ölçülüyor... Lütfen bekle.");
         const yuzde = Math.floor(Math.random() * 101);
 
-        // Canvas ayarları
         const canvas = Canvas.createCanvas(700, 250);
         const ctx = canvas.getContext('2d');
 
-        // Arkaplan
-        ctx.fillStyle = '#ffb6c1'; // Açık pembe arka plan
+        ctx.fillStyle = '#ffb6c1'; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Avatarlar
         const avatar1 = await Canvas.loadImage(message.author.displayAvatarURL({ extension: 'png' }));
         const avatar2 = await Canvas.loadImage(target.displayAvatarURL({ extension: 'png' }));
         ctx.drawImage(avatar1, 50, 50, 150, 150);
         ctx.drawImage(avatar2, 500, 50, 150, 150);
 
-        // Kalp veya Kırık Kalp ve Yüzde Çizimi
         ctx.font = '50px sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = "center";
@@ -648,100 +656,61 @@ if (command === 'gojovssukuna') {
 
         const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'askolcer.png' });
         await msg.delete();
-        return message.channel.send({ content: `**${message.author.username}** & **${target.username}** aşk uyumu:`, files: [attachment] });
+        return message.channel.send({ content: `**${message.author.username}** & **${target.username}** aşk uyumu:\n*🛡️ Ace System*`, files: [attachment] });
     }
 
+    if (command === 'patlat') {
+        const uyeler = message.guild.members.cache.filter(m => !m.user.bot).random(8);
+        let patlayanlar = uyeler.length > 0 ? uyeler.map(u => `💥 **${u.user.username}** PATLADI! 🔥`).join('\n') : 'Kimse kalmadı... herkes uçtu gitti! 💨';
 
-    // messageCreate event'inin İÇİNDE (prefix ve command parsing'in zaten yapıldığını varsayarak)
-// direkt bu kodu yapıştır:
+        const embed = new EmbedBuilder()
+            .setColor('#FF0000')
+            .setTitle('💥 **SUNUCU VE ÜYELER PATLADI!** 💥')
+            .setDescription(`**${message.author} sunucuyu infilak ettirdi!**\n\n🚨 **PATLAMA BAŞLADI!** 🚨\nSunucu paramparça oluyor...\nÜyeler havada uçuşuyor!\n\n**Patlayanlar:**\n${patlayanlar}\n\n**Tüm sunucu yok oldu!**\n*(Şaka lan şaka 😂 Sunucu hala ayakta, korkmayın)*`)
+            .setThumbnail('https://i.imgur.com/9Qe6v0K.gif')
+            .setFooter({ text: `🛡️ Ace System • Patlatan: ${message.author.username}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+            .setTimestamp();
 
-if (command === 'patlat') {
-    const { EmbedBuilder } = require('discord.js');
+        await message.delete().catch(() => {});
+        const patlamaMesaji = await message.channel.send({ embeds: [embed] });
 
-    // Rastgele 8 üye seç (botları hariç tutuyoruz)
-    const uyeler = message.guild.members.cache
-        .filter(m => !m.user.bot)
-        .random(8);
+        setTimeout(() => message.channel.send('💥 **BOOOOOOM!** 💥').catch(() => {}), 800);
+        setTimeout(() => message.channel.send('🔥 **HER ŞEY YANDI!** 🔥').catch(() => {}), 1600);
+        setTimeout(() => message.channel.send('☠️ **SUNUCU BİTTİ...** ☠️ *(yeniden doğuyor)*\n*🛡️ Ace System*').catch(() => {}), 2500);
 
-    let patlayanlar = uyeler.length > 0 
-        ? uyeler.map(u => `💥 **${u.user.username}** PATLADI! 🔥`).join('\n')
-        : 'Kimse kalmadı... herkes uçtu gitti! 💨';
-
-    const embed = new EmbedBuilder()
-        .setColor('#FF0000') // Kırmızı patlama rengi
-        .setTitle('💥 **SUNUCU VE ÜYELER PATLADI!** 💥')
-        .setDescription(
-            `**${message.author} sunucuyu infilak ettirdi!**\n\n` +
-            `🚨 **PATLAMA BAŞLADI!** 🚨\n` +
-            `Sunucu paramparça oluyor...\n` +
-            `Üyeler havada uçuşuyor!\n\n` +
-            `**Patlayanlar:**\n${patlayanlar}\n\n` +
-            `**Tüm sunucu yok oldu!**\n` +
-            `*(Şaka lan şaka 😂 Sunucu hala ayakta, korkmayın)*`
-        )
-        .setThumbnail('https://i.imgur.com/9Qe6v0K.gif') // Patlama GIF (isteğe bağlı değiştirebilirsin)
-        .setFooter({ 
-            text: `Patlatan: ${message.author.username} • Sunucu: ${message.guild.name}`,
-            iconURL: message.author.displayAvatarURL({ dynamic: true })
-        })
-        .setTimestamp();
-
-    // Komutu patlatma hissi versin diye mesajı silip embed atıyoruz
-    await message.delete().catch(() => {});
+        patlamaMesaji.react('💥').catch(() => {});
+        patlamaMesaji.react('🔥').catch(() => {});
+    }
     
-    // Embed'i gönder
-    const patlamaMesaji = await message.channel.send({ embeds: [embed] });
-
-    // Ekstra patlama efekti (biraz gecikmeli mesajlar)
-    setTimeout(() => {
-        message.channel.send('💥 **BOOOOOOM!** 💥').catch(() => {});
-    }, 800);
-
-    setTimeout(() => {
-        message.channel.send('🔥 **HER ŞEY YANDI!** 🔥').catch(() => {});
-    }, 1600);
-
-    setTimeout(() => {
-        message.channel.send('☠️ **SUNUCU BİTTİ...** ☠️ *(yeniden doğuyor)*').catch(() => {});
-    }, 2500);
-
-    // Patlama mesajına emoji ekleyelim
-    patlamaMesaji.react('💥').catch(() => {});
-    patlamaMesaji.react('🔥').catch(() => {});
-}
-    
-    // --- SADECE SANA ÖZEL CEZA MENÜSÜ ---
+    // ====================== CEZA MENÜSÜ ======================
     if (command === 'ceza-menü') {
-        if (message.author.id !== OWNER_ID) return message.reply("❌ Bu komutu sadece bot sahibi kullanabilir!");
+        if (message.author.id !== OWNER_ID) return message.reply("❌ Bu komutu sadece Ace kullanabilir!\n*🛡️ Ace System*");
 
         const target = message.mentions.members.first();
-        if (!target) return message.reply("İşlem yapılacak kişiyi etiketle: `!ceza-menü @kişi`");
+        if (!target) return message.reply("İşlem yapılacak kişiyi etiketle: `a!ceza-menü @kişi`");
 
-        const row = new ActionRowBuilder()
-            .addComponents(
-                new StringSelectMenuBuilder()
-                    .setCustomId('ceza_select')
-                    .setPlaceholder('Uygulanacak cezayı seçin')
-                    .addOptions([
-                        { label: 'Chat Mute (10 Dk)', description: 'Kullanıcıyı 10 dk susturur.', value: 'mute_10m' },
-                        { label: 'Voice Mute (1 Saat)', description: 'Kullanıcıyı 1 saat seste susturur.', value: 'vmute_1h' },
-                        { label: 'Sunucudan At (Kick)', description: 'Kullanıcıyı sunucudan atar.', value: 'kick' },
-                        { label: 'Sunucudan Yasakla (Ban)', description: 'Kullanıcıyı kalıcı banlar.', value: 'ban' },
-                    ]),
-            );
+        const row = new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('ceza_select')
+                .setPlaceholder('Uygulanacak cezayı seçin (Ace System)')
+                .addOptions([
+                    { label: 'Chat Mute (10 Dk)', description: 'Kullanıcıyı 10 dk susturur.', value: 'mute_10m' },
+                    { label: 'Voice Mute (1 Saat)', description: 'Kullanıcıyı 1 saat seste susturur.', value: 'vmute_1h' },
+                    { label: 'Sunucudan At (Kick)', description: 'Kullanıcıyı sunucudan atar.', value: 'kick' },
+                    { label: 'Sunucudan Yasakla (Ban)', description: 'Kullanıcıyı kalıcı banlar.', value: 'ban' },
+                ]),
+        );
 
-        await message.reply({ content: `**${target.user.tag}** kullanıcısı için ceza menüsü:`, components: [row] });
+        await message.reply({ content: `**${target.user.tag}** kullanıcısı için Ace Ceza Menüsü:`, components: [row] });
     }
 });
 
-// Menü Etkileşimi Dinleyici (Ceza Menüsü İçin)
 client.on('interactionCreate', async interaction => {
     if (!interaction.isStringSelectMenu()) return;
 
     if (interaction.customId === 'ceza_select') {
-        if (interaction.user.id !== OWNER_ID) return interaction.reply({ content: "Buna dokunamazsın!", ephemeral: true });
+        if (interaction.user.id !== OWNER_ID) return interaction.reply({ content: "Buna dokunamazsın! Bu menü sadece Ace'e aittir.", ephemeral: true });
 
-        // Etiketlenen kişiyi mesajdan bulmak için ufak bir hile (mesaj içeriğinden çeker)
         const targetMention = interaction.message.content.match(/<@!?(\d+)>/);
         if (!targetMention) return interaction.reply({ content: "Kullanıcı bulunamadı.", ephemeral: true });
         
@@ -753,17 +722,17 @@ client.on('interactionCreate', async interaction => {
         try {
             if (islem === 'mute_10m') {
                 await target.timeout(10 * 60 * 1000, "Sahip Menüsü");
-                await interaction.reply(`✅ ${target.user.tag} 10 dakika susturuldu.`);
+                await interaction.reply(`✅ ${target.user.tag} 10 dakika susturuldu.\n*🛡️ Ace System*`);
             } else if (islem === 'vmute_1h') {
                 if(target.voice.channel) await target.voice.setMute(true, "Sahip Menüsü");
-                await interaction.reply(`✅ ${target.user.tag} seste 1 saat susturuldu.`);
+                await interaction.reply(`✅ ${target.user.tag} seste 1 saat susturuldu.\n*🛡️ Ace System*`);
                 setTimeout(() => { if (target.voice.channel) target.voice.setMute(false); }, 3600000);
             } else if (islem === 'kick') {
                 await target.kick("Sahip Menüsü");
-                await interaction.reply(`✅ ${target.user.tag} sunucudan atıldı.`);
+                await interaction.reply(`✅ ${target.user.tag} sunucudan atıldı.\n*🛡️ Ace System*`);
             } else if (islem === 'ban') {
                 await target.ban({ reason: "Sahip Menüsü" });
-                await interaction.reply(`✅ ${target.user.tag} sunucudan yasaklandı.`);
+                await interaction.reply(`✅ ${target.user.tag} sunucudan yasaklandı.\n*🛡️ Ace System*`);
             }
         } catch (e) {
             await interaction.reply({ content: "İşlem başarısız, yetkim yetmiyor olabilir.", ephemeral: true });
@@ -771,5 +740,4 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// 6. Bot Girişi
 client.login(process.env.TOKEN);
