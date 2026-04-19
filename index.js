@@ -159,7 +159,7 @@ client.on('messageCreate', async message => {
             .addFields(
                 { 
                     name: '🎭 Üye/Eğlence Komutları', 
-                    value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat```', 
+                    value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat | a!leaderstat```', 
                     inline: false 
                 },
                 { 
@@ -518,6 +518,43 @@ client.on('messageCreate', async message => {
 
         return message.reply({ embeds: [statEmbed] });
     }
+
+    if (command === 'leaderstat') {
+    // Veritabanından tüm verileri çek ve büyükten küçüğe sırala
+    const allData = await Stats.find({ guildID: message.guild.id });
+
+    if (!allData || allData.length === 0) 
+        return message.reply("⚠️ Henüz sıralama oluşturacak veri bulunamadı.");
+
+    // Mesaj ve Ses için ayrı listeler oluşturup sıralayalım (Top 15)
+    const msgTop = [...allData].sort((a, b) => b.messageCount - a.messageCount).slice(0, 15);
+    const voiceTop = [...allData].sort((a, b) => b.voiceTime - a.voiceTime).slice(0, 15);
+
+    // Mesaj Sıralamasını Formatla
+    const msgList = msgTop.map((data, index) => {
+        return `**${index + 1}.** <@${data.userID}>: \`${data.messageCount} Mesaj\``;
+    }).join('\n');
+
+    // Ses Sıralamasını Formatla
+    const voiceList = voiceTop.map((data, index) => {
+        const toplamSaniye = Math.floor(data.voiceTime / 1000);
+        const saat = Math.floor(toplamSaniye / 3600);
+        const dakika = Math.floor((toplamSaniye % 3600) / 60);
+        return `**${index + 1}.** <@${data.userID}>: \`${saat}s ${dakika}dk\``;
+    }).join('\n');
+
+    const leaderboardEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle(`🏆 ${message.guild.name} Sunucu Sıralaması`)
+        .addFields(
+            { name: '💬 Mesaj Liderleri (Top 15)', value: msgList || 'Veri yok.', inline: true },
+            { name: '🔊 Ses Liderleri (Top 15)', value: voiceList || 'Veri yok.', inline: true }
+        )
+        .setFooter({ text: '🛡️ Ace System • Genel Sıralama', iconURL: client.user.displayAvatarURL() })
+        .setTimestamp();
+
+    return message.reply({ embeds: [leaderboardEmbed] });
+}
 
 
     if (command === 'gojovssukuna') {
