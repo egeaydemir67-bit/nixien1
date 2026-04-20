@@ -720,9 +720,6 @@ if (command === 'domainclose') {
             SendMessages: null
         });
 
-        // 2. KANAL ADINI ESKİ HALİNE GETİR (Yeni Eklendi)
-        await message.channel.setName('💬•genel-sohbet'); // Buraya sunucundaki orijinal oda adını yaz kanka
-        await message.channel.setTopic('Gerçekliğe hoş geldiniz.');
 
         // Alanı kapattığımıza dair aydınlık Embed mesajı
         const embed = {
