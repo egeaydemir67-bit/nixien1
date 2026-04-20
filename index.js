@@ -3,6 +3,7 @@ const http = require('http');
 const mongoose = require('mongoose');
 const ms = require('ms');
 const Canvas = require('canvas');
+let sonsuzlukAktif = false;
 
 const statSchema = new mongoose.Schema({
     guildID: String,
@@ -736,6 +737,57 @@ if (command === 'domainclose') {
         console.error(error);
         message.reply('Alan kapatılırken bir hata oluştu.');
     }
+}
+
+    // --- HOLLOW PURPLE (MESAJ SİLME) ---
+if (command === 'hollowpurple') {
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Bu yıkım gücü için gereken 'Altı Göz' sende yok.");
+    }
+
+    try {
+        // Son 100 mesajı siler
+        await message.channel.bulkDelete(100, true);
+
+        const embed = {
+            color: 0x800080, // Mor renk
+            title: '🟣 虚式 「茈」 (KYOSHIKI: MURASAKİ)',
+            description: '***"ACE her şeyi sıfırladı. Ortada ne bir lanet ne de bir mesaj kaldı."***',
+            image: {
+                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG54N3p6am56am56am56am56am56am56am56am56am/D99nZ1S3J7Y9vXU2i/giphy.gif'
+            }
+        };
+
+        await message.channel.send({ embeds: [embed] });
+    } catch (error) {
+        console.error(error);
+        message.reply('Hollow Purple kontrol edilemedi! (Mesajlar 14 günden eski olabilir veya yetkim yok).');
+    }
+}
+
+    // --- SONSUZLUK AÇ/KAPAT KOMUTU ---
+if (command === 'sonsuzluk') {
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Sonsuzluğu bükemezsin.");
+    }
+
+    sonsuzlukAktif = !sonsuzlukAktif; // Aktifse kapatır, kapalıysa açar.
+
+    const durum = sonsuzlukAktif ? "AKTİF" : "DEAKTİF";
+    const renk = sonsuzlukAktif ? 0x00AEFF : 0xFF0000;
+
+    const embed = {
+        color: renk,
+        title: `🛡️ Sonsuzluk Katmanı: ${durum}`,
+        description: sonsuzlukAktif 
+            ? "ACE ile arandaki mesafe şu andan itibaren sonsuzdur. Kimse dokunamaz." 
+            : "Sonsuzluk katmanı kaldırıldı. Gerçek dünya ile temas mümkün.",
+        image: {
+            url: 'https://media.giphy.com/media/10yXFkBJ0MwRJA/giphy.gif'
+        }
+    };
+
+    message.channel.send({ embeds: [embed] });
 }
     
     if (command === 'aşkölç') {
