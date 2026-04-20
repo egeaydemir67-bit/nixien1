@@ -145,7 +145,7 @@ client.on('messageCreate', async message => {
             title: '🤞 Dokunulmazlık!',
             description: `**"${message.author.username}, Ace'e ulaşmaya çalışıyorsun ama aranızda sonsuzluk var. Boşuna çabalama."**`,
             image: {
-                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG54N3p6am56am56am56am56am56am56am56am56am/S6Ssh8vlsG5O0/giphy.gif'
+                url: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZGM3ZTh1eTI5dnMxMG5henpxMnA1cnI5bTV3cnRteDh4ank2amliZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jjGbTjAq9TSUmP0rkG/giphy.gif'
             }
         };
         return message.reply({ embeds: [embed] });
@@ -162,43 +162,48 @@ client.on('messageCreate', async message => {
     };
 
     // ====================== YARDIM ======================
-    if (command === 'yardım') {
-        const elitEmbed = new EmbedBuilder()
-            .setColor('#2b2d31') 
-            .setAuthor({ name: `${client.user.username} • Komut Menüsü`, iconURL: client.user.displayAvatarURL() })
-            .setThumbnail(message.guild.iconURL({ dynamic: true }))
-            .setDescription(
-                `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
-                `> Aşağıdaki kategorilerden botun özelliklerini inceleyebilirsin.\n\n` +
-                `**✨ İstatistikler:**\n` +
-                `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
-            )
-            .addFields(
-                { 
-                    name: '🎭 Üye/Eğlence Komutları', 
-                    value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat | a!leaderstat```', 
-                    inline: false 
-                },
-                { 
-                    name: '🛡️ Moderasyon Sistemi (Gelişmiş)', 
-                    value: '```yaml\na!mute [süre] [sebep]   | a!unmute [@kişi]\na!vmute [süre] [sebep]  | a!unvmute [@kişi]\na!ban [sebep]           | a!unban [ID]\na!kick [sebep]```', 
-                    inline: false 
-                },
-                { 
-                    name: '⚙️ Yönetim & Sistem', 
-                    value: '```diff\n+ a!sicil | a!sil | a!snipe```', 
-                    inline: false 
-                }
-            )
-            .setFooter({ text: `🛡️ Ace System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
-            .setTimestamp();
+   if (command === 'yardım') {
+    const elitEmbed = new EmbedBuilder()
+        .setColor('#2b2d31') 
+        .setAuthor({ name: `${client.user.username} • Komut Menüsü`, iconURL: client.user.displayAvatarURL() })
+        .setThumbnail(message.guild.iconURL({ dynamic: true }))
+        .setDescription(
+            `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
+            `> Aşağıdaki kategorilerden botun özelliklerini inceleyebilirsin.\n\n` +
+            `**✨ İstatistikler:**\n` +
+            `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
+        )
+        .addFields(
+            { 
+                name: '🎭 Üye/Eğlence Komutları', 
+                value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat | a!leaderstat```', 
+                inline: false 
+            },
+            { 
+                name: '🛡️ Moderasyon Sistemi (Gelişmiş)', 
+                value: '```yaml\na!mute [süre] [sebep]   | a!unmute [@kişi]\na!vmute [süre] [sebep]  | a!unvmute [@kişi]\na!ban [sebep]           | a!unban [ID]\na!kick [sebep]```', 
+                inline: false 
+            },
+            { 
+                name: '⚙️ Yönetim & Sistem', 
+                value: '```diff\n+ a!sicil | a!sil | a!snipe```', 
+                inline: false 
+            }
+        )
+        .setFooter({ text: `🛡️ Ace System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+        .setTimestamp();
 
-        if (message.author.id === OWNER_ID) {
-            elitEmbed.addFields({ name: '👑 Ace Özel', value: '` a!ceza-menü ` (Sadece sana özel panel)', inline: false });
-        }
-
-        return message.reply({ embeds: [elitEmbed] });
+    // SADECE SENİN GÖREBİLECEĞİN ÖZEL ALAN (GÜNCELLENDİ)
+    if (message.author.id === '983015347105976390' || message.author.id === OWNER_ID) {
+        elitEmbed.addFields({ 
+            name: '👑 Ace Özel', 
+            value: '`a!hollowpurple` | `a!sonsuzluk` | `a!domainexpansion` | `a!domainclose` | `a!ceza-menü`', 
+            inline: false 
+        });
     }
+
+    return message.reply({ embeds: [elitEmbed] });
+}
 
     // ====================== SİL VE SNIPE ======================
     if (command === 'sil') {
@@ -770,7 +775,7 @@ if (command === 'hollowpurple') {
             title: '🟣 虚式 「茈」 (KYOSHIKI: MURASAKİ)',
             description: '***"ACE her şeyi sıfırladı. Ortada ne bir lanet ne de bir mesaj kaldı."***',
             image: {
-                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG54N3p6am56am56am56am56am56am56am56am56am/D99nZ1S3J7Y9vXU2i/giphy.gif'
+                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb25jM3VwcTBhMjJ6dXRyZmdudWdmMXd2ZzdvZjJrOGEyenpzZnVyaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MxfS5KAoviW8SbUhV9/giphy.gif'
             }
         };
 
@@ -799,7 +804,7 @@ if (command === 'sonsuzluk') {
             ? "ACE ile arandaki mesafe şu andan itibaren sonsuzdur. Kimse dokunamaz." 
             : "Sonsuzluk katmanı kaldırıldı. Gerçek dünya ile temas mümkün.",
         image: {
-            url: 'https://media.giphy.com/media/10yXFkBJ0MwRJA/giphy.gif'
+            url: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NzBneHh1ZXUxNzNyczEybWoydnZ3OXMyZGRnd3BpeWZsNWczbjQzayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LHy9iUZDBxjEwNexJm/giphy.gif'
         }
     };
 
