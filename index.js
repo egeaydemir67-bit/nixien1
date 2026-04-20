@@ -665,6 +665,73 @@ client.on('messageCreate', async message => {
         }).catch(() => {});
     }, 30000);
 }
+
+
+    // --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
+if (command === 'domainexpansion') {
+    // Sadece senin ID'ne özel kontrol
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Sadece ACE bu alanı genişletebilir! Senin lanet enerjin buna yetmez.");
+    }
+
+    const roleId = '1489798026368254122';
+    const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif';
+
+    try {
+        // Belirtilen rolün mesaj gönderme yetkisini (false) kapatıyoruz
+        await message.channel.permissionOverwrites.edit(roleId, {
+            SendMessages: false
+        });
+
+        // Gösterişli ve korkutucu Embed mesajı
+        const embed = {
+            color: 0x000000, // Simsiyah karanlık tema
+            title: '🤞 領域展開 (RYŌIKI TENKAI)',
+            description: '**"ACE TARAFINDAN ALAN GENİŞLETME (SONSUZLUK) BOŞLUĞUNA ATILDINIZ."**\n\n*Burada kelimeler anlamsız, zaman durdu. Sadece benim kurallarım geçerli.*',
+            image: {
+                url: gifUrl
+            }
+        };
+
+        await message.channel.send({ embeds: [embed] });
+    } catch (error) {
+        console.error(error);
+        message.reply('Alan genişletilirken bir hata oldu, botun yetkisi yetmiyor olabilir.');
+    }
+}
+
+// --- DOMAIN CLOSE (ALANI KAPATMA) ---
+if (command === 'domainclose') {
+    // Sadece senin ID'ne özel kontrol
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Alan zaten sana ait değil, kapatamazsın!");
+    }
+
+    const roleId = '1489798026368254122';
+    const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGE5dGs5eHZkNHFwZm40M2xjdGQzNzBuYzkzMDhwYWZ5N2Mxb2V2bSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/HARTNiFs9XM7DqfUtc/giphy.gif';
+
+    try {
+        // Rolün mesaj gönderme yetkisini sıfırlıyoruz (null yaparak varsayılana döndürürüz)
+        await message.channel.permissionOverwrites.edit(roleId, {
+            SendMessages: null
+        });
+
+        // Alanı kapattığımıza dair aydınlık Embed mesajı
+        const embed = {
+            color: 0xFFFFFF, // Bembeyaz aydınlık tema
+            title: '👁️ Alan Kapatıldı',
+            description: '**Sonsuzluk sona erdi, gerçekliğe geri döndünüz.**\n\n*Her şey normale döndü, şimdilik.*',
+            image: {
+                url: gifUrl
+            }
+        };
+
+        await message.channel.send({ embeds: [embed] });
+    } catch (error) {
+        console.error(error);
+        message.reply('Alan kapatılırken bir hata oluştu.');
+    }
+}
     
     if (command === 'aşkölç') {
         const target = message.mentions.users.first();
