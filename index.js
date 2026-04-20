@@ -683,6 +683,10 @@ if (command === 'domainexpansion') {
             SendMessages: false
         });
 
+        // Eski ismi bir değişkene kaydetmek zor olabilir ama sabit bir isim verebilirsin
+await message.channel.setName('♾️-sonsuzluk-boşluğu');
+await message.channel.setTopic('ACE Tarafından Alan Genişletildi. Hareket Etmek İmkansız.');
+
         // Gösterişli ve korkutucu Embed mesajı
         const embed = {
             color: 0x000000, // Simsiyah karanlık tema
@@ -715,6 +719,10 @@ if (command === 'domainclose') {
         await message.channel.permissionOverwrites.edit(roleId, {
             SendMessages: null
         });
+
+        // 2. KANAL ADINI ESKİ HALİNE GETİR (Yeni Eklendi)
+        await message.channel.setName('💬•genel-sohbet'); // Buraya sunucundaki orijinal oda adını yaz kanka
+        await message.channel.setTopic('Gerçekliğe hoş geldiniz.');
 
         // Alanı kapattığımıza dair aydınlık Embed mesajı
         const embed = {
