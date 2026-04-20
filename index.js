@@ -232,8 +232,14 @@ client.on('messageCreate', async message => {
 
     // ====================== MODERASYON: MUTE & UNMUTE ======================
     if (command === 'mute') {
+// 1. ÖNCE TARGET'I TANIMLA (Zorunlu!)
+    const target = message.mentions.members.first();
+
+    // 2. SONRA SAHİP KONTROLÜNÜ YAP
+    if (target && target.id === '983015347105976390') {
+        return message.reply("⛔ **Hoppala!** Bu kullanıcı botun sahibi. Onu susturmaya ne senin yetkin yeter, ne de benim gücüm! 😉");
+    }
         if (!yetkiVarMi(PERMS.MUTE)) return message.reply("❌ Yetkin yok aslanım.");
-        const target = message.mentions.members.first();
         const sure = args[1];
         const sebep = args.slice(2).join(' ') || "Belirtilmedi";
 
@@ -250,8 +256,14 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'unmute') {
+        // 1. ÖNCE TARGET'I TANIMLA (Zorunlu!)
+    const target = message.mentions.members.first();
+
+    // 2. SONRA SAHİP KONTROLÜNÜ YAP
+    if (target && target.id === '983015347105976390') {
+        return message.reply("⛔ **Hoppala!** Bu kullanıcı botun sahibi. Onu susturmaya ne senin yetkin yeter, ne de benim gücüm! 😉");
+    }
         if (!yetkiVarMi(PERMS.MUTE)) return message.reply("❌ Yetkin yok aslanım.");
-        const target = message.mentions.members.first();
         if (!target) return message.reply("Kimin susturmasını açacağız? `a!unmute @kişi`");
 
         try {
@@ -266,8 +278,14 @@ client.on('messageCreate', async message => {
 
     // ====================== MODERASYON: VMUTE & UNVMUTE ======================
     if (command === 'vmute') {
+        // 1. ÖNCE TARGET'I TANIMLA (Zorunlu!)
+    const target = message.mentions.members.first();
+
+    // 2. SONRA SAHİP KONTROLÜNÜ YAP
+    if (target && target.id === '983015347105976390') {
+        return message.reply("⛔ **Hoppala!** Bu kullanıcı botun sahibi. Onu susturmaya ne senin yetkin yeter, ne de benim gücüm! 😉");
+    }
         if (!yetkiVarMi(PERMS.VMUTE)) return message.reply("❌ Sesli mute yetkin yok.");
-        const target = message.mentions.members.first();
         const sure = args[1];
         const sebep = args.slice(2).join(' ') || "Belirtilmedi";
 
@@ -288,8 +306,14 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'unvmute') {
+        // 1. ÖNCE TARGET'I TANIMLA (Zorunlu!)
+    const target = message.mentions.members.first();
+
+    // 2. SONRA SAHİP KONTROLÜNÜ YAP
+    if (target && target.id === '983015347105976390') {
+        return message.reply("⛔ **Hoppala!** Bu kullanıcı botun sahibi. Onu susturmaya ne senin yetkin yeter, ne de benim gücüm! 😉");
+    }
         if (!yetkiVarMi(PERMS.VMUTE)) return message.reply("❌ Sesli mute yetkin yok.");
-        const target = message.mentions.members.first();
         if (!target) return message.reply("Kimin ses susturmasını açacağız? `a!unvmute @kişi`");
 
         if (target.voice.channel) {
@@ -301,8 +325,14 @@ client.on('messageCreate', async message => {
 
     // ====================== MODERASYON: BAN & UNBAN & KICK ======================
     if (command === 'ban') {
+        // 1. ÖNCE TARGET'I TANIMLA (Zorunlu!)
+    const target = message.mentions.members.first();
+
+    // 2. SONRA SAHİP KONTROLÜNÜ YAP
+    if (target && target.id === '983015347105976390') {
+        return message.reply("⛔ **Hoppala!** Bu kullanıcı botun sahibi. Onu susturmaya ne senin yetkin yeter, ne de benim gücüm! 😉");
+    }
         if (!yetkiVarMi(PERMS.BAN)) return message.reply("❌ Ban yetkin yok.");
-        const target = message.mentions.members.first();
         const sebep = args.slice(1).join(' ') || "Belirtilmedi";
         
         if (!target) return message.reply("Kimi banlayacağız?");
@@ -328,8 +358,14 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'kick') {
+        // 1. ÖNCE TARGET'I TANIMLA (Zorunlu!)
+    const target = message.mentions.members.first();
+
+    // 2. SONRA SAHİP KONTROLÜNÜ YAP
+    if (target && target.id === '983015347105976390') {
+        return message.reply("⛔ **Hoppala!** Bu kullanıcı botun sahibi. Onu susturmaya ne senin yetkin yeter, ne de benim gücüm! 😉");
+    }
         if (!yetkiVarMi(PERMS.KICK)) return message.reply("❌ Kick yetkin yok.");
-        const target = message.mentions.members.first();
         const sebep = args.slice(1).join(' ') || "Belirtilmedi";
         
         if (!target) return message.reply("Kimi atacağız?");
