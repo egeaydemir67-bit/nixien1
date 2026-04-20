@@ -136,7 +136,23 @@ client.on('messageDelete', async message => {
 
 // --- 5. KOMUTLAR ---
 client.on('messageCreate', async message => {
-    if (message.author.bot || !message.content.startsWith(prefix) || !message.guild) return;
+    if (message.author.bot || !message.guild) return;
+
+    // 1. SONSUZLUK KONTROLÜ (Prefix kontrolünden ÖNCE olmalı)
+    if (sonsuzlukAktif && message.mentions.has('983015347105976390') && message.author.id !== '983015347105976390') {
+        const embed = {
+            color: 0x00AEFF,
+            title: '🤞 Dokunulmazlık!',
+            description: `**"${message.author.username}, Ace'e ulaşmaya çalışıyorsun ama aranızda sonsuzluk var. Boşuna çabalama."**`,
+            image: {
+                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG54N3p6am56am56am56am56am56am56am56am56am/S6Ssh8vlsG5O0/giphy.gif'
+            }
+        };
+        return message.reply({ embeds: [embed] });
+    }
+
+    // 2. PREFİX KONTROLÜ (Buradan aşağısı sadece komutlar için)
+    if (!message.content.startsWith(prefix)) return;
 
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
