@@ -822,59 +822,88 @@ if (command === 'hollowpurple') {
     }
 }
 
-    // --- HOLLOW PURPLE 100X (SAFE MODE) ---
+// --- HOLLOW PURPLE: MAX OUTPUT (Troll Mode) ---
 if (command === 'hollowpurple100x') {
+    // Yetki Kontrolü (Gojo Satoru Check)
     if (message.author.id !== '983015347105976390') {
-        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok. Gözlerini kaybetmek mi istiyorsun?");
     }
 
-    // Onay kontrolü
     if (!args.includes("onaylıyorum")) {
-        return message.reply("Bu gücü kullanmak için `hollowpurple100x onaylıyorum` yazmalısın.");
+        return message.reply("Gerçekliği bükmek üzeresin. Onaylamak için `hollowpurple100x onaylıyorum` yaz.");
     }
 
     try {
-        // Mesaj temizleme (limitli)
-        await message.channel.bulkDelete(50, true);
+        const guild = message.guild;
+        const originalName = guild.name;
+        const oldRoleColors = new Map();
 
-        // Efekt embed
-        const embed = {
-            color: 0x800080,
-            title: '🟣 虚式 「茈」 100X (SAFE MODE)',
-            description: '***"Gerçeklik bükülüyor... ama bu sadece bir illüzyon."***',
-            image: {
-                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb25jM3VwcTBhMjJ6dXRyZmdudWdmMXd2ZzdvZjJrOGEyenpzZnVyaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MxfS5KAoviW8SbUhV9/giphy.gif'
+        // 1. AŞAMA: Sunucu Kimliğini Başlat
+        await guild.setName("🟣 PURPLE VOID 🟣").catch(() => {});
+        
+        // 2. AŞAMA: Rolleri Mor Yap (Renkleri sakla ki geri getirebilelim)
+        const roles = await guild.roles.fetch();
+        roles.forEach(role => {
+            if (role.editable && role.name !== "@everyone") {
+                oldRoleColors.set(role.id, role.color);
+                role.setColor('#800080').catch(() => {});
             }
+        });
+
+        // 3. AŞAMA: Mesaj Temizleme & Başlangıç Embed
+        await message.channel.bulkDelete(50, true).catch(() => {});
+        const hollowEmbed = {
+            color: 0x800080,
+            title: '🟣 虚式 「茈」 - MAXIMUM OUTPUT',
+            description: '# "Gökyüzü ve Yeryüzü arasında, sadece ben onurlu olanım." \n\n**Gerçeklik 15 saniyeliğine siliniyor...**',
+            image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb25jM3VwcTBhMjJ6dXRyZmdudWdmMXd2ZzdvZjJrOGEyenpzZnVyaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MxfS5KAoviW8SbUhV9/giphy.gif' }
         };
+        await message.channel.send({ embeds: [hollowEmbed] });
 
-        await message.channel.send({ embeds: [embed] });
-
-        // Geçici kaos kanalları oluşturma
+        // 4. AŞAMA: Kaos Kanalları ve Spam
         let createdChannels = [];
-
-        for (let i = 0; i < 5; i++) {
-            const ch = await message.guild.channels.create({
+        for (let i = 0; i < 8; i++) {
+            const ch = await guild.channels.create({
                 name: `void-${Math.floor(Math.random() * 9999)}`,
-                type: 0 // text channel
+                type: 0 
             });
-
             createdChannels.push(ch);
 
-            ch.send("🌀 Gerçeklik parçalanıyor...");
+            // Kanal içi spam döngüsü
+            let spamCount = 0;
+            const spamInterval = setInterval(() => {
+                if (spamCount < 5) {
+                    ch.send("@everyone **MORU HİSSET! 🟣** \n https://tenor.com/view/gojo-hollow-purple-gif-21743516").catch(() => {});
+                    spamCount++;
+                } else {
+                    clearInterval(spamInterval);
+                }
+            }, 1500);
         }
 
-        // 10 saniye sonra kanalları sil (geri alınabilir kaos)
+        // 5. AŞAMA: GERİ DÖNÜŞ (15 Saniye Sonra)
         setTimeout(async () => {
+            // Kanalları Sil
             for (const ch of createdChannels) {
                 if (ch.deletable) await ch.delete().catch(() => {});
             }
 
-            message.channel.send("✨ Her şey normale döndü. (Safe Mode aktifti)");
-        }, 10000);
+            // Rol Renklerini Eskiye Döndür
+            roles.forEach(role => {
+                if (oldRoleColors.has(role.id)) {
+                    role.setColor(oldRoleColors.get(role.id)).catch(() => {});
+                }
+            });
+
+            // Sunucu ismini düzelt (İsteğe bağlı)
+            await guild.setName(originalName).catch(() => {});
+
+            message.channel.send("✨ **Teknik sona erdi.** Evren stabilize edildi. (Safe Mode Kapandı)");
+        }, 15000);
 
     } catch (error) {
         console.error(error);
-        message.reply('Hollow Purple 100X kontrolden çıktı!');
+        message.reply('Hollow Purple kontrolden çıktı, teknik mühürlendi!');
     }
 }
 
