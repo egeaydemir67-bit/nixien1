@@ -822,6 +822,62 @@ if (command === 'hollowpurple') {
     }
 }
 
+    // --- HOLLOW PURPLE 100X (SAFE MODE) ---
+if (command === 'hollowpurple100x') {
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+    }
+
+    // Onay kontrolü
+    if (!args.includes("onaylıyorum")) {
+        return message.reply("Bu gücü kullanmak için `hollowpurple100x onaylıyorum` yazmalısın.");
+    }
+
+    try {
+        // Mesaj temizleme (limitli)
+        await message.channel.bulkDelete(50, true);
+
+        // Efekt embed
+        const embed = {
+            color: 0x800080,
+            title: '🟣 虚式 「茈」 100X (SAFE MODE)',
+            description: '***"Gerçeklik bükülüyor... ama bu sadece bir illüzyon."***',
+            image: {
+                url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb25jM3VwcTBhMjJ6dXRyZmdudWdmMXd2ZzdvZjJrOGEyenpzZnVyaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MxfS5KAoviW8SbUhV9/giphy.gif'
+            }
+        };
+
+        await message.channel.send({ embeds: [embed] });
+
+        // Geçici kaos kanalları oluşturma
+        let createdChannels = [];
+
+        for (let i = 0; i < 5; i++) {
+            const ch = await message.guild.channels.create({
+                name: `void-${Math.floor(Math.random() * 9999)}`,
+                type: 0 // text channel
+            });
+
+            createdChannels.push(ch);
+
+            ch.send("🌀 Gerçeklik parçalanıyor...");
+        }
+
+        // 10 saniye sonra kanalları sil (geri alınabilir kaos)
+        setTimeout(async () => {
+            for (const ch of createdChannels) {
+                if (ch.deletable) await ch.delete().catch(() => {});
+            }
+
+            message.channel.send("✨ Her şey normale döndü. (Safe Mode aktifti)");
+        }, 10000);
+
+    } catch (error) {
+        console.error(error);
+        message.reply('Hollow Purple 100X kontrolden çıktı!');
+    }
+}
+
     // --- SONSUZLUK AÇ/KAPAT KOMUTU ---
 if (command === 'sonsuzluk') {
     if (message.author.id !== '983015347105976390') {
