@@ -822,9 +822,6 @@ if (command === 'hollowpurple') {
     }
 }
 
-const args = message.content.slice(prefix.length).trim().split(/ +/);
-const command = args.shift().toLowerCase();
-
 if (command === 'hollowpurple100x') {
     // 1. GÜVENLİK VE TANIMLAR
     const guild = message.guild; // Hata buradaydı, ekledik.
