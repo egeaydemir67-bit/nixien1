@@ -190,7 +190,7 @@ client.on('messageCreate', async message => {
                 inline: false 
             }
         )
-        .setFooter({ text: `🛡️ Ace System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+        .setFooter({ text: `🛡️ Ace System / Kara System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
         .setTimestamp();
 
     // SADECE SENİN GÖREBİLECEĞİN ÖZEL ALAN (GÜNCELLENDİ)
