@@ -750,7 +750,7 @@ if (command === 'domainexpansion') {
 
         // Biri alanı açmış, diğeri üstüne açmaya çalışıyor = DOMAIN CLASH!
         await message.channel.setName('⚔️-sukuna-vs-gojo');
-        await message.channel.send("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpwaXp6YXJ1YXp6YXJ1YXp6YXJ1YXp6YXJ1YXp6YXJ1YXp6YXJ1JmNoYXRfaWQ9MTI/giphy.gif"); // İki alanın çarpışma gifi
+        await message.channel.send("https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cDE5NzhpZTFvODZlbWI4d2Q2eXdmemluenpkdHRoOHVjYmtyY2FsZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Nz0Pr7zKU459KXwbwb/giphy.gif"); // İki alanın çarpışma gifi
         
         let clashMsg = await message.channel.send(`### ⚔️ DOMAIN CLASH BAŞLADI!\n**${userName}**, **${currentDomain.type}**'nın alanına müdahale ediyor!\n\n*Güçler çarpışıyor...* (10)`);
         
@@ -772,7 +772,7 @@ if (command === 'domainexpansion') {
                     currentDomain = { active: true, owner: sukunaID, type: 'Sukuna' };
                     await message.channel.setName('💀-malevolent-shrine');
                     await message.channel.send("### 🏮 ALANIN GALİBİ: SUKUNA!\n**Her şey parçalara ayrılıyor...**");
-                    await message.channel.send("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms1NHR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4JmN0PWc/U77FFxPZf4659XoAtA/giphy.gif");
+                    await message.channel.send("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif");
                 } else {
                     // GOJO (ACE) KAZANIRSA
                     currentDomain = { active: true, owner: aceID, type: 'Gojo' };
@@ -802,7 +802,7 @@ if (command === 'domainexpansion') {
                 color: 0x000000,
                 title: '🤞 領域展開 (RYŌIKI TENKAI) - INFINITE VOID',
                 description: '**"ACE TARAFINDAN ALAN GENİŞLETME (SONSUZLUK) BOŞLUĞUNA ATILDINIZ."**\n\n*Burada kelimeler anlamsız, zaman durdu. Sadece benim kurallarım geçerli.*',
-                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif' }
+                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzM3NTBtbXl5bmxrb20wa29oamVmYTMzZ29qajZqaDZwdWx0Nzk5NyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jx4cDEP5Jqv8vekuyH/giphy.gif' }
             };
             await message.channel.send({ embeds: [embed] });
 
@@ -815,7 +815,7 @@ if (command === 'domainexpansion') {
                 color: 0x8B0000, // Koyu kan kırmızısı
                 title: '🏮 領域展開 (RYŌIKI TENKAI) - MALEVOLENT SHRINE',
                 description: '**"SUKUNA TARAFINDAN MALEVOLENT SHRINE AÇILDI."**\n\n*Her şey göz açıp kapayıncaya kadar kesilecek. Kurban edilmeye hazır olun.*',
-                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms1NHR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4JmN0PWc/U77FFxPZf4659XoAtA/giphy.gif' }
+                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif' }
             };
             await message.channel.send({ embeds: [sukunaEmbed] });
         }
@@ -839,15 +839,16 @@ if (command === 'domainclose') {
     }
 
     const roleId = '1489798026368254122';
-    const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGE5dGs5eHZkNHFwZm40M2xjdGQzNzBuYzkzMDhwYWZ5N2Mxb2V2bSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/HARTNiFs9XM7DqfUtc/giphy.gif';
+    const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif';
 
-    try {
-        // Rolün mesaj gönderme yetkisini sıfırlıyoruz
-        await message.channel.permissionOverwrites.edit(roleId, { SendMessages: null });
-        await message.channel.setName('sohbet'); // Kanal adını normale döndür (kendine göre düzenle)
+  try {
+        // SendMessages: true yaparak YEŞİL TİK yapıyoruz
+        await message.channel.permissionOverwrites.edit(roleId, { 
+            SendMessages: true 
+        });
+
+        await message.channel.setName('💬•genel-sohbet'); // Kanal ismini normale döndürür
         await message.channel.setTopic('');
-
-        // Sistemi sıfırla (Burası çok önemli, yoksa yeni alan açılamaz)
         currentDomain = { active: false, owner: null, type: null };
 
         const embed = {
