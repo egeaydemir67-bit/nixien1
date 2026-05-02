@@ -828,37 +828,36 @@ if (command === 'domainexpansion' || command === 'de') {
         return;
     }
 
-    // ================= NORMAL AÇILIŞ =================
+  // NORMAL AÇILIŞ
 
-    if (currentDomain.active) {
-        return message.reply("Zaten alan açık!");
-    }
-
-    try {
-        // 🔥 EN ÖNEMLİ FIX
-        currentDomain.active = true;
-        currentDomain.owner = message.author.id;
-
-        await message.channel.permissionOverwrites.edit(roleId, { SendMessages: false });
-        await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
-        await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
-
-        const msg = await message.channel.send(`🌀 ${userName} DOMAIN AÇTI!`);
-        await msg.pin().catch(() => {});
-
-        currentDomain.pinnedMsg = msg;
-
-        currentDomain.timeoutMsg = setTimeout(() => {
-            if (currentDomain.active) {
-                closeDomain(message, roleId, aceID, sukunaID, "Süre doldu!");
-            }
-        }, 300000);
-
-    } catch (err) {
-        console.error(err);
-    }
+if (currentDomain.active) {
+    return message.reply("Zaten alan açık!");
 }
 
+// 🔥 BURAYI EN ÜSTE AL
+currentDomain.active = true;
+currentDomain.owner = message.author.id;
+
+try {
+    await message.channel.permissionOverwrites.edit(roleId, { SendMessages: false });
+    await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
+    await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
+
+    const msg = await message.channel.send(`🌀 ${userName} DOMAIN AÇTI!`);
+    await msg.pin().catch(() => {});
+
+    currentDomain.pinnedMsg = msg;
+
+    currentDomain.timeoutMsg = setTimeout(() => {
+        if (currentDomain.active) {
+            closeDomain(message, roleId, aceID, sukunaID, "Süre doldu!");
+        }
+    }, 300000);
+
+} catch (err) {
+    console.error(err);
+}
+    
 // ================== DOMAIN CLOSE ==================
 if (command === 'domainclose' || command === 'dc') {
 
