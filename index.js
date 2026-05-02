@@ -897,34 +897,30 @@ if (command === 'domainclose' || command === 'dc') {
 
 // --- ALAN KAPATMA YARDIMCI FONKSİYONU ---
 // Hem manuel kapatmada hem de otomatik süre bitiminde aynı işlemleri yapmak için
-async function closeDomainLogic(message, roleId, aceID, sukunaID, reasonText) {
-    try {
-        // İzinleri sıfırla (Herkes tekrar konuşabilir)
-        await message.channel.permissionOverwrites.edit(roleId, { SendMessages: null }); // null = varsayılan ayarlara dön
-        await message.channel.permissionOverwrites.edit(aceID, { SendMessages: null });
-        await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: null });
+   // --- YARDIMCI FONKSİYON ---
+// --- YARDIMCI FONKSİYON ---
+async function closeDomainLogic(message, roleId, aceID, sukunaID, reason) {
+    // İzinleri "YEŞİL TİK" (True) yapıyoruz
+    await message.channel.permissionOverwrites.edit(roleId, { SendMessages: true });
+    await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
+    await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
 
-        // Eğer alanın başında sabitlenen bir mesaj varsa sabitten çıkar
-        if (currentDomain.pinnedMsg) {
-            await currentDomain.pinnedMsg.unpin().catch(() => {});
-        }
+    if (currentDomain.pinnedMsg) {
+        await currentDomain.pinnedMsg.unpin().catch(() => {});
+    }
 
-        // Zamanlayıcıyı durdur (Manuel kapatıldıysa)
-        if (currentDomain.timeoutMsg) {
-            clearTimeout(currentDomain.timeoutMsg);
-        }
+    await message.channel.send({
+        embeds: [{
+            color: 0xFFFFFF,
+            title: '👁️ Alan Parçalandı',
+            description: reason,
+            image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
+        }]
+    });
+    
+    currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, isClashing: false };
+}
 
-        await message.channel.send({
-            embeds: [{
-                color: 0xFFFFFF,
-                title: '👁️ Alan Parçalandı',
-                description: `${reasonText}\nGerçeklik normale döndü. Bariyer kalktı, artık herkes konuşabilir.`,
-                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
-            }]
-        });
-
-        // Verileri sıfırla
-        currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, timeoutMsg: null };
 
     } catch (error) {
         console.error("Alan kapatılırken hata:", error);
