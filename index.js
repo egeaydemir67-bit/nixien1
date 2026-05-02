@@ -892,38 +892,39 @@ if (command === 'domainclose' || command === 'dc') {
     const sukunaID = '1456965268520833154'; 
     const roleId = '1489798026368254122';
 
-    await closeDomainLogic(message, roleId, aceID, sukunaID, `**${message.author.username}** alanını kapattı.`);
+    // Kapatma fonksiyonunu çağır
+    closeDomainLogic(message, roleId, aceID, sukunaID, `**${message.author.username}** alanını kapattı.`);
 }
 
-// --- ALAN KAPATMA YARDIMCI FONKSİYONU ---
-// Hem manuel kapatmada hem de otomatik süre bitiminde aynı işlemleri yapmak için
-   // --- YARDIMCI FONKSİYON ---
-// --- YARDIMCI FONKSİYON ---
+// --- YARDIMCI FONKSİYON (TAM YEŞİL TİK VERSİYON) ---
 async function closeDomainLogic(message, roleId, aceID, sukunaID, reason) {
-    // İzinleri "YEŞİL TİK" (True) yapıyoruz
-    await message.channel.permissionOverwrites.edit(roleId, { SendMessages: true });
-    await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
-    await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
+    try {
+        // İzinleri "YEŞİL TİK" (True) yapıyoruz
+        await message.channel.permissionOverwrites.edit(roleId, { SendMessages: true });
+        await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
+        await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
 
-    if (currentDomain.pinnedMsg) {
-        await currentDomain.pinnedMsg.unpin().catch(() => {});
-    }
+        // Sabitlenmiş mesajı kaldır
+        if (currentDomain.pinnedMsg) {
+            await currentDomain.pinnedMsg.unpin().catch(() => {});
+        }
 
-    await message.channel.send({
-        embeds: [{
-            color: 0xFFFFFF,
-            title: '👁️ Alan Parçalandı',
-            description: reason,
-            image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
-        }]
-    });
-    
-    currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, isClashing: false };
-}
-
+        // Alan kapanış mesajını gönder
+        await message.channel.send({
+            embeds: [{
+                color: 0xFFFFFF,
+                title: '👁️ Alan Parçalandı',
+                description: reason + "\n\nGerçeklik normale döndü, bariyerler kalktı.",
+                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
+            }]
+        });
+        
+        // Verileri temizle
+        currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, isClashing: false };
 
     } catch (error) {
-        console.error("Alan kapatılırken hata:", error);
+        console.error("Alan kapatılırken hata oluştu:", error);
+        message.channel.send("Bariyer bozulurken bir hata oluştu ama yetkiler sıfırlanmaya çalışıldı.");
     }
 }
 
