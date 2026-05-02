@@ -5,15 +5,19 @@ const ms = require('ms');
 const Canvas = require('canvas');
 let sonsuzlukAktif = false;
 
-// Bu değişken tüm komutlardan bağımsız, dosyanın en üstünde olmalı!
-let currentDomain = { 
-    active: false, 
-    owner: null, 
-    type: null, 
-    pinnedMsg: null, 
-    timeoutMsg: null, 
-    isClashing: false 
+// ================== GLOBAL STATE ==================
+let currentDomain = {
+    active: false,
+    owner: null,
+    type: null,
+    pinnedMsg: null,
+    timeoutMsg: null,
+    isClashing: false
 };
+
+// ================== HELPER ==================
+const normalize = str =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 
 
 const statSchema = new mongoose.Schema({
@@ -745,176 +749,138 @@ let currentDomain = {
 };
 
 
-// --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
-if (command === 'domainexpansion' || command === 'de') {
-    const aceID = '983015347105976390';  
-    const sukunaID = '1456965268520833154'; 
-    const roleId = '1489798026368254122';   
 
-    if (message.author.id !== aceID && message.author.id !== sukunaID) {
-        return message.reply({ content: "Senin lanet enerjin bu alanı açmaya yetmez!", ephemeral: true });
+// ================== DOMAIN EXPANSION ==================
+if (command === 'domainexpansion' || command === 'de') {
+
+    const aceID = '983015347105976390';
+    const sukunaID = '1456965268520833154';
+    const roleId = '1489798026368254122';
+
+    if (![aceID, sukunaID].includes(message.author.id)) {
+        return message.reply("Bu güce sahip değilsin!");
     }
 
     const isAce = message.author.id === aceID;
-    const userType = isAce ? 'Gojo' : 'Sukuna';
     const userName = isAce ? 'ACE' : 'NİŞASTA';
-    const domainTitle = isAce ? '♾️ SONSUZLUK BOŞLUĞU' : '🏮 PARALAYAN TAPINAK';
-    const domainColor = isAce ? 0x000000 : 0x8B0000;
-    const domainGif = isAce 
-        ? 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzM3NTBtbXl5bmxrb20wa29oamVmYTMzZ29qajZqaDZwdWx0Nzk5NyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jx4cDEP5Jqv8vekuyH/giphy.gif' 
-        : 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif';
 
-    // 1. DURUM: ALAN ÇARPIŞMASI (DOMAIN CLASH)
-    if (currentDomain.active) {
-        if (currentDomain.owner === message.author.id) {
-            return message.reply(`Zaten kendi alanının içindesin ${userName}!`);
-        }
+    // ================= CLASH =================
+    if (currentDomain.active && currentDomain.owner !== message.author.id) {
 
         if (currentDomain.isClashing) {
-            return message.reply({ content: "Şu an zaten bir alan çarpışması yaşanıyor, savaşa odaklan!", ephemeral: true });
+            return message.reply("Zaten clash var!");
         }
 
-        currentDomain.isClashing = true; // Savaş kilidini aç
+        currentDomain.isClashing = true;
 
-        const clashEmbed = {
-            color: 0xFFA500,
-            title: `⚔️ ALAN ÇARPIŞMASI BAŞLADI!`,
-            description: `**${userName}**, kendi alanını açarak mevcut bariyeri zorluyor!\n\n🔥 **HAKİMİYET SAVAŞI BAŞLADI!** 🔥\n\n**ACE** ve **NİŞASTA**, alan hakimiyetini ele geçirmek için **10 Saniye** boyunca kanala **\`GÜÇ\`** yazın! En çok yazan bariyeri kırar ve gerçekliği kendi isteğine göre büker!`,
-            image: { url: "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cDE5NzhpZTFvODZlbWI4d2Q2eXdmemluenpkdHRoOHVjYmtyY2FsZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Nz0Pr7zKU459KXwbwb/giphy.gif" }
-        };
-
-        await message.channel.send({ content: `<@${aceID}> ⚔️ <@${sukunaID}>`, embeds: [clashEmbed] });
+        await message.channel.send(`⚔️ <@${aceID}> vs <@${sukunaID}> BAŞLADI!\n10 saniye boyunca **GÜÇ** yazın!`);
 
         let aceScore = 0;
         let sukunaScore = 0;
 
-        const filter = m => (m.author.id === aceID || m.author.id === sukunaID) && m.content.toLocaleUpperCase('tr-TR') === 'GÜÇ';
-        const collector = message.channel.createMessageCollector({ filter, time: 10000 }); // 10 Saniye
+        const filter = m =>
+            [aceID, sukunaID].includes(m.author.id) &&
+            normalize(m.content) === "GUC";
 
-        collector.on('collect', m => {
+        const collector = message.channel.createMessageCollector({
+            filter,
+            time: 10000
+        });
+
+        collector.on("collect", m => {
             if (m.author.id === aceID) aceScore++;
             if (m.author.id === sukunaID) sukunaScore++;
         });
 
-        collector.on('end', async () => {
-            currentDomain.isClashing = false; // Savaş bitti
+        collector.on("end", async () => {
 
-            let winnerID = null;
-            let winnerName = "";
-            let winnerIsAce = false;
+            currentDomain.isClashing = false;
 
-            if (aceScore > sukunaScore) {
-                winnerID = aceID;
-                winnerName = 'ACE';
-                winnerIsAce = true;
-            } else if (sukunaScore > aceScore) {
-                winnerID = sukunaID;
-                winnerName = 'NİŞASTA';
-                winnerIsAce = false;
-            } else {
-                // BERABERLİK DURUMU
-                await message.channel.send({
-                    embeds: [{
-                        color: 0xFFFFFF,
-                        title: "💥 İKİ ALAN DA ÇÖKTÜ!",
-                        description: `Skor: İkiniz de **${aceScore}** kez yazarak eşit güç uyguladınız!\nLanet enerjileri birbiriyle çakıştı ve iki bariyer de aynı anda paramparça oldu.`,
-                        image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
-                    }]
-                });
-                return closeDomainLogic(message, roleId, aceID, sukunaID, "Alan çarpışması berabere bitti.");
+            if (aceScore === sukunaScore) {
+                await message.channel.send(`💥 BERABERE! (${aceScore})`);
+                return closeDomain(message, roleId, aceID, sukunaID, "İki alan da çöktü!");
             }
 
-            // KAZANANIN ALANINI EKRANA YANSIT
-            const winnerGif = winnerIsAce 
-                ? 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzM3NTBtbXl5bmxrb20wa29oamVmYTMzZ29qajZqaDZwdWx0Nzk5NyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jx4cDEP5Jqv8vekuyH/giphy.gif' 
-                : 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif';
-            
-            const winnerTitle = winnerIsAce ? '♾️ SONSUZLUK BOŞLUĞU' : '🏮 PARALAYAN TAPINAK';
+            const winnerID = aceScore > sukunaScore ? aceID : sukunaID;
+            const winnerName = winnerID === aceID ? "ACE" : "NİŞASTA";
 
-            const resultEmbed = {
-                color: winnerIsAce ? 0x000000 : 0x8B0000,
-                title: `🏆 ÇARPIŞMANIN GALİBİ: ${winnerName}!`,
-                description: `### Lanet Enerjisi Skoru:\n🔵 **ACE:** ${aceScore} Vuruş\n🔴 **NİŞASTA:** ${sukunaScore} Vuruş\n\n**Zayıf olan bariyer paramparça oldu! Artık alanın mutlak hakimi ${winnerName}!**\n\n🤞 **RYŌIKI TENKAI - ${winnerTitle}**`,
-                image: { url: winnerGif }
-            };
-
-            // Eski sabitlenmiş mesajı kaldır
+            // eski pini kaldır
             if (currentDomain.pinnedMsg) {
                 await currentDomain.pinnedMsg.unpin().catch(() => {});
             }
 
-            const newDomainMessage = await message.channel.send({ content: `<@${winnerID}> ALANI ELE GEÇİRDİ!`, embeds: [resultEmbed] });
-            await newDomainMessage.pin().catch(() => {});
+            const msg = await message.channel.send(`🏆 ${winnerName} kazandı!`);
+            await msg.pin().catch(() => {});
 
-            // Kazananın verilerini mevcut alana geçir
             currentDomain.owner = winnerID;
-            currentDomain.type = winnerIsAce ? 'Gojo' : 'Sukuna';
-            currentDomain.pinnedMsg = newDomainMessage;
+            currentDomain.pinnedMsg = msg;
+            currentDomain.active = true;
 
-            // Timeout'u sıfırlayıp yeniden başlat
             clearTimeout(currentDomain.timeoutMsg);
-            currentDomain.timeoutMsg = setTimeout(async () => {
+
+            currentDomain.timeoutMsg = setTimeout(() => {
                 if (currentDomain.active) {
-                    await closeDomainLogic(message, roleId, aceID, sukunaID, "Lanet enerjisi tükendi. Alan otomatik olarak çöktü.");
+                    closeDomain(message, roleId, aceID, sukunaID, "Süre doldu!");
                 }
             }, 300000);
         });
 
-        return; // Çarpışma tetiklendi, kodu burada kes
+        return;
     }
-    
-    // 2. DURUM: NORMAL ALAN AÇILIŞI (Ortada alan yoksa)
+
+    // ================= NORMAL AÇILIŞ =================
+
+    if (currentDomain.active) {
+        return message.reply("Zaten alan açık!");
+    }
+
     try {
+        // 🔥 EN ÖNEMLİ FIX
+        currentDomain.active = true;
+        currentDomain.owner = message.author.id;
+
         await message.channel.permissionOverwrites.edit(roleId, { SendMessages: false });
         await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
         await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
 
-        const embed = {
-            color: domainColor,
-            title: `🤞 領域展開 (RYŌIKI TENKAI) - ${domainTitle}`,
-            description: `**${userName}** bu kanalda alanını genişletti. Dış dünya ile bağlantı koptu.\n\n*${isAce ? "Zaman ve mekan ACE'in kontrolünde." : "Her şey NİŞASTA'nın keskin saldırıları altında."}*\n\n(Normal üyeler susturuldu, sadece Lanet Kullanıcıları savaşabilir!)`,
-            image: { url: domainGif },
-            footer: { text: "Alan etkisini kapatmak için !domainclose kullanın." }
-        };
+        const msg = await message.channel.send(`🌀 ${userName} DOMAIN AÇTI!`);
+        await msg.pin().catch(() => {});
 
-        const domainMessage = await message.channel.send({ content: "@here Gerçeklik bükülüyor!", embeds: [embed] });
-        await domainMessage.pin().catch(() => {});
+        currentDomain.pinnedMsg = msg;
 
-        const autoCloseTimeout = setTimeout(async () => {
+        currentDomain.timeoutMsg = setTimeout(() => {
             if (currentDomain.active) {
-                await closeDomainLogic(message, roleId, aceID, sukunaID, "Lanet enerjisi tükendi. Alan otomatik olarak çöktü.");
+                closeDomain(message, roleId, aceID, sukunaID, "Süre doldu!");
             }
         }, 300000);
 
-        // Değişkeni güncelle
-        currentDomain.active = true;
-        currentDomain.owner = message.author.id;
-        currentDomain.type = userType;
-        currentDomain.pinnedMsg = domainMessage;
-        currentDomain.timeoutMsg = autoCloseTimeout;
-        currentDomain.isClashing = false;
-
-    } catch (error) {
-        console.error(error);
-        message.reply('Bariyer kurulamadı! Botun `Kanalları Yönet` ve `Mesajları Yönet` yetkisi olduğundan emin ol.');
+    } catch (err) {
+        console.error(err);
     }
 }
 
-// --- DOMAIN CLOSE (ALANI KAPATMA) ---
+// ================== DOMAIN CLOSE ==================
 if (command === 'domainclose' || command === 'dc') {
-    if (!currentDomain.active) return message.reply("Şu an açık olan bir alan yok!");
-    if (message.author.id !== currentDomain.owner) return message.reply("Bu alanı sadece sahibi (veya çarpışma galibi) kapatabilir!");
 
-    const aceID = '983015347105976390';  
-    const sukunaID = '1456965268520833154'; 
+    if (!currentDomain.active) {
+        return message.reply("Açık domain yok!");
+    }
+
+    if (message.author.id !== currentDomain.owner) {
+        return message.reply("Sadece sahibi kapatabilir!");
+    }
+
+    const aceID = '983015347105976390';
+    const sukunaID = '1456965268520833154';
     const roleId = '1489798026368254122';
 
-    closeDomainLogic(message, roleId, aceID, sukunaID, `**${message.author.username}** alanını kapattı.`);
+    closeDomain(message, roleId, aceID, sukunaID, "Manuel kapatıldı.");
 }
 
-// --- YARDIMCI FONKSİYON ---
-async function closeDomainLogic(message, roleId, aceID, sukunaID, reason) {
+// ================== CLOSE FUNCTION ==================
+async function closeDomain(message, roleId, aceID, sukunaID, reason) {
     try {
+
         await message.channel.permissionOverwrites.edit(roleId, { SendMessages: true });
         await message.channel.permissionOverwrites.edit(aceID, { SendMessages: true });
         await message.channel.permissionOverwrites.edit(sukunaID, { SendMessages: true });
@@ -923,29 +889,22 @@ async function closeDomainLogic(message, roleId, aceID, sukunaID, reason) {
             await currentDomain.pinnedMsg.unpin().catch(() => {});
         }
 
-        // Varsa timeout'u temizle ki arkada boşuna çalışmasın
         clearTimeout(currentDomain.timeoutMsg);
 
-        await message.channel.send({
-            embeds: [{
-                color: 0xFFFFFF,
-                title: '👁️ Alan Parçalandı',
-                description: reason + "\n\nGerçeklik normale döndü, bariyerler kalktı.",
-                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
-            }]
-        });
-        
-        // Değişkenleri tamamen sıfırla
-        currentDomain.active = false;
-        currentDomain.owner = null;
-        currentDomain.type = null;
-        currentDomain.pinnedMsg = null;
-        currentDomain.timeoutMsg = null;
-        currentDomain.isClashing = false;
+        await message.channel.send(`👁️ Domain kapandı: ${reason}`);
 
-    } catch (error) {
-        console.error("Alan kapatılırken hata oluştu:", error);
-        message.channel.send("Bariyer bozulurken bir hata oluştu ama yetkiler sıfırlanmaya çalışıldı.");
+        // RESET
+        currentDomain = {
+            active: false,
+            owner: null,
+            type: null,
+            pinnedMsg: null,
+            timeoutMsg: null,
+            isClashing: false
+        };
+
+    } catch (err) {
+        console.error(err);
     }
 }
 
