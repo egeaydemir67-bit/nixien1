@@ -841,15 +841,28 @@ if (command === 'domainclose') {
     const roleId = '1489798026368254122';
     const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif';
 
-  try {
-        // SendMessages: true yaparak YEŞİL TİK yapıyoruz
-        await message.channel.permissionOverwrites.edit(roleId, { 
-            SendMessages: true 
+// --- DOMAIN CLOSE İÇİNDEKİ İSİM DEĞİŞTİRME KISMINI BÖYLE GÜNCELLE ---
+
+try {
+    // 1. Önce izinleri açalım (Burası çalışıyor demiştin)
+    await message.channel.permissionOverwrites.edit(roleId, { 
+        SendMessages: true 
+    });
+
+    // 2. Kanal ismini değiştirmeyi dene ve hata varsa konsola yazdır
+    await message.channel.setName('💬•genel-sohbet')
+        .then(updated => console.log(`Kanal ismi başarıyla değişti: ${updated.name}`))
+        .catch(err => {
+            console.error("İsim değiştirme hatası:", err);
+            message.reply("Kanal ismini değiştiremedim, yetkim olmayabilir veya çok hızlı işlem yaptın!");
         });
 
-        await message.channel.setName('💬•genel-sohbet'); // Kanal ismini normale döndürür
-        await message.channel.setTopic('');
-        currentDomain = { active: false, owner: null, type: null };
+    await message.channel.setTopic('Hoş geldiniz.'); 
+    
+    // Değişkeni sıfırlama
+    currentDomain = { active: false, owner: null, type: null };
+
+    // ... Embed gönderme kısmı
 
         const embed = {
             color: 0xFFFFFF,
