@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const ms = require('ms');
 const Canvas = require('canvas');
 let sonsuzlukAktif = false;
+let currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, timeoutMsg: null };
 
 
 const statSchema = new mongoose.Schema({
@@ -734,8 +735,6 @@ let currentDomain = {
     threadId: null 
 };
 
-// --- GLOBAL DEĞİŞKENLER (Bot dosyasının en üstlerinde bir yerde olmalı) ---
-let currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, timeoutMsg: null };
 
 // --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
 if (command === 'domainexpansion' || command === 'de') {
