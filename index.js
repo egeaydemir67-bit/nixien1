@@ -737,7 +737,7 @@ let currentDomain = {
 
 
 // --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
-if (command === 'domainexpansion' || command === 'domainexpansion') {
+if (command === 'domainexpansion' || command === 'de') {
     const aceID = '983015347105976390';  
     const sukunaID = '1456965268520833154'; 
     const roleId = '1489798026368254122';   
