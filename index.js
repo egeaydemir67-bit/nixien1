@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const ms = require('ms');
 const Canvas = require('canvas');
 let sonsuzlukAktif = false;
+let currentDomain = { active: false, owner: null, type: null };
 
 const statSchema = new mongoose.Schema({
     guildID: String,
@@ -725,68 +726,135 @@ client.on('messageCreate', async message => {
 }
 
 
-    // --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
+// --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
 if (command === 'domainexpansion') {
-    // Sadece senin ID'ne özel kontrol
-    if (message.author.id !== '983015347105976390') {
-        return message.reply("Sadece ACE bu alanı genişletebilir! Senin lanet enerjin buna yetmez.");
+    const aceID = '983015347105976390';    // Senin ID (Gojo)
+    const sukunaID = '1456965268520833154'; // Kurucu ID (Sukuna)
+    const roleId = '1489798026368254122';   // Kısıtlanacak Rol ID
+
+    // Sadece siz ikiniz kullanabilirsiniz
+    if (message.author.id !== aceID && message.author.id !== sukunaID) {
+        return message.reply("Senin lanet enerjin bu alanı açmaya yetmez!");
     }
 
-    const roleId = '1489798026368254122';
-    const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif';
+    // Komutu kullanan kişinin kim olduğunu belirliyoruz
+    const isAce = message.author.id === aceID;
+    const userType = isAce ? 'Gojo' : 'Sukuna';
+    const userName = isAce ? 'ACE' : 'NİŞASTA';
 
-    try {
-        // Belirtilen rolün mesaj gönderme yetkisini (false) kapatıyoruz
-        await message.channel.permissionOverwrites.edit(roleId, {
-            SendMessages: false
-        });
+    // 1. DURUM: EĞER ZATEN BİR ALAN AÇIKSA VE DİĞER KİŞİ KOMUTU GİRDİYSE (CLASH)
+    if (currentDomain.active) {
+        if (currentDomain.owner === message.author.id) {
+            return message.reply(`Zaten kendi alanının içindesin ${userName}! Önce kapatman lazım.`);
+        }
 
-        // Eski ismi bir değişkene kaydetmek zor olabilir ama sabit bir isim verebilirsin
-await message.channel.setName('♾️-sonsuzluk-boşluğu');
-await message.channel.setTopic('ACE Tarafından Alan Genişletildi. Hareket Etmek İmkansız.');
-
-        // Gösterişli ve korkutucu Embed mesajı
-        const embed = {
-            color: 0x000000, // Simsiyah karanlık tema
-            title: '🤞 領域展開 (RYŌIKI TENKAI)',
-            description: '**"ACE TARAFINDAN ALAN GENİŞLETME (SONSUZLUK) BOŞLUĞUNA ATILDINIZ."**\n\n*Burada kelimeler anlamsız, zaman durdu. Sadece benim kurallarım geçerli.*',
-            image: {
-                url: gifUrl
+        // Biri alanı açmış, diğeri üstüne açmaya çalışıyor = DOMAIN CLASH!
+        await message.channel.setName('⚔️-sukuna-vs-gojo');
+        await message.channel.send("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpwaXp6YXJ1YXp6YXJ1YXp6YXJ1YXp6YXJ1YXp6YXJ1YXp6YXJ1JmNoYXRfaWQ9MTI/giphy.gif"); // İki alanın çarpışma gifi
+        
+        let clashMsg = await message.channel.send(`### ⚔️ DOMAIN CLASH BAŞLADI!\n**${userName}**, **${currentDomain.type}**'nın alanına müdahale ediyor!\n\n*Güçler çarpışıyor...* (10)`);
+        
+        // 10 Saniyelik Gerilim ve Geri Sayım
+        let countdown = 10;
+        const clashInterval = setInterval(async () => {
+            countdown -= 2; // 2'şer saniye atlayarak sayalım
+            
+            if (countdown > 0) {
+                await clashMsg.edit(`### ⚔️ DOMAIN CLASH BAŞLADI!\n**Güçler çarpışıyor...** (${countdown})\n*Enerji dalgalanıyor!*`);
+            } else {
+                clearInterval(clashInterval);
+                
+                // Şans Faktörü: %50-%50 Kazanan Belirleme
+                const winnerType = Math.random() > 0.5 ? 'Gojo' : 'Sukuna';
+                
+                if (winnerType === 'Sukuna') {
+                    // SUKUNA KAZANIRSA
+                    currentDomain = { active: true, owner: sukunaID, type: 'Sukuna' };
+                    await message.channel.setName('💀-malevolent-shrine');
+                    await message.channel.send("### 🏮 ALANIN GALİBİ: SUKUNA!\n**Her şey parçalara ayrılıyor...**");
+                    await message.channel.send("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms1NHR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4JmN0PWc/U77FFxPZf4659XoAtA/giphy.gif");
+                } else {
+                    // GOJO (ACE) KAZANIRSA
+                    currentDomain = { active: true, owner: aceID, type: 'Gojo' };
+                    await message.channel.setName('♾️-sonsuz-boşluk');
+                    await message.channel.send("### 🤞 ALANIN GALİBİ: GOJO!\n**Sonsuzluk galip geldi.**");
+                    await message.channel.send("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif");
+                }
             }
-        };
+        }, 2000); // Her 2 saniyede bir tetiklenir (toplam 10 saniye)
+        
+        return; // Çarpışma olduğu için normal açılış kodunu çalıştırma
+    }
 
-        await message.channel.send({ embeds: [embed] });
+    // 2. DURUM: EĞER HİÇBİR ALAN AÇIK DEĞİLSE (NORMAL AÇILIŞ)
+    try {
+        // Herkesin mesaj atmasını engelle
+        await message.channel.permissionOverwrites.edit(roleId, { SendMessages: false });
+        
+        currentDomain = { active: true, owner: message.author.id, type: userType };
+
+        if (isAce) {
+            // GOJO (ACE) ALANI
+            await message.channel.setName('♾️-sonsuz-boşluk');
+            await message.channel.setTopic('ACE Tarafından Alan Genişletildi. Hareket Etmek İmkansız.');
+            
+            const embed = {
+                color: 0x000000,
+                title: '🤞 領域展開 (RYŌIKI TENKAI) - INFINITE VOID',
+                description: '**"ACE TARAFINDAN ALAN GENİŞLETME (SONSUZLUK) BOŞLUĞUNA ATILDINIZ."**\n\n*Burada kelimeler anlamsız, zaman durdu. Sadece benim kurallarım geçerli.*',
+                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif' }
+            };
+            await message.channel.send({ embeds: [embed] });
+
+        } else {
+            // SUKUNA (KURUCU) ALANI
+            await message.channel.setName('🏮-malevolent-shrine');
+            await message.channel.setTopic('SUKUNA Tarafından Alan Genişletildi. Kıyım Başladı.');
+            
+            const sukunaEmbed = {
+                color: 0x8B0000, // Koyu kan kırmızısı
+                title: '🏮 領域展開 (RYŌIKI TENKAI) - MALEVOLENT SHRINE',
+                description: '**"SUKUNA TARAFINDAN MALEVOLENT SHRINE AÇILDI."**\n\n*Her şey göz açıp kapayıncaya kadar kesilecek. Kurban edilmeye hazır olun.*',
+                image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms1NHR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4dzR4JmN0PWc/U77FFxPZf4659XoAtA/giphy.gif' }
+            };
+            await message.channel.send({ embeds: [sukunaEmbed] });
+        }
+
     } catch (error) {
         console.error(error);
         message.reply('Alan genişletilirken bir hata oldu, botun yetkisi yetmiyor olabilir.');
+        currentDomain = { active: false, owner: null, type: null }; // Hata olursa sistemi sıfırla
     }
 }
 
 // --- DOMAIN CLOSE (ALANI KAPATMA) ---
 if (command === 'domainclose') {
-    // Sadece senin ID'ne özel kontrol
-    if (message.author.id !== '983015347105976390') {
-        return message.reply("Alan zaten sana ait değil, kapatamazsın!");
+    // Sadece alanı açan kişi kapatabilir
+    if (!currentDomain.active) {
+        return message.reply("Şu anda açık bir alan yok!");
+    }
+    
+    if (message.author.id !== currentDomain.owner) {
+        return message.reply("Bu alan sana ait değil, sadece alanın sahibi kapatabilir!");
     }
 
     const roleId = '1489798026368254122';
     const gifUrl = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGE5dGs5eHZkNHFwZm40M2xjdGQzNzBuYzkzMDhwYWZ5N2Mxb2V2bSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/HARTNiFs9XM7DqfUtc/giphy.gif';
 
     try {
-        // Rolün mesaj gönderme yetkisini sıfırlıyoruz (null yaparak varsayılana döndürürüz)
-        await message.channel.permissionOverwrites.edit(roleId, {
-            SendMessages: null
-        });
+        // Rolün mesaj gönderme yetkisini sıfırlıyoruz
+        await message.channel.permissionOverwrites.edit(roleId, { SendMessages: null });
+        await message.channel.setName('sohbet'); // Kanal adını normale döndür (kendine göre düzenle)
+        await message.channel.setTopic('');
 
+        // Sistemi sıfırla (Burası çok önemli, yoksa yeni alan açılamaz)
+        currentDomain = { active: false, owner: null, type: null };
 
-        // Alanı kapattığımıza dair aydınlık Embed mesajı
         const embed = {
-            color: 0xFFFFFF, // Bembeyaz aydınlık tema
+            color: 0xFFFFFF,
             title: '👁️ Alan Kapatıldı',
-            description: '**Sonsuzluk sona erdi, gerçekliğe geri döndünüz.**\n\n*Her şey normale döndü, şimdilik.*',
-            image: {
-                url: gifUrl
-            }
+            description: '**Gerçekliğe geri döndünüz.**\n\n*Her şey normale döndü, şimdilik.*',
+            image: { url: gifUrl }
         };
 
         await message.channel.send({ embeds: [embed] });
