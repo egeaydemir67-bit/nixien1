@@ -737,7 +737,7 @@ let currentDomain = {
 
 
 // --- DOMAIN EXPANSION (ALAN GENİŞLETME) ---
-if (command === 'domainexpansion' || command === 'de') {
+if (command === 'domainexpansion' || command === 'domainexpansion') {
     const aceID = '983015347105976390';  
     const sukunaID = '1456965268520833154'; 
     const roleId = '1489798026368254122';   
@@ -755,54 +755,93 @@ if (command === 'domainexpansion' || command === 'de') {
         ? 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzM3NTBtbXl5bmxrb20wa29oamVmYTMzZ29qajZqaDZwdWx0Nzk5NyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jx4cDEP5Jqv8vekuyH/giphy.gif' 
         : 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif';
 
+  // En üstteki global değişkeni şu şekilde güncelle:
+// let currentDomain = { active: false, owner: null, type: null, pinnedMsg: null, timeoutMsg: null, isClashing: false };
+
     // 1. DURUM: ALAN ÇARPIŞMASI (DOMAIN CLASH)
     if (currentDomain.active) {
         if (currentDomain.owner === message.author.id) {
             return message.reply(`Zaten kendi alanının içindesin ${userName}!`);
         }
 
-        let countdown = 10;
+        // Eğer halihazırda bir çarpışma varsa tekrar tetiklenmesini engelle
+        if (currentDomain.isClashing) {
+            return message.reply({ content: "Şu an zaten bir alan çarpışması yaşanıyor, savaşa odaklan!", ephemeral: true });
+        }
+
+        currentDomain.isClashing = true; // Savaş kilidini aç
+
         const clashEmbed = {
             color: 0xFFA500,
-            title: `⚔️ ALAN ÇARPIŞMASI: ${currentDomain.type} vs ${userType}`,
-            description: `**${userName}**, mevcut alanı kendi alanıyla parçalamaya çalışıyor...\n\nBariyerler çatlıyor! Kalan süre: **${countdown}**`,
+            title: `⚔️ ALAN ÇARPIŞMASI BAŞLADI!`,
+            description: `**${userName}**, kendi alanını açarak mevcut bariyeri zorluyor!\n\n🔥 **HAKİMİYET SAVAŞI BAŞLADI!** 🔥\n\n**ACE** ve **NİŞASTA**, alan hakimiyetini ele geçirmek için **10 Saniye** boyunca kanala **\`GÜÇ\`** yazın! En çok yazan bariyeri kırar ve gerçekliği kendi isteğine göre büker!`,
             image: { url: "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cDE5NzhpZTFvODZlbWI4d2Q2eXdmemluenpkdHRoOHVjYmtyY2FsZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Nz0Pr7zKU459KXwbwb/giphy.gif" }
         };
 
-        let clashMsg = await message.channel.send({ embeds: [clashEmbed] });
+        await message.channel.send({ content: `<@${aceID}> ⚔️ <@${sukunaID}>`, embeds: [clashEmbed] });
 
-        const clashInterval = setInterval(async () => {
-            countdown -= 2;
-            if (countdown > 0) {
-                clashEmbed.description = `**${userName}**, mevcut alanı kendi alanıyla parçalamaya çalışıyor...\n\nBariyerler çatlıyor! Kalan süre: **${countdown}**`;
-                await clashMsg.edit({ embeds: [clashEmbed] }).catch(() => {});
+        let aceScore = 0;
+        let sukunaScore = 0;
+
+        // Discord'un Mesaj Toplayıcısı (MessageCollector) ile sadece 'GÜÇ' yazanları sayıyoruz
+        const filter = m => (m.author.id === aceID || m.author.id === sukunaID) && m.content.toLocaleUpperCase('tr-TR') === 'GÜÇ';
+        const collector = message.channel.createMessageCollector({ filter, time: 10000 }); // 10 Saniye (10000 ms)
+
+        collector.on('collect', m => {
+            if (m.author.id === aceID) aceScore++;
+            if (m.author.id === sukunaID) sukunaScore++;
+        });
+
+        collector.on('end', async () => {
+            currentDomain.isClashing = false; // Savaş bitti, kilidi kapat
+
+            let winnerID = null;
+            let winnerName = "";
+            let winnerIsAce = false;
+
+            if (aceScore > sukunaScore) {
+                winnerID = aceID;
+                winnerName = 'GOJO (ACE)';
+                winnerIsAce = true;
+            } else if (sukunaScore > aceScore) {
+                winnerID = sukunaID;
+                winnerName = 'SUKUNA (NİŞASTA)';
+                winnerIsAce = false;
             } else {
-                clearInterval(clashInterval);
-                const winnerIsAce = Math.random() > 0.5; // %50 şans
-                const winnerName = winnerIsAce ? 'GOJO (ACE)' : 'SUKUNA (NİŞASTA)';
-                const winGif = winnerIsAce 
-                    ? 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif' 
-                    : 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif';
-
-                const resultEmbed = {
-                    color: winnerIsAce ? 0x000000 : 0x8B0000,
-                    title: `🏆 ÇARPIŞMANIN GALİBİ: ${winnerName}!`,
-                    description: `**Bariyer paramparça oldu! Kazananın alanı tüm gerçekliği kaplıyor!**\n\nArtık alanın mutlak hakimi ${winnerName}.`,
-                    image: { url: winGif }
-                };
-
-                await clashMsg.edit({ embeds: [resultEmbed] }).catch(() => {});
-
-                // Kazananın verilerini global state'e yaz
-                currentDomain.owner = winnerIsAce ? aceID : sukunaID;
-                currentDomain.type = winnerIsAce ? 'Gojo' : 'Sukuna';
-                
-                // İsteğe bağlı: Eski sabitlenmiş mesajı kaldırıp yenisini sabitleyebilirsin
+                // BERABERLİK DURUMU (Örn: ikisi de 15 kez yazdıysa)
+                await message.channel.send({
+                    embeds: [{
+                        color: 0xFFFFFF,
+                        title: "💥 İKİ ALAN DA ÇÖKTÜ!",
+                        description: `Skor: İkiniz de **${aceScore}** kez yazarak eşit güç uyguladınız!\nLanet enerjileri birbiriyle çakıştı ve iki bariyer de aynı anda paramparça oldu.`,
+                        image: { url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGhpYTNuczVsaGJkczdjNTVsNm43Nmt1ajE1NjIxbnhkYmFvcDhwZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/KJQva3zYQ2rni/giphy.gif' }
+                    }]
+                });
+                return closeDomainLogic(message, roleId, aceID, sukunaID, "Alan çarpışması berabere bitti.");
             }
-        }, 2000); // Discord rate limitlerine takılmamak için 2 saniye ideal
-        return;
-    }
 
+            // KAZANAN BELLİ OLDU
+            const winGif = winnerIsAce 
+                ? 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpkcmZxaGFobnpqMTlrem5jM3Z3YmR5M2k5d2VxcmVxMDQyZGp0ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif' 
+                : 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWVobmE0M3FpaHhyMmpiNWN2MXJ2eXo3OWVmenNpeTZkeTY4c2x5dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26evZjvGaxvlhGeqqL/giphy.gif';
+
+            const resultEmbed = {
+                color: winnerIsAce ? 0x000000 : 0x8B0000,
+                title: `🏆 ÇARPIŞMANIN GALİBİ: ${winnerName}!`,
+                description: `### Lanet Enerjisi Skoru:\n🔵 **ACE:** ${aceScore} Vuruş\n🔴 **NİŞASTA:** ${sukunaScore} Vuruş\n\n**Zayıf olan bariyer paramparça oldu! Artık alanın mutlak hakimi ${winnerName}!**`,
+                image: { url: winGif }
+            };
+
+            await message.channel.send({ content: `<@${winnerID}> ALANI ELE GEÇİRDİ!`, embeds: [resultEmbed] });
+
+            // Kazananın verilerini mevcut alana geçir
+            currentDomain.owner = winnerID;
+            currentDomain.type = winnerIsAce ? 'Gojo' : 'Sukuna';
+        });
+
+        return; // Çarpışma tetiklendiği için kodun geri kalanını (normal alan açılışını) okumasını durdurur
+    }
+    
     // 2. DURUM: NORMAL ALAN AÇILIŞI
     try {
         // İZOLASYON: Herkesi sustur, sadece Ace ve Sukuna'ya konuşma izni ver
