@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const ms = require('ms');
 const Canvas = require('canvas');
 let sonsuzlukAktif = false;
-let currentDomain = { active: false, owner: null, type: null };
+
 
 const statSchema = new mongoose.Schema({
     guildID: String,
