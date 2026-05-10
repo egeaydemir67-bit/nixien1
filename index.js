@@ -845,6 +845,37 @@ if (command === 'hollowpurple') {
     }
 }
 
+    if (command === 'blackflash') {
+    // Sadece sen veya Yöneticiler kullanabilsin
+    if (message.author.id !== '983015347105976390' && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        return message.reply("❌ Bu tekniği kullanacak kadar yüksek bir lanetli enerji seviyesine sahip değilsin.");
+    }
+
+    const target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
+    if (!target) return message.reply("❌ Odaklanman lazım! Kime vuracağını etiketlemedin.");
+
+    if (target.id === message.author.id) return message.reply("❌ Kendi üzerinde kara şimşek çaktıramazsın dostum.");
+    
+    // 5 Dakikalık susturma (300.000 milisaniye)
+    try {
+        await target.timeout(5 * 60 * 1000, "Black Flash! - Kritik Vuruş");
+        
+        const blackFlashEmbed = new EmbedBuilder()
+            .setColor('#000000')
+            .setTitle('✨ KOKUSEN! (BLACK FLASH)')
+            .setDescription(`<@${message.author.id}>, <@${target.id}> adlı kullanıcıya lanetli enerjinin özüyle vurdu! \n\n**Etki:** Kullanıcı **5 dakika** boyunca susturuldu.`)
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTNwczRxZWdvemdhbHFvZ2k0NDk3OXM0YTU3dmUxeHh2MnQycHlhZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Sq8yO4JmUVWGaf1Zxs/giphy.gif')
+            .setFooter({ text: 'Lanetli enerji 10^-7 saniye içinde çaktı!' })
+            .setTimestamp();
+
+        return message.reply({ embeds: [blackFlashEmbed] });
+
+    } catch (err) {
+        console.error(err);
+        return message.reply("❌ Kullanıcıyı sustururken bir hata oluştu (Yetkim yetmiyor olabilir veya kullanıcı yönetici olabilir).");
+    }
+}
+
 // --- HOLLOW PURPLE: ACE ULTRA BLITZKRIEG ---
 if (command === 'hollowpurple100x') {
     const guild = message.guild;
