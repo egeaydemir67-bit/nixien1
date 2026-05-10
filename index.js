@@ -408,6 +408,93 @@ client.on('messageCreate', async message => {
         return message.reply({ embeds: [embed] });
     }
 
+    if (command === 'uyarı') {
+    // Yetki kontrolü (İstediğin Rol ID'si)
+    if (!message.member.roles.cache.has("1501944298076242073")) {
+        return message.reply("❌ Bu işlemi yapmak için gerekli yetkiye sahip değilsin.");
+    }
+
+    const target = message.mentions.users.first() || client.users.cache.get(args[0]);
+    if (!target) {
+        return message.reply("❌ Lütfen uyarmak istediğin kullanıcıyı etiketle.");
+    }
+
+    // Kullanıcının kendisini veya botu uyarmasını engellemek istersen
+    if (target.id === message.author.id) return message.reply("❌ Kendini uyaramazsın!");
+    if (target.bot) return message.reply("❌ Botlara uyarı veremezsin!");
+
+    // Sebep kontrolü (zorunlu)
+    const sebep = args.slice(1).join(' ');
+    if (!sebep) {
+        return message.reply("❌ Uyarı için bir sebep belirtmelisin. Kullanım: `!uyarı @kullanıcı <sebep>`");
+    }
+
+    // 1. ADIM: Sicil Veritabanına Kaydetme
+    const uyariKaydi = await new Sicil({
+        kullaniciID: target.id,
+        yetkiliID: message.author.id,
+        islem: 'Uyarı',
+        sebep: sebep,
+        tarih: new Date(),
+        sure: 'Süresiz' // Uyarının süresi olmaz ama format bozulmasın diye ekledim.
+    }).save();
+
+    // 2. ADIM: Embed ve Buton Oluşturma
+    const embed = new EmbedBuilder()
+        .setColor('#e67e22') // Turuncu uyarı rengi
+        .setAuthor({ name: `${target.username} Adlı Kullanıcı Uyarıldı!`, iconURL: target.displayAvatarURL() })
+        .setDescription(`⚠️ <@${target.id}> adlı kullanıcıya kuralları ihlal ettiği için bir uyarı verildi.\n\n> **Yetkili:** <@${message.author.id}>\n> **Sebep:** *${sebep}*`)
+        .setFooter({ text: '🛡️ Ace System • Yanlış işlem mi? Alttaki butondan geri alabilirsiniz.', iconURL: client.user.displayAvatarURL() })
+        .setTimestamp();
+
+    const row = new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+                .setCustomId(`uyari_kaldir_${uyariKaydi._id}`) // Veritabanındaki eşsiz ID'yi kullanıyoruz
+                .setLabel('Yanlış Uyarıyı Kaldır')
+                .setEmoji('🗑️')
+                .setStyle(ButtonStyle.Danger)
+        );
+
+    const uyariMesaji = await message.reply({ embeds: [embed], components: [row] });
+
+    // 3. ADIM: Buton Etkileşimi (Collector) Dinleme
+    // Sadece komutu kullanan yetkili butona basabilsin ve buton 2 dakika aktif kalsın.
+    const filter = (i) => i.customId === `uyari_kaldir_${uyariKaydi._id}` && i.user.id === message.author.id;
+    const collector = uyariMesaji.createMessageComponentCollector({ filter, time: 120000 }); 
+
+    collector.on('collect', async (i) => {
+        // Veritabanından o uyarıyı sil
+        await Sicil.findByIdAndDelete(uyariKaydi._id);
+
+        const iptalEmbed = new EmbedBuilder()
+            .setColor('#00ff00')
+            .setDescription(`✅ <@${target.id}> adlı kullanıcıya verilen son uyarı **<@${i.user.id}>** tarafından iptal edildi ve kullanıcının sicilinden silindi.`)
+            .setTimestamp();
+
+        // Mesajı güncelle ve butonları kaldır
+        await i.update({ embeds: [iptalEmbed], components: [] });
+    });
+
+    collector.on('end', (collected) => {
+        // Eğer 2 dakika içinde butona basılmazsa, butonu pasif (disabled) hale getiriyoruz ki süresi dolduktan sonra buga girmesin.
+        if (collected.size === 0) {
+            const disabledRow = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('uyari_suresi_doldu')
+                        .setLabel('Uyarıyı Kaldır (Süre Doldu)')
+                        .setEmoji('🗑️')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(true)
+                );
+            uyariMesaji.edit({ components: [disabledRow] }).catch(() => {});
+        }
+    });
+
+    return;
+}
+
     // ====================== YENİ EĞLENCE: KAÇ CM, ZAR AT, YAZI TURA ======================
     if (command === 'kaçcm') {
         const target = message.mentions.users.first() || message.author;
