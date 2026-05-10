@@ -200,7 +200,7 @@ client.on('messageCreate', async message => {
     if (message.author.id === '983015347105976390' || message.author.id === (typeof OWNER_ID !== 'undefined' ? OWNER_ID : "")) {
         elitEmbed.addFields({ 
             name: '👑 Ace Özel', 
-            value: '`a!hollowpurple` | `a!sonsuzluk` | `a!domainexpansion` | `a!domainclose` | `a!ceza-menü`', 
+            value: '`a!hollowpurple` | `a!sonsuzluk` | `a!domainexpansion` | `a!blackflash` | `a!domainclose` | `a!ceza-menü`', 
             inline: false 
         });
     }
