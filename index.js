@@ -188,8 +188,8 @@ client.on('messageCreate', async message => {
             },
             { 
                 name: '⚙️ Yönetim & Sistem', 
-                value: '```diff\n+ a!sicil | a!sil | a!snipe
-``', 
+                value: '```diff\n+ a!sicil | a!sil | a!snipe```', 
+
                 inline: false 
             }
         )
