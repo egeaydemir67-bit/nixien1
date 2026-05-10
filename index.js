@@ -411,7 +411,8 @@ client.on('messageCreate', async message => {
 
     if (command === 'uyarı') {
     // Yetki kontrolü (İstediğin Rol ID'si)
-    if (!message.member.roles.cache.has("1501944298076242073")) {
+  // Yetki kontrolü: Belirtilen rol ID'sine sahipse VEYA Yöneticiyse kullanabilir
+    if (!message.member.roles.cache.has("1501944298076242073") && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
         return message.reply("❌ Bu işlemi yapmak için gerekli yetkiye sahip değilsin.");
     }
 
