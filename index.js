@@ -164,7 +164,7 @@ client.on('messageCreate', async message => {
     };
 
     // ====================== YARDIM ======================
-   if (command === 'yardım') {
+ if (command === 'yardım') {
     const elitEmbed = new EmbedBuilder()
         .setColor('#2b2d31') 
         .setAuthor({ name: `${client.user.username} • Komut Menüsü`, iconURL: client.user.displayAvatarURL() })
@@ -183,20 +183,21 @@ client.on('messageCreate', async message => {
             },
             { 
                 name: '🛡️ Moderasyon Sistemi (Gelişmiş)', 
-                value: '```yaml\na!mute [süre] [sebep]   | a!unmute [@kişi]\na!vmute [süre] [sebep]  | a!unvmute [@kişi]\na!ban [sebep]           | a!unban [ID]\na!kick [sebep]```', 
+                value: '```yaml\na!uyarı [@kişi] [sebep] | a!kick [sebep]\na!mute [süre] [sebep]   | a!unmute [@kişi]\na!vmute [süre] [sebep]  | a!unvmute [@kişi]\na!ban [sebep]           | a!unban [ID]```', 
                 inline: false 
             },
             { 
                 name: '⚙️ Yönetim & Sistem', 
-                value: '```diff\n+ a!sicil | a!sil | a!snipe```', 
+                value: '```diff\n+ a!sicil | a!sil | a!snipe
+``', 
                 inline: false 
             }
         )
         .setFooter({ text: `🛡️ Ace System / Kara System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
         .setTimestamp();
 
-    // SADECE SENİN GÖREBİLECEĞİN ÖZEL ALAN (GÜNCELLENDİ)
-    if (message.author.id === '983015347105976390' || message.author.id === OWNER_ID) {
+    // SADECE SENİN GÖREBİLECEĞİN ÖZEL ALAN
+    if (message.author.id === '983015347105976390' || message.author.id === (typeof OWNER_ID !== 'undefined' ? OWNER_ID : "")) {
         elitEmbed.addFields({ 
             name: '👑 Ace Özel', 
             value: '`a!hollowpurple` | `a!sonsuzluk` | `a!domainexpansion` | `a!domainclose` | `a!ceza-menü`', 
