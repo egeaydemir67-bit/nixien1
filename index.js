@@ -847,7 +847,7 @@ if (command === 'hollowpurple') {
 
     if (command === 'blackflash') {
     // Sadece sen veya Yöneticiler kullanabilsin
-    if (message.author.id !== '983015347105976390' && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+    if (message.author.id !== '983015347105976390, 1255178865643360328' && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
         return message.reply("❌ Bu tekniği kullanacak kadar yüksek bir lanetli enerji seviyesine sahip değilsin.");
     }
 
