@@ -714,7 +714,7 @@ if (command === 'çocukyap') {
     const cinsiyet = (cinsiyetInput === 'kiz' || cinsiyetInput === 'kız') ? 'kız' : 'erkek';
 
     if (!kayit.cocuklar) kayit.cocuklar = []; 
-    if (kayit.cocuklar.length >= 10) return message.reply("Maşallah! Zaten 10 çocuğunuz var, nüfus planlaması şart. Daha fazla yapamazsınız. 😅");
+    if (kayit.cocuklar.length >= 50) return message.reply("Maşallah! Zaten 50 çocuğunuz var, nüfusa farkmı atmaya çalışıyosunuz amk. Daha fazla yapamazsınız. 😅");
 
     const yeniCocuk = {
         ad: isim,
