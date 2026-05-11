@@ -48,10 +48,12 @@ const sicilSchema = new mongoose.Schema({
 });
 const Sicil = mongoose.model('Sicil', sicilSchema);
 
+// Örnek Evlilik Şeması (Kendi dosyandaki ile değiştir/güncelle)
 const evlilikSchema = new mongoose.Schema({
     kullanici1: String,
     kullanici2: String,
-    tarih: { type: Date, default: Date.now }
+    tarih: { type: Date, default: Date.now },
+    cocuklar: { type: Array, default: [] } // Yeni eklenen kısım
 });
 const Evlilik = mongoose.model('Evlilik', evlilikSchema);
 
@@ -528,105 +530,211 @@ client.on('messageCreate', async message => {
         return message.reply(`Havaya bir bozuk para attın...\nVe sonuç: **${sonuc}**\n*🛡️ Ace System*`);
     }
 
-    // ====================== EĞLENCE (ESKİLER) ======================
-    if (command === 'evlen') {
-        const target = message.mentions.users.first();
-        if (!target) return message.reply("Kiminle evlenmek istiyorsun?");
-        if (target.id === message.author.id) return message.reply("Kendi kendinle evlenemezsin!");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
-        const evliMi = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
-        if (evliMi) return message.reply("Zaten evlisin!");
-        const karsiEvliMi = await Evlilik.findOne({ $or: [{ kullanici1: target.id }, { kullanici2: target.id }] });
-        if (karsiEvliMi) return message.reply("Teklif ettiğin kişi zaten evli!");
+// ====================== EĞLENCE (GELİŞTİRİLMİŞ) ======================
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('evet_evlen').setLabel('Evet!').setStyle(ButtonStyle.Success).setEmoji('💍'),
-            new ButtonBuilder().setCustomId('hayir_evlen').setLabel('Hayır').setStyle(ButtonStyle.Danger).setEmoji('💔')
-        );
+if (command === 'evlen') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("💍 Kiminle evlenmek istiyorsun? Etiketlemeyi unuttun!");
+    if (target.id === message.author.id) return message.reply("Kendi kendinle evlenemezsin, o kadar da yalnız değilsin! 😅");
+    if (target.bot) return message.reply("Botlarla evlenmek yasalara aykırı kanka...");
 
-        const teklifMsg = await message.channel.send({ 
-            content: `Hey ${target}, **${message.author.username}** sana evlilik teklifi ediyor! Kabul ediyor musun?`, 
-            components: [row] 
-        });
+    const evliMi = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
+    if (evliMi) return message.reply("Zaten evlisin! Tek eşlilik esastır. 😠");
+    const karsiEvliMi = await Evlilik.findOne({ $or: [{ kullanici1: target.id }, { kullanici2: target.id }] });
+    if (karsiEvliMi) return message.reply("Göz diktiğin kişi zaten başkasıyla evli, yuva yıkanın yuvası olmaz!");
 
-        const filter = i => i.user.id === target.id;
-        const collector = teklifMsg.createMessageComponentCollector({ filter, time: 60000 });
+    const teklifEmbed = new EmbedBuilder()
+        .setColor('#ff69b4')
+        .setTitle('💍 Bir Evlilik Teklifi Var!')
+        .setDescription(`Hey ${target}, **${message.author.username}** sana hayatını birleştirmeyi teklif ediyor!\n\n*Hastalıkta, sağlıkta, iyi günde ve kötü günde onunla olmaya var mısın?*`)
+        .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
+        .setFooter({ text: 'Teklife cevap vermek için 60 saniyen var.' });
 
-        collector.on('collect', async i => {
-            if (i.customId === 'evet_evlen') {
-                await new Evlilik({ kullanici1: message.author.id, kullanici2: target.id }).save();
-                
-                const rol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
-                if (rol) {
-                    message.member.roles.add(rol).catch(()=>{});
-                    const targetMember = message.guild.members.cache.get(target.id);
-                    if (targetMember) targetMember.roles.add(rol).catch(()=>{});
-                }
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('evet_evlen').setLabel('Evet!').setStyle(ButtonStyle.Success).setEmoji('💍'),
+        new ButtonBuilder().setCustomId('hayir_evlen').setLabel('Hayır').setStyle(ButtonStyle.Danger).setEmoji('💔')
+    );
 
-                await i.update({ content: `🎉 Tebrikler! **${message.author.username}** ve **${target.username}** artık resmen evli! 💍\n*🛡️ Ace System*`, components: [] });
-            } else {
-                await i.update({ content: `💔 Ahbeee! **${target.username}**, evlilik teklifini reddetti. Geçmiş olsun...\n*🛡️ Ace System*`, components: [] });
+    const teklifMsg = await message.channel.send({ 
+        content: `${target}`, 
+        embeds: [teklifEmbed],
+        components: [row] 
+    });
+
+    const filter = i => i.user.id === target.id;
+    const collector = teklifMsg.createMessageComponentCollector({ filter, time: 60000 });
+
+    collector.on('collect', async i => {
+        if (i.customId === 'evet_evlen') {
+            await new Evlilik({ kullanici1: message.author.id, kullanici2: target.id, cocuklar: [] }).save();
+            
+            const rol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
+            if (rol) {
+                message.member.roles.add(rol).catch(()=>{});
+                const targetMember = message.guild.members.cache.get(target.id);
+                if (targetMember) targetMember.roles.add(rol).catch(()=>{});
             }
-        });
 
-        collector.on('end', collected => {
-            if (collected.size === 0) teklifMsg.edit({ content: "⏳ Evlilik teklifi zaman aşımına uğradı.", components: [] });
-        });
-    }
+            const kabulEmbed = new EmbedBuilder()
+                .setColor('#00ff00')
+                .setTitle('🎉 Gelin Öpülebilir!')
+                .setDescription(`İnanılmaz! **${message.author.username}** ve **${target.username}** artık resmen evli! Birbirinize çok yakıştınız. 🥂`)
+                .setFooter({ text: '🛡️ Ace System' });
 
-    if (command === 'boşan') {
-        const kayit = await Evlilik.findOne({ 
-            $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] 
-        });
+            await i.update({ content: null, embeds: [kabulEmbed], components: [] });
+        } else {
+            const retEmbed = new EmbedBuilder()
+                .setColor('#ff0000')
+                .setTitle('💔 Yak Yıkıl Hayaller...')
+                .setDescription(`Maalesef, **${target.username}** evlilik teklifini reddetti. Önümüzdeki maçlara bakacağız ${message.author.username}... 🚬`)
+                .setFooter({ text: '🛡️ Ace System' });
 
-        if (!kayit) return message.reply("😕 Zaten evli değilsin ki boşanalım?");
+            await i.update({ content: null, embeds: [retEmbed], components: [] });
+        }
+    });
 
-        const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
-        const partner = await message.guild.members.fetch(partnerID).catch(() => null);
+    collector.on('end', collected => {
+        if (collected.size === 0) teklifMsg.edit({ content: "⏳ Kimse cevap vermedi, teklif zaman aşımına uğradı.", embeds: [], components: [] });
+    });
+}
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('evet_bosan').setLabel('Evet, Boşanalım').setStyle(ButtonStyle.Danger).setEmoji('💔'),
-            new ButtonBuilder().setCustomId('hayir_bosan').setLabel('Hayır, Vazgeçtim').setStyle(ButtonStyle.Secondary).setEmoji('❤️')
-        );
+if (command === 'boşan') {
+    const kayit = await Evlilik.findOne({ 
+        $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] 
+    });
 
-        const bosanMsg = await message.reply({
-            content: `💔 **${message.author.username}**, <@${partnerID}> ile boşanmak istediğini söylüyor.\nGerçekten boşanmak istiyor musun?`,
-            components: [row]
-        });
+    if (!kayit) return message.reply("😕 Zaten evli değilsin ki boşanalım?");
 
-        const filter = i => i.user.id === message.author.id;
-        const collector = bosanMsg.createMessageComponentCollector({ filter, time: 60000 });
+    const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
+    const partner = await message.guild.members.fetch(partnerID).catch(() => null);
 
-        collector.on('collect', async i => {
-            if (i.customId === 'evet_bosan') {
-                await Evlilik.deleteOne({ _id: kayit._id });
+    const bosanEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setTitle('⚖️ Mahkeme Salonu')
+        .setDescription(`**${message.author.username}**, cidden <@${partnerID}> ile yollarını ayırmak istiyor musun?\n*Bu işlem geri alınamaz ve tüm çocukların velayeti devlete (bota) geçer.*`)
+        .setThumbnail('https://cdn-icons-png.flaticon.com/512/10355/10355836.png'); // Kırık kalp ikonu
 
-                const evliRol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
-                if (evliRol) {
-                    message.member.roles.remove(evliRol).catch(() => {});
-                    if (partner) partner.roles.remove(evliRol).catch(() => {});
-                }
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('evet_bosan').setLabel('Evet, Boşanalım').setStyle(ButtonStyle.Danger).setEmoji('💔'),
+        new ButtonBuilder().setCustomId('hayir_bosan').setLabel('Hayır, Vazgeçtim').setStyle(ButtonStyle.Secondary).setEmoji('❤️')
+    );
 
-                await i.update({ content: `💔 **${message.author.username}** ve <@${partnerID}> resmen boşandı...\n*🛡️ Ace System*`, components: [] });
-            } else {
-                await i.update({ content: `❤️ Boşanma iptal edildi. Hâlâ evlisin! 💍\n*🛡️ Ace System*`, components: [] });
+    const bosanMsg = await message.reply({
+        embeds: [bosanEmbed],
+        components: [row]
+    });
+
+    const filter = i => i.user.id === message.author.id;
+    const collector = bosanMsg.createMessageComponentCollector({ filter, time: 60000 });
+
+    collector.on('collect', async i => {
+        if (i.customId === 'evet_bosan') {
+            await Evlilik.deleteOne({ _id: kayit._id });
+
+            const evliRol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
+            if (evliRol) {
+                message.member.roles.remove(evliRol).catch(() => {});
+                if (partner) partner.roles.remove(evliRol).catch(() => {});
             }
-        });
 
-        collector.on('end', collected => {
-            if (collected.size === 0) bosanMsg.edit({ content: "⏳ Boşanma talebi zaman aşımına uğradı.", components: [] }).catch(() => {});
-        });
+            const sonEmbed = new EmbedBuilder()
+                .setColor('#000000')
+                .setDescription(`📜 Mahkeme kararıyla **${message.author.username}** ve <@${partnerID}> resmen boşandı. Herkes kendi yoluna...`)
+                .setFooter({ text: '🛡️ Ace System' });
+
+            await i.update({ embeds: [sonEmbed], components: [] });
+        } else {
+            const iptalEmbed = new EmbedBuilder()
+                .setColor('#00ff00')
+                .setDescription(`❤️ Aşk galip geldi! Boşanma davası geri çekildi. Hâlâ evlisiniz! 💍`)
+                .setFooter({ text: '🛡️ Ace System' });
+
+            await i.update({ embeds: [iptalEmbed], components: [] });
+        }
+    });
+
+    collector.on('end', collected => {
+        if (collected.size === 0) bosanMsg.edit({ content: "⏳ İşlem iptal edildi (Zaman Aşımı).", embeds: [], components: [] }).catch(() => {});
+    });
+}
+
+if (command === 'evlilik') {
+    const kayit = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
+    if (!kayit) return message.reply("Bekarlık sultanlıktır... ama sen şu an sultansın (Evli değilsin).");
+
+    const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
+    const tarihSaniye = Math.floor(kayit.tarih.getTime() / 1000); 
+
+    let cocukMetni = "Yok";
+    if (kayit.cocuklar && kayit.cocuklar.length > 0) {
+        cocukMetni = kayit.cocuklar.map((c, index) => {
+            const emoji = c.cinsiyet === 'kız' ? '👧' : '👦';
+            return `**${index + 1}.** ${emoji} ${c.ad} (${c.cinsiyet})`;
+        }).join('\n');
     }
 
-    if (command === 'evlilik') {
-        const kayit = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
-        if (!kayit) return message.reply("Şu an kimseyle evli değilsin.");
+    const cuzdanEmbed = new EmbedBuilder()
+        .setColor('#8b0000') // Bordo renk (Nüfus cüzdanı/Evlilik cüzdanı teması)
+        .setTitle('📜 AİLE VE NÜFUS CÜZDANI')
+        .setThumbnail('https://cdn-icons-png.flaticon.com/512/3063/3063226.png') // Klasik cüzdan resmi
+        .addFields(
+            { name: '👤 1. Eş', value: `<@${message.author.id}>`, inline: true },
+            { name: '👤 2. Eş', value: `<@${partnerID}>`, inline: true },
+            { name: '\u200B', value: '\u200B', inline: true }, // Boşluk
+            { name: '📅 Evlilik Tarihi ve Saati', value: `<t:${tarihSaniye}:F>`, inline: false },
+            { name: '⏳ Evlilik Süresi', value: `<t:${tarihSaniye}:R>`, inline: false },
+            { name: '👶 Kayıtlı Çocuklar', value: cocukMetni, inline: false }
+        )
+        .setFooter({ text: 'TC. Discord Nüfus Müdürlüğü • 🛡️ Ace System', iconURL: message.guild.iconURL() });
 
-        const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
-        const tarih = Math.floor(kayit.tarih.getTime() / 1000); 
-        return message.reply(`💍 <@${partnerID}> ile <t:${tarih}:R> evlendin!\n*🛡️ Ace System*`);
+    return message.reply({ embeds: [cuzdanEmbed] });
+}
+
+if (command === 'çocukyap') {
+    // Argümanları yakala (Örn: !çocukyap Ali erkek)
+    // args tanımlı değilse mesaj içeriğinden çekelim:
+    const args = message.content.trim().split(/ +/).slice(1);
+    
+    const kayit = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
+    if (!kayit) return message.reply("Çocuk yapmak için önce evlenmen lazım! Leylekler getirmiyor ya bunu...");
+
+    const isim = args[0];
+    const cinsiyetInput = args[1]?.toLowerCase();
+
+    if (!isim || !cinsiyetInput) {
+        return message.reply("Doğru kullanım: `!çocukyap <isim> <kız/erkek>`");
     }
 
+    if (!['kız', 'kiz', 'erkek'].includes(cinsiyetInput)) {
+        return message.reply("Lütfen geçerli bir cinsiyet gir: `kız` veya `erkek`.");
+    }
+
+    const cinsiyet = (cinsiyetInput === 'kiz' || cinsiyetInput === 'kız') ? 'kız' : 'erkek';
+
+    if (!kayit.cocuklar) kayit.cocuklar = []; 
+    if (kayit.cocuklar.length >= 10) return message.reply("Maşallah! Zaten 10 çocuğunuz var, nüfus planlaması şart. Daha fazla yapamazsınız. 😅");
+
+    const yeniCocuk = {
+        ad: isim,
+        cinsiyet: cinsiyet
+    };
+
+    kayit.cocuklar.push(yeniCocuk);
+    await kayit.save();
+
+    const emoji = cinsiyet === 'kız' ? '👧' : '👦';
+    const cocukEmbed = new EmbedBuilder()
+        .setColor(cinsiyet === 'kız' ? '#ffb6c1' : '#add8e6') // Kıza pembe, erkeğe mavi ton
+        .setTitle('🍼 Yeni Bir Bebek Dünyaya Geldi!')
+        .setDescription(`Tebrikler <@${message.author.id}>! Nur topu gibi bir **${cinsiyet}** çocuğunuz oldu.\n\nİsmi: **${isim}** ${emoji}\n\n*Ailesine ve vatanına hayırlı bir evlat olması dileğiyle...*`)
+        .setFooter({ text: '🛡️ Ace System' });
+
+    return message.reply({ embeds: [cocukEmbed] });
+}
+
+    
     if (command === 'kedisev') {
         try {
             const res = await fetch('https://api.thecatapi.com/v1/images/search');
