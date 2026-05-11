@@ -662,34 +662,82 @@ if (command === 'boşan') {
 
 if (command === 'evlilik') {
     const kayit = await Evlilik.findOne({ $or: [{ kullanici1: message.author.id }, { kullanici2: message.author.id }] });
-    if (!kayit) return message.reply("Bekarlık sultanlıktır... ama sen şu an sultansın (Evli değilsin).");
+    if (!kayit) return message.reply("Bekarlık sultanlıktır... ama sen şu an sultansın.");
 
     const partnerID = kayit.kullanici1 === message.author.id ? kayit.kullanici2 : kayit.kullanici1;
     const tarihSaniye = Math.floor(kayit.tarih.getTime() / 1000); 
 
+    // Çocukları listeleme mantığını limitlere göre ayarlıyoruz
     let cocukMetni = "Yok";
-    if (kayit.cocuklar && kayit.cocuklar.length > 0) {
-        cocukMetni = kayit.cocuklar.map((c, index) => {
-            const emoji = c.cinsiyet === 'kız' ? '👧' : '👦';
-            return `**${index + 1}.** ${emoji} ${c.ad} (${c.cinsiyet})`;
-        }).join('\n');
+    const cocukSayisi = kayit.cocuklar ? kayit.cocuklar.length : 0;
+
+    if (cocukSayisi > 0) {
+        // Eğer çocuk sayısı çoksa (örn 15+), embed şişmesin diye kısa liste yapıyoruz
+        if (cocukSayisi > 15) {
+            cocukMetni = `👨‍👩‍👧‍👦 Toplam **${cocukSayisi}** çocuk var.\n*Hepsini görmek için aşağıdaki butona tıkla!*`;
+        } else {
+            cocukMetni = kayit.cocuklar.map((c, index) => {
+                const emoji = c.cinsiyet === 'kız' ? '👧' : '👦';
+                return `\`${index + 1}.\` ${emoji} ${c.ad}`;
+            }).join(' | '); // Yan yana yazdırarak yerden tasarruf ediyoruz
+        }
     }
 
     const cuzdanEmbed = new EmbedBuilder()
-        .setColor('#8b0000') // Bordo renk (Nüfus cüzdanı/Evlilik cüzdanı teması)
+        .setColor('#8b0000')
         .setTitle('📜 AİLE VE NÜFUS CÜZDANI')
-        .setThumbnail('https://cdn-icons-png.flaticon.com/512/3063/3063226.png') // Klasik cüzdan resmi
+        .setThumbnail('https://cdn-icons-png.flaticon.com/512/3063/3063226.png')
         .addFields(
-            { name: '👤 1. Eş', value: `<@${message.author.id}>`, inline: true },
-            { name: '👤 2. Eş', value: `<@${partnerID}>`, inline: true },
-            { name: '\u200B', value: '\u200B', inline: true }, // Boşluk
-            { name: '📅 Evlilik Tarihi ve Saati', value: `<t:${tarihSaniye}:F>`, inline: false },
-            { name: '⏳ Evlilik Süresi', value: `<t:${tarihSaniye}:R>`, inline: false },
-            { name: '👶 Kayıtlı Çocuklar', value: cocukMetni, inline: false }
+            { name: '👤 Eşler', value: `<@${kayit.kullanici1}> 💍 <@${kayit.kullanici2}>`, inline: false },
+            { name: '📅 Evlilik Tarihi', value: `<t:${tarihSaniye}:F> (<t:${tarihSaniye}:R>)`, inline: false },
+            { name: `👶 Kayıtlı Çocuklar (${cocukSayisi})`, value: cocukMetni, inline: false }
         )
-        .setFooter({ text: 'TC. Discord Nüfus Müdürlüğü • 🛡️ Ace System', iconURL: message.guild.iconURL() });
+        .setFooter({ text: 'TC. Discord Nüfus Müdürlüğü • 🛡️ Ace System' });
 
-    return message.reply({ embeds: [cuzdanEmbed] });
+    // Eğer 15'ten fazla çocuk varsa detay butonu ekleyelim
+    const components = [];
+    if (cocukSayisi > 15) {
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('cocuklari_listele')
+                .setLabel('Tüm Çocukları Listele')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('👶')
+        );
+        components.push(row);
+    }
+
+    const msg = await message.reply({ embeds: [cuzdanEmbed], components: components });
+
+    // Buton kolektörü (Sadece çok çocuk varsa çalışır)
+    if (cocukSayisi > 15) {
+        const filter = i => i.user.id === message.author.id;
+        const collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+
+        collector.on('collect', async i => {
+            if (i.customId === 'cocuklari_listele') {
+                // Çocukları 25-25 iki gruba ayırıp daha geniş bir listede gösteriyoruz
+                const tamListe = kayit.cocuklar.map((c, index) => {
+                    const emoji = c.cinsiyet === 'kız' ? '👧' : '👦';
+                    return `**${index + 1}.** ${emoji} ${c.ad}`;
+                });
+
+                const chunk = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, k) => arr.slice(k * size, k * size + size));
+                const parcalar = chunk(tamListe, 25); // Discord 25 field sınırı koyduğu için bölüyoruz
+
+                const listeEmbed = new EmbedBuilder()
+                    .setColor('#8b0000')
+                    .setTitle(`👶 ${message.author.username} Ailesinin Tüm Çocukları`)
+                    .setDescription(parcalar[0].join('\n')) // İlk 25 çocuk
+
+                if (parcalar[1]) {
+                    listeEmbed.addFields({ name: 'Devamı...', value: parcalar[1].join('\n') }); // Sonraki 25 çocuk
+                }
+
+                await i.reply({ embeds: [listeEmbed], ephemeral: true });
+            }
+        });
+    }
 }
 
 if (command === 'çocukyap') {
