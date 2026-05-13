@@ -634,7 +634,6 @@ if (command === 'yardım') {
         return message.reply(`Havaya bir bozuk para attın...\nVe sonuç: **${sonuc}**\n*🛡️ Ace System*`);
     }
 
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
 // ====================== EĞLENCE (GELİŞTİRİLMİŞ) ======================
 
