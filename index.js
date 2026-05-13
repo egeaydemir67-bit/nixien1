@@ -167,106 +167,56 @@ client.on('messageCreate', async message => {
 
 // ====================== YARDIM (BUTONLU) ======================
     if (command === 'yardım') {
-        const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ComponentType } = require('discord.js');
+        const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
-        // --- ANA SAYFA EMBED ---
         const mainEmbed = new EmbedBuilder()
             .setColor('#2b2d31')
             .setAuthor({ name: `${client.user.username} • Yardım Menüsü`, iconURL: client.user.displayAvatarURL() })
             .setThumbnail(message.guild.iconURL({ dynamic: true }))
-            .setDescription(
-                `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
-                `> Aşağıdaki butonları kullanarak kategoriler arasında geçiş yapabilirsin.\n\n` +
-                `**✨ İstatistikler:**\n` +
-                `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
-            )
-            .setFooter({ text: `🛡️ Ace System • Sorgulayan: ${message.author.username}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+            .setDescription(`> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n> Aşağıdaki butonlardan kategorileri inceleyebilirsin.\n\n**✨ İstatistikler:**\n┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``)
+            .setFooter({ text: `🛡️ Ace System • ${message.author.username} istedi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
             .setTimestamp();
 
-        // --- BUTONLAR ---
         const buttons = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId('eglence').setLabel('Eğlence').setEmoji('🎭').setStyle(ButtonStyle.Secondary),
             new ButtonBuilder().setCustomId('moderasyon').setLabel('Moderasyon').setEmoji('🛡️').setStyle(ButtonStyle.Secondary),
             new ButtonBuilder().setCustomId('yonetim').setLabel('Yönetim').setEmoji('⚙️').setStyle(ButtonStyle.Secondary)
         );
 
-        // Sahibi kontrol et ve Ace Özel butonu ekle
-        const isOwner = message.author.id === '983015347105976390';
-        if (isOwner) {
-            buttons.addComponents(
-                new ButtonBuilder().setCustomId('aceozel').setLabel('Ace Özel').setEmoji('👑').setStyle(ButtonStyle.Danger)
-            );
+        if (message.author.id === '983015347105976390') {
+            buttons.addComponents(new ButtonBuilder().setCustomId('aceozel').setLabel('Ace Özel').setEmoji('👑').setStyle(ButtonStyle.Danger));
         }
 
         const msg = await message.reply({ embeds: [mainEmbed], components: [buttons] });
 
-        // --- COLLECTOR (ETKİLEŞİM YAKALAYICI) ---
-        const collector = msg.createMessageComponentCollector({
-            filter: i => i.user.id === message.author.id, // Sadece komutu yazan kullanabilir
-            time: 60000 // 1 dakika sonra butonlar deaktif olur
-        });
+        const collector = msg.createMessageComponentCollector({ filter: i => i.user.id === message.author.id, time: 60000 });
 
-collector.on('collect', async i => {
-            const selectedEmbed = new EmbedBuilder()
-                .setColor('#2b2d31')
-                .setTimestamp();
+        collector.on('collect', async i => {
+            const embed = new EmbedBuilder().setColor('#2b2d31').setTimestamp();
 
             if (i.customId === 'eglence') {
-                selectedEmbed.setTitle('🎭 Üye/Eğlence Komutları')
-                    .setDescription(`\`\`\`fix
-a!aşkölç
-a!evlen | a!boşan | a!evlilik
-a!kedisev | a!patlat
-a!zarat | a!yazıtura
-a!kaçcm | a!stat | a!leaderstat
-
-a!sarıl | a!öp | a!tokat
-a!duello | a!keko-olcer | a!fidye
-\`\`\``);
+                embed.setTitle('🎭 Üye/Eğlence Komutları')
+                     .addFields({ name: 'Komutlar', value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat | a!leaderstat\na!sarıl | a!öp | a!tokat | a!duello\na!keko-olcer | a!fidye```' });
             } 
-            
             else if (i.customId === 'moderasyon') {
-                selectedEmbed.setTitle('🛡️ Moderasyon Sistemi')
-                    .setDescription(`\`\`\`yaml
-a!uyarı [@kişi] [sebep]
-a!kick [sebep]
-a!ban [sebep] | a!unban [ID]
-a!mute [süre] [sebep] | a!unmute
-a!vmute [süre] [sebep] | a!unvmute
-\`\`\``);
+                embed.setTitle('🛡️ Moderasyon Sistemi')
+                     .addFields({ name: 'Komutlar', value: '```yaml\na!uyarı | a!kick | a!ban | a!unban\na!mute | a!unmute | a!vmute | a!unvmute```' });
             } 
-            
             else if (i.customId === 'yonetim') {
-                selectedEmbed.setTitle('⚙️ Yönetim & Sistem')
-                    .setDescription(`\`\`\`diff
-+ a!sicil
-+ a!sil
-+ a!snipe
-\`\`\``);
+                embed.setTitle('⚙️ Yönetim & Sistem')
+                     .addFields({ name: 'Komutlar', value: '```diff\n+ a!sicil | a!sil | a!snipe```' });
             } 
-            
             else if (i.customId === 'aceozel') {
-                selectedEmbed.setTitle('👑 Ace Özel Menü')
-                    .setColor('#ff0000')
-                    .setDescription(`\`\`\`fix
-a!hollowpurple
-a!sonsuzluk
-a!domainexpansion
-a!blackflash
-a!domainclose
-a!ceza-menü
-\`\`\``);
+                embed.setTitle('👑 Ace Özel Menü').setColor('#ff0000')
+                     .addFields({ name: 'Komutlar', value: '`a!hollowpurple` | `a!sonsuzluk` | `a!domainexpansion` | `a!blackflash` | `a!domainclose` | `a!ceza-menü`' });
             }
 
-            await i.update({ embeds: [selectedEmbed] }).catch(() => {});
+            await i.update({ embeds: [embed] }).catch(() => {});
         });
 
         collector.on('end', () => {
-            // Süre dolduğunda butonları devre dışı bırak (isteğe bağlı)
-            const disabledButtons = new ActionRowBuilder().addComponents(
-                buttons.components.map(button => ButtonBuilder.from(button).setDisabled(true))
-            );
-            msg.edit({ components: [disabledButtons] }).catch(() => {});
+            const row = new ActionRowBuilder().addComponents(buttons.components.map(b => ButtonBuilder.from(b).setDisabled(true)));
+            msg.edit({ components: [row] }).catch(() => {});
         });
     }
 
