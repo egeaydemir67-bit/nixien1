@@ -1,4 +1,18 @@
-const { Client, GatewayIntentBits, PermissionsBitField, EmbedBuilder, Partials, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { 
+    Client, 
+    GatewayIntentBits, 
+    PermissionsBitField, 
+    EmbedBuilder, 
+    Partials, 
+    ActionRowBuilder, 
+    ButtonBuilder, 
+    ButtonStyle, 
+    StringSelectMenuBuilder, 
+    AttachmentBuilder, 
+    ModalBuilder, 
+    TextInputBuilder, 
+    TextInputStyle 
+} = require('discord.js');
 const http = require('http');
 const mongoose = require('mongoose');
 const ms = require('ms');
@@ -459,7 +473,7 @@ if (command === 'yardım') {
     }
 
    if (command === 'uyarı') {
-    const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require('discord.js');
+   
 
     // 1. YETKİ KONTROLÜ (Komutu kullanan kişi yetkili mi?)
     const yetkiliRolID = "1501944298076242073";
