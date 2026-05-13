@@ -165,50 +165,107 @@ client.on('messageCreate', async message => {
         return message.author.id === message.guild.ownerId || message.author.id === OWNER_ID || message.member.roles.cache.has(rolID);
     };
 
-    // ====================== YARDIM ======================
- if (command === 'yardım') {
-    const elitEmbed = new EmbedBuilder()
-        .setColor('#2b2d31') 
-        .setAuthor({ name: `${client.user.username} • Komut Menüsü`, iconURL: client.user.displayAvatarURL() })
-        .setThumbnail(message.guild.iconURL({ dynamic: true }))
-        .setDescription(
-            `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
-            `> Aşağıdaki kategorilerden botun özelliklerini inceleyebilirsin.\n\n` +
-            `**✨ İstatistikler:**\n` +
-            `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
-        )
-        .addFields(
-            { 
-                name: '🎭 Üye/Eğlence Komutları', 
-                value: '```fix\na!aşkölç | a!evlen | a!boşan | a!evlilik\na!kedisev | a!patlat | a!zarat | a!yazıtura\na!kaçcm | a!stat | a!leaderstat```', 
-                inline: false 
-            },
-            { 
-                name: '🛡️ Moderasyon Sistemi (Gelişmiş)', 
-                value: '```yaml\na!uyarı [@kişi] [sebep] | a!kick [sebep]\na!mute [süre] [sebep]   | a!unmute [@kişi]\na!vmute [süre] [sebep]  | a!unvmute [@kişi]\na!ban [sebep]           | a!unban [ID]```', 
-                inline: false 
-            },
-            { 
-                name: '⚙️ Yönetim & Sistem', 
-                value: '```diff\n+ a!sicil | a!sil | a!snipe```', 
+// ====================== YARDIM (BUTONLU) ======================
+    if (command === 'yardım') {
+        const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ComponentType } = require('discord.js');
 
-                inline: false 
+        // --- ANA SAYFA EMBED ---
+        const mainEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setAuthor({ name: `${client.user.username} • Yardım Menüsü`, iconURL: client.user.displayAvatarURL() })
+            .setThumbnail(message.guild.iconURL({ dynamic: true }))
+            .setDescription(
+                `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
+                `> Aşağıdaki butonları kullanarak kategoriler arasında geçiş yapabilirsin.\n\n` +
+                `**✨ İstatistikler:**\n` +
+                `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
+            )
+            .setFooter({ text: `🛡️ Ace System • Sorgulayan: ${message.author.username}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+            .setTimestamp();
+
+        // --- BUTONLAR ---
+        const buttons = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId('eglence').setLabel('Eğlence').setEmoji('🎭').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('moderasyon').setLabel('Moderasyon').setEmoji('🛡️').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder().setCustomId('yonetim').setLabel('Yönetim').setEmoji('⚙️').setStyle(ButtonStyle.Secondary)
+        );
+
+        // Sahibi kontrol et ve Ace Özel butonu ekle
+        const isOwner = message.author.id === '983015347105976390';
+        if (isOwner) {
+            buttons.addComponents(
+                new ButtonBuilder().setCustomId('aceozel').setLabel('Ace Özel').setEmoji('👑').setStyle(ButtonStyle.Danger)
+            );
+        }
+
+        const msg = await message.reply({ embeds: [mainEmbed], components: [buttons] });
+
+        // --- COLLECTOR (ETKİLEŞİM YAKALAYICI) ---
+        const collector = msg.createMessageComponentCollector({
+            filter: i => i.user.id === message.author.id, // Sadece komutu yazan kullanabilir
+            time: 60000 // 1 dakika sonra butonlar deaktif olur
+        });
+
+collector.on('collect', async i => {
+            let selectedEmbed = new EmbedBuilder().setColor('#2b2d31').setTimestamp();
+
+            if (i.customId === 'eglence') {
+                selectedEmbed.setTitle('🎭 Üye/Eğlence Komutları')
+                    .setDescription(
+                        '```fix\n' +
+                        'a!aşkölç    | a!evlen     | a!boşan\n' +
+                        'a!evlilik   | a!kedisev   | a!patlat\n' +
+                        'a!zarat     | a!yazıtura  | a!kaçcm\n' +
+                        'a!stat      | a!leaderstat\n\n' +
+                        'a!sarıl     | a!öp        | a!tokat\n' +
+                        'a!duello    | a!keko-olcer| a!fidye\n' +
+                        '```'
+                    );
+            } 
+            
+            else if (i.customId === 'moderasyon') {
+                selectedEmbed.setTitle('🛡️ Moderasyon Sistemi')
+                    .setDescription(
+                        '```yaml\n' +
+                        'a!uyarı     | a!kick      | a!ban\n' +
+                        'a!unban     | a!mute      | a!unmute\n' +
+                        'a!vmute     | a!unvmute\n' +
+                        '```'
+                    );
+            } 
+            
+            else if (i.customId === 'yonetim') {
+                selectedEmbed.setTitle('⚙️ Yönetim & Sistem')
+                    .setDescription(
+                        '```diff\n' +
+                        '+ a!sicil   | a!sil       | a!snipe\n' +
+                        '```'
+                    );
+            } 
+            
+            else if (i.customId === 'aceozel') {
+                selectedEmbed.setTitle('👑 Ace Özel Menü')
+                    .setColor('#ff0000')
+                    .setDescription(
+                        '```fix\n' +
+                        'a!hollowpurple    | a!sonsuzluk\n' +
+                        'a!domainexpansion | a!blackflash\n' +
+                        'a!domainclose     | a!ceza-menü\n' +
+                        '```'
+                    );
             }
-        )
-        .setFooter({ text: `🛡️ Ace System / Kara System • ${message.author.username} tarafından istendi.`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
-        .setTimestamp();
 
-    // SADECE SENİN GÖREBİLECEĞİN ÖZEL ALAN
-    if (message.author.id === '983015347105976390' || message.author.id === (typeof OWNER_ID !== 'undefined' ? OWNER_ID : "")) {
-        elitEmbed.addFields({ 
-            name: '👑 Ace Özel', 
-            value: '`a!hollowpurple` | `a!sonsuzluk` | `a!domainexpansion` | `a!blackflash` | `a!domainclose` | `a!ceza-menü`', 
-            inline: false 
+            await i.update({ embeds: [selectedEmbed] });
+        });
+
+        collector.on('end', () => {
+            // Süre dolduğunda butonları devre dışı bırak (isteğe bağlı)
+            const disabledButtons = new ActionRowBuilder().addComponents(
+                buttons.components.map(button => ButtonBuilder.from(button).setDisabled(true))
+            );
+            msg.edit({ components: [disabledButtons] }).catch(() => {});
         });
     }
-
-    return message.reply({ embeds: [elitEmbed] });
-}
 
     // ====================== SİL VE SNIPE ======================
     if (command === 'sil') {
@@ -411,95 +468,152 @@ client.on('messageCreate', async message => {
         return message.reply({ embeds: [embed] });
     }
 
-    if (command === 'uyarı') {
-    // Yetki kontrolü (İstediğin Rol ID'si)
-  // Yetki kontrolü: Belirtilen rol ID'sine sahipse VEYA Yöneticiyse kullanabilir
-    if (!message.member.roles.cache.has("1501944298076242073") && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+   if (command === 'uyarı') {
+    const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require('discord.js');
+
+    // 1. YETKİ KONTROLÜ (Komutu kullanan kişi yetkili mi?)
+    const yetkiliRolID = "1501944298076242073";
+    const yetkiliMi = message.member.roles.cache.has(yetkiliRolID) || 
+                      message.member.permissions.has(PermissionsBitField.Flags.Administrator) ||
+                      message.author.id === '983015347105976390'; // Sen her zaman kullanabilmelisin
+
+    if (!yetkiliMi) {
         return message.reply("❌ Bu işlemi yapmak için gerekli yetkiye sahip değilsin.");
     }
 
+    // 2. HEDEF KULLANICIYI BULMA
     const target = message.mentions.users.first() || client.users.cache.get(args[0]);
     if (!target) {
-        return message.reply("❌ Lütfen uyarmak istediğin kullanıcıyı etiketle.");
+        return message.reply("❌ Lütfen uyarmak istediğin kullanıcıyı etiketle veya ID gir.");
     }
 
-    // Kullanıcının kendisini veya botu uyarmasını engellemek istersen
-    if (target.id === message.author.id) return message.reply("❌ Kendini uyaramazsın!");
-    if (target.bot) return message.reply("❌ Botlara uyarı veremezsin!");
-
-    // Sebep kontrolü (zorunlu)
+    // 3. SEBEP KONTROLÜ
     const sebep = args.slice(1).join(' ');
     if (!sebep) {
         return message.reply("❌ Uyarı için bir sebep belirtmelisin. Kullanım: `!uyarı @kullanıcı <sebep>`");
     }
 
-    // 1. ADIM: Sicil Veritabanına Kaydetme
-    const uyariKaydi = await new Sicil({
-        kullaniciID: target.id,
-        yetkiliID: message.author.id,
-        islem: 'Uyarı',
-        sebep: sebep,
-        tarih: new Date(),
-        sure: 'Süresiz' // Uyarının süresi olmaz ama format bozulmasın diye ekledim.
-    }).save();
+    // Botu uyarmayı engelleme (Veritabanı şişmesin diye bunu tutmanı öneririm)
+    if (target.bot) return message.reply("❌ Botlara uyarı veremezsin!");
 
-    // 2. ADIM: Embed ve Buton Oluşturma
-    const embed = new EmbedBuilder()
-        .setColor('#e67e22') // Turuncu uyarı rengi
-        .setAuthor({ name: `${target.username} Adlı Kullanıcı Uyarıldı!`, iconURL: target.displayAvatarURL() })
-        .setDescription(`⚠️ <@${target.id}> adlı kullanıcıya kuralları ihlal ettiği için bir uyarı verildi.\n\n> **Yetkili:** <@${message.author.id}>\n> **Sebep:** *${sebep}*`)
-        .setFooter({ text: '🛡️ Ace System • Yanlış işlem mi? Alttaki butondan geri alabilirsiniz.', iconURL: client.user.displayAvatarURL() })
-        .setTimestamp();
+    try {
+        // 4. ADIM: Sicil Veritabanına Kaydetme
+        const uyariKaydi = await new Sicil({
+            kullaniciID: target.id,
+            yetkiliID: message.author.id,
+            islem: 'Uyarı',
+            sebep: sebep,
+            tarih: new Date(),
+            sure: 'Süresiz'
+        }).save();
 
-    const row = new ActionRowBuilder()
-        .addComponents(
+        // 5. ADIM: Embed ve Buton
+        const embed = new EmbedBuilder()
+            .setColor('#e67e22')
+            .setAuthor({ name: `${target.username} Adlı Kullanıcı Uyarıldı!`, iconURL: target.displayAvatarURL() })
+            .setDescription(`⚠️ <@${target.id}> adlı kullanıcıya bir uyarı verildi.\n\n> **Yetkili:** <@${message.author.id}>\n> **Sebep:** *${sebep}*`)
+            .setFooter({ text: '🛡️ Ace System • İşlemi geri almak için butonu kullanın.', iconURL: client.user.displayAvatarURL() })
+            .setTimestamp();
+
+        const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId(`uyari_kaldir_${uyariKaydi._id}`) // Veritabanındaki eşsiz ID'yi kullanıyoruz
+                .setCustomId(`uyari_kaldir_${uyariKaydi._id}`)
                 .setLabel('Yanlış Uyarıyı Kaldır')
                 .setEmoji('🗑️')
                 .setStyle(ButtonStyle.Danger)
         );
 
-    const uyariMesaji = await message.reply({ embeds: [embed], components: [row] });
+        const uyariMesaji = await message.reply({ embeds: [embed], components: [row] });
 
-    // 3. ADIM: Buton Etkileşimi (Collector) Dinleme
-    // Sadece komutu kullanan yetkili butona basabilsin ve buton 2 dakika aktif kalsın.
-    const filter = (i) => i.customId === `uyari_kaldir_${uyariKaydi._id}` && i.user.id === message.author.id;
-    const collector = uyariMesaji.createMessageComponentCollector({ filter, time: 120000 }); 
+        // 6. ADIM: Collector (İptal Etme Sistemi)
+        const filter = (i) => i.customId === `uyari_kaldir_${uyariKaydi._id}` && i.user.id === message.author.id;
+        const collector = uyariMesaji.createMessageComponentCollector({ filter, time: 120000 });
 
-    collector.on('collect', async (i) => {
-        // Veritabanından o uyarıyı sil
-        await Sicil.findByIdAndDelete(uyariKaydi._id);
+        collector.on('collect', async (i) => {
+            await Sicil.findByIdAndDelete(uyariKaydi._id);
+            const iptalEmbed = new EmbedBuilder()
+                .setColor('#00ff00')
+                .setDescription(`✅ <@${target.id}> adlı kullanıcıya verilen uyarı **<@${i.user.id}>** tarafından sicilden silindi.`)
+                .setTimestamp();
 
-        const iptalEmbed = new EmbedBuilder()
-            .setColor('#00ff00')
-            .setDescription(`✅ <@${target.id}> adlı kullanıcıya verilen son uyarı **<@${i.user.id}>** tarafından iptal edildi ve kullanıcının sicilinden silindi.`)
-            .setTimestamp();
+            await i.update({ embeds: [iptalEmbed], components: [] });
+        });
 
-        // Mesajı güncelle ve butonları kaldır
-        await i.update({ embeds: [iptalEmbed], components: [] });
-    });
-
-    collector.on('end', (collected) => {
-        // Eğer 2 dakika içinde butona basılmazsa, butonu pasif (disabled) hale getiriyoruz ki süresi dolduktan sonra buga girmesin.
-        if (collected.size === 0) {
-            const disabledRow = new ActionRowBuilder()
-                .addComponents(
+        collector.on('end', (collected) => {
+            if (collected.size === 0) {
+                const disabledRow = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setCustomId('uyari_suresi_doldu')
-                        .setLabel('Uyarıyı Kaldır (Süre Doldu)')
-                        .setEmoji('🗑️')
+                        .setLabel('Geri Alma Süresi Doldu')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(true)
                 );
-            uyariMesaji.edit({ components: [disabledRow] }).catch(() => {});
-        }
-    });
+                uyariMesaji.edit({ components: [disabledRow] }).catch(() => {});
+            }
+        });
 
-    return;
+    } catch (err) {
+        console.error(err);
+        return message.reply("❌ Veritabanına kayıt işlenirken bir hata oluştu. MongoDB bağlantını kontrol et kanka.");
+    }
+}
+    
+    // ====================== YENİ EĞLENCE: KAÇ CM, ZAR AT, YAZI TURA ======================
+
+    if (command === 'duello') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Düello yapacağın birini etiketlemelisin!");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendine düello yapamazsın, akıl sağlığını koru.");
+
+    const kazanan = Math.random() < 0.5 ? message.author : target;
+    const kaybeden = kazanan.id === message.author.id ? target : message.author;
+
+    const duelloEmbed = new EmbedBuilder()
+        .setColor('#ff0000')
+        .setTitle('⚔️ Düello Sonucu')
+        .setDescription(`**<@${kazanan.id}>**, rakiibi **<@${kaybeden.id}>** kullanıcısını tek hamlede yere serdi!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW4wb3pmZDY4emg2dTh4Zm1naDVkb2o3bHJzOG53eHFjZzRnZGh5aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Phlda4eDmA8FX5BaLj/giphy.gif');
+
+    return message.reply({ embeds: [duelloEmbed] });
 }
 
-    // ====================== YENİ EĞLENCE: KAÇ CM, ZAR AT, YAZI TURA ======================
+    if (command === 'tokat') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi tokatlayacağını seçmelisin.");
+
+    const tokatEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setDescription(`✋ <@${message.author.id}>, <@${target.id}> adlı kullanıcıya öyle bir tokat attı ki, feleği şaştı!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MHlkbTh6cGRuOGdoMTVxejJsZmw4eThha2pycDl6eDBzbmlxOGZwbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/W13QzeK4A03AP540o9/giphy.gif');
+
+    return message.reply({ embeds: [tokatEmbed] });
+}
+
+    if (command === 'öp') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi öpeceğini seçmelisin, havayı mı öpeceksin?");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi öpeceksin? Biraz yalnız hissediyoruz galiba...");
+
+    const opEmbed = new EmbedBuilder()
+        .setColor('#ff69b4')
+        .setDescription(`💋 <@${message.author.id}>, <@${target.id}> kullanıcısını şap diye öptü!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTN2YTV2Z3U3ZzA5eWRubzNoaHE4MHFpbDk0YmFjOWVqM214M3cyYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LVXUEwWACquWRFeKCl/giphy.gif');
+
+    return message.reply({ embeds: [opEmbed] });
+}
+
+    if (command === 'sarıl') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Sarılacak birini bulamadık mı?");
+
+    const sarilEmbed = new EmbedBuilder()
+        .setColor('#3498db')
+        .setDescription(`🫂 <@${message.author.id}>, <@${target.id}> kullanıcısına sımsıkı sarıldı. Her şey geçecek...`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExczV1YmJhYTIydWZ0YmQxYXR6eG1raDBlZXR0aDFuZ201YXQwaGpiaSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/nsYlsQmxYIY5jVqe6j/giphy.gif');
+
+    return message.reply({ embeds: [sarilEmbed] });
+}
+    
     if (command === 'kaçcm') {
         const target = message.mentions.users.first() || message.author;
         const uzunluk = Math.floor(Math.random() * 35) + 1; // 1 ile 35 arası
@@ -973,8 +1087,6 @@ if (command === 'çocukyap') {
 
 
 
-
-
     // --- HOLLOW PURPLE (MESAJ SİLME) ---
 if (command === 'hollowpurple') {
     if (message.author.id !== '983015347105976390') {
@@ -1003,7 +1115,7 @@ if (command === 'hollowpurple') {
 
     if (command === 'blackflash') {
     // Sadece sen veya Yöneticiler kullanabilsin
-    if (message.author.id !== '983015347105976390, 1255178865643360328' && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+   if (message.author.id !== '983015347105976390') return;
         return message.reply("❌ Bu tekniği kullanacak kadar yüksek bir lanetli enerji seviyesine sahip değilsin.");
     }
 
@@ -1030,6 +1142,67 @@ if (command === 'hollowpurple') {
         console.error(err);
         return message.reply("❌ Kullanıcıyı sustururken bir hata oluştu (Yetkim yetmiyor olabilir veya kullanıcı yönetici olabilir).");
     }
+}
+
+    if (command === 'domainexpansion') {
+    // Sadece senin ID'n veya yönetici yetkisi olanlar kullanabilsin
+        // Satoru Gojo Yetki Kontrolü
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+    }
+
+    const roles = message.guild.roles.cache;
+
+    // Kanaldaki her rol için mesaj göndermeyi kapat
+    roles.forEach(async (role) => {
+        try {
+            await message.channel.permissionOverwrites.edit(role, {
+                SendMessages: false
+            });
+        } catch (err) {
+            // "Everyone" rolü veya botun üstündeki rollerde hata verebilir, burayı boş geçiyoruz
+        }
+    });
+
+    const domainEmbed = new EmbedBuilder()
+        .setColor('#000001')
+        .setTitle('🤞 Alan Genişletmesi: Sonsuz Boşluk (Infinite Void)')
+        .setDescription('**Herkes Ace’in alanına hapsoldu!**\n\n> *Burada her şey sonsuzdur, hiçbir şey hareket edemez...*')
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHFuOXZibTFvcXVnY290cGZvOHJtejNhOTRjODk0dTA0Zjl0cmVxbSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif')
+        .setFooter({ text: 'Gojo Satoru tekniklerini kullanıyor...' })
+        .setTimestamp();
+
+    return message.channel.send({ embeds: [domainEmbed] });
+}
+
+    if (command === 'domainclose') {
+       // Satoru Gojo Yetki Kontrolü
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+    }
+
+    const roles = message.guild.roles.cache;
+
+    // Kanaldaki her rol için mesaj göndermeyi tekrar aç (Yeşil Tik)
+    roles.forEach(async (role) => {
+        try {
+            await message.channel.permissionOverwrites.edit(role, {
+                SendMessages: true
+            });
+        } catch (err) {
+            // Hata yönetimini boş geçiyoruz
+        }
+    });
+
+    const closeEmbed = new EmbedBuilder()
+        .setColor('#ffffff')
+        .setTitle('✨ Alan Kapatıldı')
+        .setDescription('**Alan çözüldü, herkes şu an özgür.**\n\n> *Zihinlerinizdeki sonsuzluk sona erdi.*')
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3amh6NTI0dDIwaHpoNnRobG0yMnprank5N2h3Y2NlYmNxczNvaW80bCZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/nMtKecpxYBRLH5ggYp/giphy.gif')
+        .setFooter({ text: 'Sonsuz Boşluk sona erdi.' })
+        .setTimestamp();
+
+    return message.channel.send({ embeds: [closeEmbed] });
 }
 
 // --- HOLLOW PURPLE: ACE ULTRA BLITZKRIEG ---
