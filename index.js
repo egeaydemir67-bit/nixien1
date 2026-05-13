@@ -207,55 +207,50 @@ client.on('messageCreate', async message => {
         });
 
 collector.on('collect', async i => {
-            let selectedEmbed = new EmbedBuilder().setColor('#2b2d31').setTimestamp();
+            const selectedEmbed = new EmbedBuilder()
+                .setColor('#2b2d31')
+                .setTimestamp();
 
             if (i.customId === 'eglence') {
                 selectedEmbed.setTitle('🎭 Üye/Eğlence Komutları')
-                    .setDescription(
-                        '```fix\n' +
-                        'a!aşkölç    | a!evlen     | a!boşan\n' +
-                        'a!evlilik   | a!kedisev   | a!patlat\n' +
-                        'a!zarat     | a!yazıtura  | a!kaçcm\n' +
-                        'a!stat      | a!leaderstat\n\n' +
-                        'a!sarıl     | a!öp        | a!tokat\n' +
-                        'a!duello    | a!keko-olcer| a!fidye\n' +
-                        '```'
-                    );
+                    .setDescription(`\`\`\`fix
+a!aşkölç    | a!evlen     | a!boşan
+a!evlilik   | a!kedisev   | a!patlat
+a!zarat     | a!yazıtura  | a!kaçcm
+a!stat      | a!leaderstat
+
+a!sarıl     | a!öp        | a!tokat
+a!duello    | a!keko-olcer| a!fidye
+\`\`\``);
             } 
             
             else if (i.customId === 'moderasyon') {
                 selectedEmbed.setTitle('🛡️ Moderasyon Sistemi')
-                    .setDescription(
-                        '```yaml\n' +
-                        'a!uyarı     | a!kick      | a!ban\n' +
-                        'a!unban     | a!mute      | a!unmute\n' +
-                        'a!vmute     | a!unvmute\n' +
-                        '```'
-                    );
+                    .setDescription(`\`\`\`yaml
+a!uyarı     | a!kick      | a!ban
+a!unban     | a!mute      | a!unmute
+a!vmute     | a!unvmute
+\`\`\``);
             } 
             
             else if (i.customId === 'yonetim') {
                 selectedEmbed.setTitle('⚙️ Yönetim & Sistem')
-                    .setDescription(
-                        '```diff\n' +
-                        '+ a!sicil   | a!sil       | a!snipe\n' +
-                        '```'
-                    );
+                    .setDescription(`\`\`\`diff
++ a!sicil   | a!sil       | a!snipe
+\`\`\``);
             } 
             
             else if (i.customId === 'aceozel') {
                 selectedEmbed.setTitle('👑 Ace Özel Menü')
                     .setColor('#ff0000')
-                    .setDescription(
-                        '```fix\n' +
-                        'a!hollowpurple    | a!sonsuzluk\n' +
-                        'a!domainexpansion | a!blackflash\n' +
-                        'a!domainclose     | a!ceza-menü\n' +
-                        '```'
-                    );
+                    .setDescription(`\`\`\`fix
+a!hollowpurple    | a!sonsuzluk
+a!domainexpansion | a!blackflash
+a!domainclose     | a!ceza-menü
+\`\`\``);
             }
 
-            await i.update({ embeds: [selectedEmbed] });
+            await i.update({ embeds: [selectedEmbed] }).catch(() => {});
         });
 
         collector.on('end', () => {
