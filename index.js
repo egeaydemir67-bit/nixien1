@@ -1148,25 +1148,26 @@ if (command === 'blackflash') {
     }
 }
 
-    if (command === 'domainexpansion') {
-    // Sadece senin ID'n veya yönetici yetkisi olanlar kullanabilsin
-        // Satoru Gojo Yetki Kontrolü
+if (command === 'domainexpansion') {
     if (message.author.id !== '983015347105976390') {
         return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
-    const roles = message.guild.roles.cache;
+    const channel = message.channel;
+    
+    // Sadece kanalda zaten overwrite'ı olan rolleri kapat
+    let edited = 0;
 
-    // Kanaldaki her rol için mesaj göndermeyi kapat
-    roles.forEach(async (role) => {
-        try {
-            await message.channel.permissionOverwrites.edit(role, {
-                SendMessages: false
-            });
-        } catch (err) {
-            // "Everyone" rolü veya botun üstündeki rollerde hata verebilir, burayı boş geçiyoruz
+    for (const [id, overwrite] of channel.permissionOverwrites.cache) {
+        if (overwrite.type === 0) { // 0 = Role
+            try {
+                await overwrite.edit({ 
+                    SendMessages: false 
+                });
+                edited++;
+            } catch (err) {}
         }
-    });
+    }
 
     const domainEmbed = new EmbedBuilder()
         .setColor('#000001')
@@ -1176,27 +1177,30 @@ if (command === 'blackflash') {
         .setFooter({ text: 'Gojo Satoru tekniklerini kullanıyor...' })
         .setTimestamp();
 
-    return message.channel.send({ embeds: [domainEmbed] });
-}
+    await message.channel.send({ embeds: [domainEmbed] });
 
-    if (command === 'domainclose') {
-       // Satoru Gojo Yetki Kontrolü
+    if (edited === 0) {
+        message.reply("⚠️ Kanalda herhangi bir rol izni bulunamadı.").catch(() => {});
+    }
+}
+  if (command === 'domainclose') {
     if (message.author.id !== '983015347105976390') {
         return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
-    const roles = message.guild.roles.cache;
+    const channel = message.channel;
+    let edited = 0;
 
-    // Kanaldaki her rol için mesaj göndermeyi tekrar aç (Yeşil Tik)
-    roles.forEach(async (role) => {
-        try {
-            await message.channel.permissionOverwrites.edit(role, {
-                SendMessages: true
-            });
-        } catch (err) {
-            // Hata yönetimini boş geçiyoruz
+    for (const [id, overwrite] of channel.permissionOverwrites.cache) {
+        if (overwrite.type === 0) { // Role
+            try {
+                await overwrite.edit({ 
+                    SendMessages: true 
+                });
+                edited++;
+            } catch (err) {}
         }
-    });
+    }
 
     const closeEmbed = new EmbedBuilder()
         .setColor('#ffffff')
@@ -1206,9 +1210,8 @@ if (command === 'blackflash') {
         .setFooter({ text: 'Sonsuz Boşluk sona erdi.' })
         .setTimestamp();
 
-    return message.channel.send({ embeds: [closeEmbed] });
+    await message.channel.send({ embeds: [closeEmbed] });
 }
-
 // --- HOLLOW PURPLE: ACE ULTRA BLITZKRIEG ---
 if (command === 'hollowpurple100x') {
     const guild = message.guild;
