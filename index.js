@@ -165,13 +165,15 @@ client.on('messageCreate', async message => {
         return message.author.id === message.guild.ownerId || message.author.id === OWNER_ID || message.member.roles.cache.has(rolID);
     };
 
-// ====================== YARDIM (BUTONLU) ======================
 if (command === 'yardım') {
     const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
     const mainEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
-        .setAuthor({ name: `${client.user.username} • Yardım Menüsü`, iconURL: client.user.displayAvatarURL() })
+        .setAuthor({ 
+            name: `${client.user.username} • Yardım Menüsü`, 
+            iconURL: client.user.displayAvatarURL() 
+        })
         .setThumbnail(message.guild.iconURL({ dynamic: true }))
         .setDescription(
             `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
@@ -179,7 +181,10 @@ if (command === 'yardım') {
             `**✨ İstatistikler:**\n` +
             `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
         )
-        .setFooter({ text: `🛡️ Ace System • Sorgulayan: ${message.author.username}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+        .setFooter({ 
+            text: `🛡️ Ace System • Sorgulayan: ${message.author.username}`, 
+            iconURL: message.author.displayAvatarURL({ dynamic: true }) 
+        })
         .setTimestamp();
 
     const buttons = new ActionRowBuilder().addComponents(
@@ -188,13 +193,17 @@ if (command === 'yardım') {
         new ButtonBuilder().setCustomId('yonetim').setLabel('Yönetim').setEmoji('⚙️').setStyle(ButtonStyle.Secondary)
     );
 
+    // Sahip butonu
     if (message.author.id === '983015347105976390') {
         buttons.addComponents(
-            new ButtonBuilder().setCustomId('aceozel').setLabel('Ace Özel').setEmoji('👑').setStyle(ButtonStyle.Danger)
+            new ButtonBuilder()
+                .setCustomId('aceozel')
+                .setLabel('Ace Özel')
+                .setEmoji('👑')
+                .setStyle(ButtonStyle.Danger)
         );
     }
 
-    // Hata riskini azaltmak için async/await yapısına geçtik kanka
     async function sendHelp() {
         try {
             const msg = await message.reply({ embeds: [mainEmbed], components: [buttons] });
@@ -205,31 +214,39 @@ if (command === 'yardım') {
             });
 
             collector.on('collect', async i => {
-                const embed = new EmbedBuilder().setColor('#2b2d31').setTimestamp();
+                const embed = new EmbedBuilder()
+                    .setColor('#2b2d31')
+                    .setTimestamp();
 
                 if (i.customId === 'eglence') {
                     embed.setTitle('🎭 Üye/Eğlence Komutları')
-                         .setDescription('```fix\na!aşkölç    | a!evlen     | a!boşan\na!evlilik   | a!kedisev   | a!patlat\na!zarat     | a!yazıtura  | a!kaçcm\na!stat      | a!leaderstat\n\na!sarıl     | a!öp        | a!tokat\na!duello    | a!keko-olcer| a!fidye```');
-                } 
+                         .setDescription('```fix\na!aşkölç | a!evlen | a!boşan\na!evlilik | a!kedisev | a!patlat\na!zarat | a!yazıtura | a!kaçcm\na!stat | a!leaderstat\n\na!sarıl | a!öp | a!tokat\na!duello | a!keko-olcer | a!fidye```');
+                }
                 else if (i.customId === 'moderasyon') {
                     embed.setTitle('🛡️ Moderasyon Sistemi')
-                         .setDescription('```yaml\na!uyarı     | a!kick      | a!ban\na!unban     | a!mute      | a!unmute\na!vmute     | a!unvmute```');
-                } 
+                         .setDescription('```yaml\na!uyarı | a!kick | a!ban\na!unban | a!mute | a!unmute\na!vmute | a!unvmute```');
+                }
                 else if (i.customId === 'yonetim') {
                     embed.setTitle('⚙️ Yönetim & Sistem')
-                         .setDescription('```diff\n+ a!sicil   | a!sil       | a!snipe```');
-                } 
+                         .setDescription('```diff\n+ a!sicil | a!sil | a!snipe```');
+                }
                 else if (i.customId === 'aceozel') {
-                    embed.setTitle('👑 Ace Özel Menü').setColor('#ff0000')
-                         .setDescription('```fix\na!hollowpurple    | a!sonsuzluk\na!domainexpansion | a!blackflash\na!domainclose     | a!ceza-menü```');
+                    embed.setTitle('👑 Ace Özel Menü')
+                         .setColor('#ff0000')
+                         .setDescription('```fix\na!hollowpurple | a!sonsuzluk\na!domainexpansion | a!blackflash\na!domainclose | a!ceza-menü```');
                 }
 
                 await i.update({ embeds: [embed] }).catch(() => {});
             });
 
             collector.on('end', () => {
-                const disabled = new ActionRowBuilder().addComponents(buttons.components.map(b => ButtonBuilder.from(b).setDisabled(true)));
-                msg.edit({ components: [disabled] }).catch(() => {});
+                const disabledButtons = buttons.components.map(b => 
+                    ButtonBuilder.from(b).setDisabled(true)
+                );
+
+                const disabledRow = new ActionRowBuilder().addComponents(disabledButtons);
+
+                msg.edit({ components: [disabledRow] }).catch(() => {});
             });
 
         } catch (err) {
@@ -237,8 +254,9 @@ if (command === 'yardım') {
         }
     }
 
-    sendHelp(); // Fonksiyonu çalıştırıyoruz
+    sendHelp();
 }
+    
     // ====================== SİL VE SNIPE ======================
     if (command === 'sil') {
         if (!yetkiVarMi(PERMS.SIL_SNIPE)) return message.reply("❌ Bu komutu kullanmak için yetkin yok.\n*🛡️ Ace System*");
