@@ -166,7 +166,7 @@ client.on('messageCreate', async message => {
     };
 
 if (command === 'yardım') {
-    const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+
 
     const mainEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
