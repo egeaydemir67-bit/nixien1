@@ -214,29 +214,34 @@ collector.on('collect', async i => {
             if (i.customId === 'eglence') {
                 selectedEmbed.setTitle('🎭 Üye/Eğlence Komutları')
                     .setDescription(`\`\`\`fix
-a!aşkölç    | a!evlen     | a!boşan
-a!evlilik   | a!kedisev   | a!patlat
-a!zarat     | a!yazıtura  | a!kaçcm
-a!stat      | a!leaderstat
+a!aşkölç
+a!evlen | a!boşan | a!evlilik
+a!kedisev | a!patlat
+a!zarat | a!yazıtura
+a!kaçcm | a!stat | a!leaderstat
 
-a!sarıl     | a!öp        | a!tokat
-a!duello    | a!keko-olcer| a!fidye
+a!sarıl | a!öp | a!tokat
+a!duello | a!keko-olcer | a!fidye
 \`\`\``);
             } 
             
             else if (i.customId === 'moderasyon') {
                 selectedEmbed.setTitle('🛡️ Moderasyon Sistemi')
                     .setDescription(`\`\`\`yaml
-a!uyarı     | a!kick      | a!ban
-a!unban     | a!mute      | a!unmute
-a!vmute     | a!unvmute
+a!uyarı [@kişi] [sebep]
+a!kick [sebep]
+a!ban [sebep] | a!unban [ID]
+a!mute [süre] [sebep] | a!unmute
+a!vmute [süre] [sebep] | a!unvmute
 \`\`\``);
             } 
             
             else if (i.customId === 'yonetim') {
                 selectedEmbed.setTitle('⚙️ Yönetim & Sistem')
                     .setDescription(`\`\`\`diff
-+ a!sicil   | a!sil       | a!snipe
++ a!sicil
++ a!sil
++ a!snipe
 \`\`\``);
             } 
             
@@ -244,9 +249,12 @@ a!vmute     | a!unvmute
                 selectedEmbed.setTitle('👑 Ace Özel Menü')
                     .setColor('#ff0000')
                     .setDescription(`\`\`\`fix
-a!hollowpurple    | a!sonsuzluk
-a!domainexpansion | a!blackflash
-a!domainclose     | a!ceza-menü
+a!hollowpurple
+a!sonsuzluk
+a!domainexpansion
+a!blackflash
+a!domainclose
+a!ceza-menü
 \`\`\``);
             }
 
