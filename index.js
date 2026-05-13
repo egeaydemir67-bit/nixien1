@@ -169,7 +169,6 @@ client.on('messageCreate', async message => {
 if (command === 'yardım') {
     const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
-    // --- ANA SAYFA EMBED ---
     const mainEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
         .setAuthor({ name: `${client.user.username} • Yardım Menüsü`, iconURL: client.user.displayAvatarURL() })
@@ -183,59 +182,63 @@ if (command === 'yardım') {
         .setFooter({ text: `🛡️ Ace System • Sorgulayan: ${message.author.username}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
         .setTimestamp();
 
-    // --- BUTONLAR ---
     const buttons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('eglence').setLabel('Eğlence').setEmoji('🎭').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId('moderasyon').setLabel('Moderasyon').setEmoji('🛡️').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId('yonetim').setLabel('Yönetim').setEmoji('⚙️').setStyle(ButtonStyle.Secondary)
     );
 
-    // Sahibi kontrol et
     if (message.author.id === '983015347105976390') {
         buttons.addComponents(
             new ButtonBuilder().setCustomId('aceozel').setLabel('Ace Özel').setEmoji('👑').setStyle(ButtonStyle.Danger)
         );
     }
 
-    message.reply({ embeds: [mainEmbed], components: [buttons] }).then(msg => {
-        const collector = msg.createMessageComponentCollector({
-            filter: i => i.user.id === message.author.id,
-            time: 60000
-        });
+    // Hata riskini azaltmak için async/await yapısına geçtik kanka
+    async function sendHelp() {
+        try {
+            const msg = await message.reply({ embeds: [mainEmbed], components: [buttons] });
 
-        collector.on('collect', async i => {
-            const selectedEmbed = new EmbedBuilder().setColor('#2b2d31').setTimestamp();
+            const collector = msg.createMessageComponentCollector({
+                filter: i => i.user.id === message.author.id,
+                time: 60000
+            });
 
-            if (i.customId === 'eglence') {
-                selectedEmbed.setTitle('🎭 Üye/Eğlence Komutları')
-                    .setDescription(`\`\`\`fix\na!aşkölç    | a!evlen     | a!boşan\na!evlilik   | a!kedisev   | a!patlat\na!zarat     | a!yazıtura  | a!kaçcm\na!stat      | a!leaderstat\n\na!sarıl     | a!öp        | a!tokat\na!duello    | a!keko-olcer| a!fidye\`\`\``);
-            } 
-            else if (i.customId === 'moderasyon') {
-                selectedEmbed.setTitle('🛡️ Moderasyon Sistemi')
-                    .setDescription(`\`\`\`yaml\na!uyarı     | a!kick      | a!ban\na!unban     | a!mute      | a!unmute\na!vmute     | a!unvmute\`\`\``);
-            } 
-            else if (i.customId === 'yonetim') {
-                selectedEmbed.setTitle('⚙️ Yönetim & Sistem')
-                    .setDescription(`\`\`\`diff\n+ a!sicil   | a!sil       | a!snipe\`\`\``);
-            } 
-            else if (i.customId === 'aceozel') {
-                selectedEmbed.setTitle('👑 Ace Özel Menü')
-                    .setColor('#ff0000')
-                    .setDescription(`\`\`\`fix\na!hollowpurple    | a!sonsuzluk\na!domainexpansion | a!blackflash\na!domainclose     | a!ceza-menü\`\`\``);
-            }
+            collector.on('collect', async i => {
+                const embed = new EmbedBuilder().setColor('#2b2d31').setTimestamp();
 
-            await i.update({ embeds: [selectedEmbed] }).catch(() => {});
-        });
+                if (i.customId === 'eglence') {
+                    embed.setTitle('🎭 Üye/Eğlence Komutları')
+                         .setDescription('```fix\na!aşkölç    | a!evlen     | a!boşan\na!evlilik   | a!kedisev   | a!patlat\na!zarat     | a!yazıtura  | a!kaçcm\na!stat      | a!leaderstat\n\na!sarıl     | a!öp        | a!tokat\na!duello    | a!keko-olcer| a!fidye```');
+                } 
+                else if (i.customId === 'moderasyon') {
+                    embed.setTitle('🛡️ Moderasyon Sistemi')
+                         .setDescription('```yaml\na!uyarı     | a!kick      | a!ban\na!unban     | a!mute      | a!unmute\na!vmute     | a!unvmute```');
+                } 
+                else if (i.customId === 'yonetim') {
+                    embed.setTitle('⚙️ Yönetim & Sistem')
+                         .setDescription('```diff\n+ a!sicil   | a!sil       | a!snipe```');
+                } 
+                else if (i.customId === 'aceozel') {
+                    embed.setTitle('👑 Ace Özel Menü').setColor('#ff0000')
+                         .setDescription('```fix\na!hollowpurple    | a!sonsuzluk\na!domainexpansion | a!blackflash\na!domainclose     | a!ceza-menü```');
+                }
 
-        collector.on('end', () => {
-            const disabledRow = new ActionRowBuilder().addComponents(
-                buttons.components.map(button => ButtonBuilder.from(button).setDisabled(true))
-            );
-            msg.edit({ components: [disabledRow] }).catch(() => {});
-        });
-    }).catch(err => console.log("Hata oluştu kanka:", err));
+                await i.update({ embeds: [embed] }).catch(() => {});
+            });
+
+            collector.on('end', () => {
+                const disabled = new ActionRowBuilder().addComponents(buttons.components.map(b => ButtonBuilder.from(b).setDisabled(true)));
+                msg.edit({ components: [disabled] }).catch(() => {});
+            });
+
+        } catch (err) {
+            console.error("Yardım komutu patladı:", err);
+        }
+    }
+
+    sendHelp(); // Fonksiyonu çalıştırıyoruz
 }
-
     // ====================== SİL VE SNIPE ======================
     if (command === 'sil') {
         if (!yetkiVarMi(PERMS.SIL_SNIPE)) return message.reply("❌ Bu komutu kullanmak için yetkin yok.\n*🛡️ Ace System*");
