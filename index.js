@@ -220,7 +220,7 @@ if (command === 'yardım') {
 
                 if (i.customId === 'eglence') {
                     embed.setTitle('🎭 Üye/Eğlence Komutları')
-                         .setDescription('```fix\na!aşkölç | a!evlen | a!boşan\na!evlilik | a!kedisev | a!patlat\na!zarat | a!yazıtura | a!kaçcm\na!stat | a!leaderstat\n\na!sarıl | a!öp | a!tokat\na!duello | a!keko-olcer | a!fidye```');
+                         .setDescription('```fix\na!aşkölç | a!evlen | a!boşan\na!evlilik | a!kedisev | a!patlat\na!zarat | a!yazıtura | a!kaçcm\na!stat | a!leaderstat\n\na!sarıl | a!öp | a!tokat\na!duello```');
                 }
                 else if (i.customId === 'moderasyon') {
                     embed.setTitle('🛡️ Moderasyon Sistemi')
