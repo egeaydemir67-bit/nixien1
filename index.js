@@ -606,6 +606,19 @@ if (command === 'yardım') {
     return message.reply({ embeds: [opEmbed] });
 }
 
+        if (command === 'sik') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi sikceğini seçmelisin, havaya mı sokcaksın?");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi sikiceksin? Biraz yalnız hissediyoruz galiba...");
+
+    const opEmbed = new EmbedBuilder()
+        .setColor('#ff69b4')
+        .setDescription(`💓 <@${message.author.id}>, <@${target.id}> kullanıcısını ŞAP ŞAP Sikti!`)
+        .setImage('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWt3cWZvc3B5ajBybGE1ZDFuMzRja2N1aTJweTlhampvc2I1dXRhMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IsIyvk7zftw4H2C1Kz/giphy.gif');
+
+    return message.reply({ embeds: [opEmbed] });
+}
+
     if (command === 'sarıl') {
     const target = message.mentions.users.first();
     if (!target) return message.reply("❌ Sarılacak birini bulamadık mı?");
