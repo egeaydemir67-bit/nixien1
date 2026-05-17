@@ -351,7 +351,7 @@ if (command === 'yardım') {
 
     const rulesEmbed = new EmbedBuilder()
         .setColor('#2b2d31') // Discord'un koyu temasına uyumlu arka plan rengi
-        .setTitle('📜 Sunucu Kuralları / A R V E X Yönetimi Sunar.')
+        .setTitle('📜 Sunucu Kuralları / N İ X İ E N Yönetimi Sunar.')
         .setDescription(`📌 @everyone Herkesin uyması gereken kurallar aşağıda listelenmiştir. İhlal edenlere ceza uygulanır.\n\n` +
         
         `**🧑‍🤝‍🧑 GENEL SAYGI**\n` +
@@ -395,7 +395,7 @@ if (command === 'yardım') {
 
         `**🪪 YÖNETİM**\n` +
         `📌 Yönetim, gerekli gördüğü durumlarda kurallarda değişiklik yapma ve ek kural getirme hakkını saklı tutar.`)
-        .setFooter({ text: 'A R V E X Yönetimi', iconURL: message.guild.iconURL({ dynamic: true }) })
+        .setFooter({ text: 'N İ X İ E N Yönetimi', iconURL: message.guild.iconURL({ dynamic: true }) })
         .setTimestamp();
 
     // Kurallar kanalına everyone atarak mesajı gönderiyoruz
