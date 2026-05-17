@@ -156,18 +156,53 @@ client.on('messageDelete', async message => {
 client.on('messageCreate', async message => {
     if (message.author.bot || !message.guild) return;
 
-    // 1. SONSUZLUK KONTROLÜ (Prefix kontrolünden ÖNCE olmalı)
-    if (sonsuzlukAktif && message.mentions.has('983015347105976390') && message.author.id !== '983015347105976390') {
-        const embed = {
-            color: 0x00AEFF,
-            title: '🤞 Dokunulmazlık!',
-            description: `**"${message.author.username}, Ace'e ulaşmaya çalışıyorsun ama aranızda sonsuzluk var. Boşuna çabalama."**`,
-            image: {
-                url: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZGM3ZTh1eTI5dnMxMG5henpxMnA1cnI5bTV3cnRteDh4ank2amliZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jjGbTjAq9TSUmP0rkG/giphy.gif'
+// 1. SONSUZLUK KONTROLÜ (Prefix kontrolünden ÖNCE olmalı)
+if (sonsuzlukAktif && message.mentions.has('983015347105976390') && message.author.id !== '983015347105976390') {
+    
+    // 1. KADEME: Cürret Etme Aşaması
+    const stage1Embed = new EmbedBuilder()
+        .setColor('#00AEFF')
+        .setTitle('🤞 Sonsuzluk Sınırı İhlal Edildi!')
+        .setDescription(`**"${message.author.username}, sen bana dokunmaya mı cürret ettin?"**\n\n> Aranızda sonsuz bir mesafe var. Yaklaşabileceğini mi sandın?`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NGFoZGk2YjRkdWNidTJoZDQ4YXN4eTdkN3hnNHM3OXpyYjFtbngwZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/iNPNqI81MvDQ4D4n6D/giphy.gif')
+        .setFooter({ text: 'Sonsuzluk dokunulmazlığı aktif...' })
+        .setTimestamp();
+
+    // İlk uyarı mesajını gönderiyoruz
+    const sentMessage = await message.reply({ embeds: [stage1Embed] });
+
+    // 3 Saniye Sonra Bedel Ödetme Aşaması (2. Kademe + Timeout)
+    setTimeout(async () => {
+        let timeoutUygulandi = true;
+        
+        // Etiketleyen kişi sunucuda bir yönetici değilse ve botun rolü yetiyorsa timeout at
+        if (message.member && !message.member.permissions.has(PermissionsBitField.Flags.Administrator) && message.member.moderatable) {
+            try {
+                // 10 Saniyelik Susturma (10 * 1000 milisaniye)
+                await message.member.timeout(10 * 1000, "Sonsuzluğa dokunmaya çalışmanın bedeli!");
+            } catch (err) {
+                console.error("Sonsuzluk cezası verilirken hata çıktı:", err);
+                timeoutUygulandi = false;
             }
-        };
-        return message.reply({ embeds: [embed] });
-    }
+        } else {
+            timeoutUygulandi = false; // Yönetici veya bottan üstün rolse cezayı pas geç
+        }
+
+        // 2. KADEME: Bedel Ödetme Aşaması
+        const stage2Embed = new EmbedBuilder()
+            .setColor('#ff0000')
+            .setTitle('⚡ Bedelini Ödeyeceksin.')
+            .setDescription(`**"${message.author.username}, sonsuzluğun sınırlarını zorlamanın cezası ağırdır."**\n\n${timeoutUygulandi ? '➔ Lanetli enerji çarpması nedeniyle **10 saniye** boyunca felç oldun (Susturuldun)!' : '➔ *Özel Dereceli bir büyücü (Yönetici) olduğun için fiziksel olarak etkilenmedin ama sonsuzluğun ezici baskısını tüm ruhunla hissettin...*'}`)
+            .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3N2dza3FnNHd5cWV4YnNkdmVvZ3gwcDJib2s5NzkzNHdrbmt0YjVjOCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/W13QzeK4A03AP540o9/giphy.gif')
+            .setFooter({ text: 'Mesafe asla kapanmaz.' })
+            .setTimestamp();
+
+        // Mesajı yeni gif ve metinle güncelliyoruz
+        await sentMessage.edit({ embeds: [stage2Embed] }).catch(() => {});
+    }, 5000); // 3 saniye sonra ikinci aşamaya geçer
+
+    return; // Botun alt satırlardaki diğer normal komutları çalıştırmasını engellemek için durduruyoruz
+}
 
     // 2. PREFİX KONTROLÜ (Buradan aşağısı sadece komutlar için)
     if (!message.content.startsWith(prefix)) return;
@@ -180,20 +215,21 @@ client.on('messageCreate', async message => {
     };
 
 if (command === 'yardım') {
-
-
     const mainEmbed = new EmbedBuilder()
         .setColor('#2b2d31')
         .setAuthor({ 
-            name: `${client.user.username} • Yardım Menüsü`, 
+            name: `${client.user.username} • Gelişmiş Yardım Menüsü`, 
             iconURL: client.user.displayAvatarURL() 
         })
         .setThumbnail(message.guild.iconURL({ dynamic: true }))
         .setDescription(
-            `> 🛡️ **Gelişmiş Güvenlik ve Eğlence sistemine hoş geldin.**\n` +
-            `> Aşağıdaki butonları kullanarak kategoriler arasında geçiş yapabilirsin.\n\n` +
-            `**✨ İstatistikler:**\n` +
-            `┕ 🏓 **Ping:** \`${client.ws.ping}ms\` | 👥 **Kullanıcı:** \`${message.guild.memberCount}\``
+            `### 🛡️ Ace System'e Hoş Geldin!\n` +
+            `> Sunucunun güvenliğini sağlamak, düzeni korumak ve eğlenceyi en üst seviyeye çıkarmak için tasarlandım.\n` +
+            `> Kategoriler arasında geçiş yapmak için aşağıdaki **butonları** kullanabilirsin.\n\n` +
+            `📊 **Anlık İstatistikler:**\n` +
+            `🤖 **Gecikme Süresi:** \`${client.ws.ping}ms\`\n` +
+            `👥 **Toplam Üye:** \`${message.guild.memberCount}\` Kullanıcı\n` +
+            `🔗 **Prefix:** \`a!\``
         )
         .setFooter({ 
             text: `🛡️ Ace System • Sorgulayan: ${message.author.username}`, 
@@ -207,7 +243,7 @@ if (command === 'yardım') {
         new ButtonBuilder().setCustomId('yonetim').setLabel('Yönetim').setEmoji('⚙️').setStyle(ButtonStyle.Secondary)
     );
 
-    // Sahip butonu
+    // Sahip butonu (Sadece senin ID'ne özel)
     if (message.author.id === '983015347105976390') {
         buttons.addComponents(
             new ButtonBuilder()
@@ -230,24 +266,60 @@ if (command === 'yardım') {
             collector.on('collect', async i => {
                 const embed = new EmbedBuilder()
                     .setColor('#2b2d31')
-                    .setTimestamp();
+                    .setTimestamp()
+                    .setFooter({ text: `🛡️ Ace System • Kategori: ${i.component.label}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 
                 if (i.customId === 'eglence') {
-                    embed.setTitle('🎭 Üye/Eğlence Komutları')
-                         .setDescription('```fix\na!aşkölç | a!evlen | a!boşan\na!evlilik | a!kedisev | a!patlat\na!zarat | a!yazıtura | a!kaçcm\na!stat | a!leaderstat\n\na!sarıl | a!öp | a!tokat\na!duello```');
+                    embed.setTitle('🎭 Üye & Eğlence Sistemi')
+                         .setDescription(
+                             `💬 **Eğlence & Etkileşim Komutları:**\n\n` +
+                             `❤️ \`a!aşkölç\` ➔ Etiketlediğin kişiyle aşk yüzdenizi ölçer.\n` +
+                             `💍 \`a!evlen\` / \`a!boşan\` ➔ Sunucudaki bir üyeyle evlenmenizi/boşanmanızı sağlar.\n` +
+                             `📜 \`a!evlilik\` ➔ Mevcut evlilik durumunu ve partnerini gösterir.\n` +
+                             `🐱 \`a!kedisev\` ➔ Rastgele tatlı bir kedi resmi gönderir.\n` +
+                             `💥 \`a!patlat\` ➔ Eğlence amaçlı kanalda patlama simülasyonu yapar.\n` +
+                             `🎲 \`a!zarat\` / \`a!yazıtura\` ➔ Zar atar veya yazı-tura oynatır.\n` +
+                             `📏 \`a!kaçcm\` ➔ Tamamen eğlence amaçlı şans ölçümü yapar.\n` +
+                             `🫂 \`a!sarıl\` / \`a!öp\` / \`a!tokat\` ➔ Belirttiğin üyeye sarılır, öper veya tokat atarsın.\n` +
+                             `⚔️ \`a!duello\` ➔ Sunucudaki bir üyeye ölümüne düello teklif edersin.\n` +
+                             `📊 \`a!stat\` / \`a!leaderstat\` ➔ Sunucu içi aktiflik verilerini ve liderlik tablosunu gösterir.`
+                         );
                 }
                 else if (i.customId === 'moderasyon') {
-                    embed.setTitle('🛡️ Moderasyon Sistemi')
-                         .setDescription('```yaml\na!uyarı | a!kick | a!ban\na!unban | a!mute | a!unmute\na!vmute | a!unvmute```');
+                    embed.setTitle('🛡️ Moderasyon & Ceza Sistemi')
+                         .setDescription(
+                             `🔨 **Sunucu İntizamı İçin Gerekli Komutlar:**\n\n` +
+                             `⚠️ \`a!uyarı\` ➔ Kuralları çiğneyen üyeye resmi uyarı ekler.\n` +
+                             `🥾 \`a!kick\` ➔ Belirtilen üyeyi sunucudan sağ tık atmadan tekmeler.\n` +
+                             `🚫 \`a!ban\` / \`a!unban\` ➔ Üyeyi sunucudan yasaklar veya yasağını kaldırır.\n` +
+                             `🔇 \`a!mute\` / \`a!unmute\` ➔ Üyenin yazı kanallarındaki konuşma yetkisini yönetir.\n` +
+                             `🔊 \`a!vmute\` / \`a!unvmute\` ➔ Üyenin ses kanallarındaki mikrofonunu kapatır/açar.`
+                         );
                 }
                 else if (i.customId === 'yonetim') {
-                    embed.setTitle('⚙️ Yönetim & Sistem')
-                         .setDescription('```diff\n+ a!sicil | a!sil | a!snipe```');
+                    embed.setTitle('⚙️ Yönetim & Altyapı Sistemi')
+                         .setDescription(
+                             `🛠️ **Sunucu Yönetimi ve Log Komutları:**\n\n` +
+                             `📂 \`a!sicil\` ➔ Etiketlenen üyenin geçmiş ceza kayıtlarını listeler.\n` +
+                             `🗑️ \`a!sil\` ➔ Belirtilen miktarda mesajı kanaldan anında temizler.\n` +
+                             `🎯 \`a!snipe\` ➔ Kanaldan son silinen mesajı yakalar ve içeriğini gösterir.`
+                         );
                 }
                 else if (i.customId === 'aceozel') {
-                    embed.setTitle('👑 Ace Özel Menü')
+                    embed.setTitle('👑 Ace Özel • Sınırsız Güç Menüsü')
                          .setColor('#ff0000')
-                         .setDescription('```fix\na!hollowpurple | a!sonsuzluk\na!domainexpansion | a!blackflash\na!domainclose | a!ceza-menü```');
+                         .setDescription(
+                             `🔮 **Gojo Satoru Teknikleri & Kurucu Yetkileri:**\n\n` +
+                             `🤞 \`a!domainexpansion\` ➔ Alan Genişletmesi: Sonsuz Boşluk'u açarak kanalı kilitler.\n` +
+                             `❌ \`a!domainclose\` ➔ Aktif olan Alan Genişletmesini çözer ve kanalı açar.\n` +
+                             `⚡ \`a!blackflash\` ➔ Hedefe Kara Şimşek çaktırır (Yönetici değilse 5 Dk Mute).\n` +
+                             `🟣 \`a!hollow\` ➔ Kademeli sanal kütle patlaması başlatır (7 Gün Mute).\n` +
+                             `🟣 \`a!hollowpurple\` ➔ Kanaldaki Her Şeyi Lanetler/Siler.\n` +
+                             `🛡️ \`a!sonsuzluk\` ➔ Pasif korumayı açar. Seni etiketleyenler 10 Saniye ceza yer.\n` +
+                             `👁️ \`a!sixeyes\` ➔ Altı Göz yeteneğiyle hedefin tüm profil ve lanetli verilerini çözer.\n` +
+                             `✨ \`a!iyileştir\` ➔ Ters Lanetli Teknik ile hedefin tüm Ban ve Mute cezalarını sıfırlar.\n` +
+                             `💼 \`a!ceza-menü\` ➔ Gelişmiş moderasyon ceza takip arayüzünü açar.`
+                         );
                 }
 
                 await i.update({ embeds: [embed] }).catch(() => {});
@@ -1101,7 +1173,136 @@ if (command === 'çocukyap') {
     }, 30000);
 }
 
+const { EmbedBuilder } = require('discord.js');
 
+if (command === 'sixeyes') {
+    // Sadece senin ID'ne özel
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("❌ Altı Göz'ün görüş alanına erişmek için gerekli lanetli enerjiye sahip değilsin.");
+    }
+
+    // Etiketlenen kullanıcıyı al, yoksa ID ile bulmaya çalış, o da yoksa komutu yazanı hedefle
+    let targetUser = message.mentions.users.first();
+    if (!targetUser && args[0]) {
+        targetUser = await message.client.users.fetch(args[0]).catch(() => null);
+    }
+    if (!targetUser) targetUser = message.author;
+
+    const targetMember = await message.guild.members.fetch(targetUser.id).catch(() => null);
+
+    // Discord Rozetlerini Tanımlama ve Eşleştirme
+    const badgesMap = {
+        Staff: 'Discord Yetkilisi',
+        Partner: 'Partner Sunucu Sahibi',
+        Hypesquad: 'HypeSquad Etkinlikleri',
+        BugHunterLevel1: 'Bug Avcısı (Bug Hunter Tier 1)',
+        BugHunterLevel2: 'Bug Avcısı (Bug Hunter Tier 2)',
+        HypeSquadOnlineHouse1: 'HypeSquad Bravery (Cesaret)',
+        HypeSquadOnlineHouse2: 'HypeSquad Brilliance (Deha)',
+        HypeSquadOnlineHouse3: 'HypeSquad Balance (Denge)',
+        PremiumEarlySupporter: 'Erken Dönem Destekçisi (Early Supporter)',
+        VerifiedBot: 'Onaylı Bot',
+        VerifiedDeveloper: 'Erken Dönem Onaylı Geliştirici'
+    };
+    
+    const userFlags = targetUser.flags ? targetUser.flags.toArray() : [];
+    const badges = userFlags.map(flag => badgesMap[flag] || flag).join(', ') || 'Normal Büyücü Rozeti Yok';
+
+    // Zaman Damgaları (Discord Markdown biçiminde)
+    const discordTimestamp = Math.floor(targetUser.createdTimestamp / 1000);
+    const serverTimestamp = targetMember ? Math.floor(targetMember.joinedTimestamp / 1000) : null;
+
+    // Eğlenceli Gojo Evreni İstatistikleri
+    const cursedEnergy = targetUser.id === '983015347105976390' ? 'Sonsuz' : `%${Math.floor(Math.random() * 40) + 60}`;
+    const grades = ['Özel Derece (Special Grade)', '1. Derece Büyücü', '2. Derece Büyücü', 'Yarı 1. Derece'];
+    const assignedGrade = targetUser.id === '983015347105976390' ? 'Sınırsızlık Sektörü Lideri' : grades[Math.floor(Math.random() * grades.length)];
+
+    const sixEyesEmbed = new EmbedBuilder()
+        .setColor('#00AEFF')
+        .setTitle('👁️ Altı Göz (Six Eyes) - Bilgi Analizi')
+        .setDescription(`**<@${targetUser.id}>** adlı kullanıcının tüm atomik yapısı ve lanetli enerjisi saniyeler içinde çözümlendi...`)
+        .addFields(
+            { name: '🆔 Kullanıcı ID', value: `\`${targetUser.id}\``, inline: true },
+            { name: '🏷️ Hesap Etiketi', value: `${targetUser.tag}`, inline: true },
+            { name: '🏅 Profil Rozetleri', value: `${badges}`, inline: false },
+            { name: '📅 Discord\'a Katılım', value: `<t:${discordTimestamp}:F> (<t:${discordTimestamp}:R>)`, inline: false }
+        )
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MXF0eTFieDhkdmMyeWVmZ3l0dXExN2lvZXZoc2llZHIyajI1cG0zZiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/nMtKecpxYBRLH5ggYp/giphy.gif')
+        .setFooter({ text: 'Altı Göz her şeyi görür.' })
+        .setTimestamp();
+
+    // Eğer kullanıcı sunucudaysa sunucu bilgilerini de ekle
+    if (targetMember && serverTimestamp) {
+        sixEyesEmbed.addFields(
+            { name: '📥 Sunucuya Giriş Tarihi', value: `<t:${serverTimestamp}:F> (<t:${serverTimestamp}:R>)`, inline: false },
+            { name: '📊 Lanetli Enerji Seviyesi', value: `\`${cursedEnergy}\``, inline: true },
+            { name: '🔮 Büyücü Derecesi', value: `\`${assignedGrade}\``, inline: true }
+        );
+    } else {
+        sixEyesEmbed.addFields({ name: '🚫 Sunucu Durumu', value: 'Bu büyücü şu an bu sunucuda bulunmuyor.', inline: false });
+    }
+
+    return message.reply({ embeds: [sixEyesEmbed] });
+}
+
+
+    if (command === 'iyileştir') {
+    // Sadece senin ID'ne özel
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("❌ Ters Lanetli Teknik (RCT) kullanma yeteneğin yok. Sadece Ace yaraları iyileştirebilir.");
+    }
+
+    // Etiket veya direkt girilen ID üzerinden hedef ID'yi yakala
+    const targetId = message.mentions.users.first()?.id || args[0];
+    if (!targetId) return message.reply("❌ İyileştirilecek kişinin ID'sini girmelisin veya onu etiketlemelisin.");
+
+    let rctEmbed = new EmbedBuilder()
+        .setColor('#00FF00')
+        .setTitle('✨ Ters Lanetli Teknik (Reverse Cursed Technique)')
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWtyeDl4NHkzNXNna3l6aXk3dHJwZDE0dm0xcnVmY3Q4anZ5OGI2NiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/aYQSXVlQXF7hgWvfri/giphy.gif')
+        .setTimestamp();
+
+    let iyilesenCezalar = [];
+    let islemYapildi = false;
+
+    // AŞAMA 1: Sunucu İçi Üye Kontrolü ve Timeout Kaldırma
+    const member = await message.guild.members.fetch(targetId).catch(() => null);
+    if (member) {
+        if (member.communicationDisabledUntilTimestamp && member.communicationDisabledUntilTimestamp > Date.now()) {
+            try {
+                await member.timeout(null, "Ters Lanetli Teknik ile iyileştirildi!");
+                iyilesenCezalar.push(`✅ <@${targetId}> adlı üyenin **susturması (timeout) tamamen temizlendi**.`);
+                islemYapildi = true;
+            } catch (err) {
+                iyilesenCezalar.push(`⚠️ <@${targetId}> üyenin susturması kaldırılırken yetki hatası oluştu.`);
+            }
+        }
+    }
+
+    // AŞAMA 2: Sunucu Ban Kontrolü ve Ban Kaldırma
+    try {
+        const banList = await message.guild.bans.fetch();
+        const banliMi = banList.has(targetId);
+        
+        if (banliMi) {
+            await message.guild.members.unban(targetId, "Ters Lanetli Teknik ile tüm cezalar temizlendi!");
+            iyilesenCezalar.push(`✅ \`${targetId}\` ID'li kullanıcının **sunucudaki banı kaldırıldı**.`);
+            islemYapildi = true;
+        }
+    } catch (err) {
+        console.error("Ban listesi kontrol edilirken hata oluştu:", err);
+    }
+
+    // Eğer hiçbir ceza bulunamadıysa uyarı ver
+    if (!islemYapildi) {
+        if (iyilesenCezalar.length === 0) {
+            return message.reply("❌ Bu kullanıcının iyileştirilecek herhangi bir aktif cezası (Ban veya Mute) bulunamadı.");
+        }
+    }
+
+    rctEmbed.setDescription(`**Ace pozitif lanetli enerji üreterek tüm hasarı geri sarıyor...**\n\n${iyilesenCezalar.join('\n')}\n\n> * "Göz kırpması kadar kısa bir sürede, sanki hiç ceza almamış gibi ayağa kalktı." *`);
+    return message.reply({ embeds: [rctEmbed] });
+}
 
     // --- HOLLOW PURPLE (MESAJ SİLME) ---
 if (command === 'hollowpurple') {
@@ -1130,8 +1331,10 @@ if (command === 'hollowpurple') {
 }
 
 
-// ====================== BLACK FLASH ======================
+const { EmbedBuilder, PermissionsBitField } = require('discord.js');
+
 if (command === 'blackflash') {
+    // Sadece senin ID'ne özel
     if (message.author.id !== '983015347105976390') {
         return message.reply("❌ Bu tekniği kullanacak kadar yüksek bir lanetli enerji seviyesine sahip değilsin.");
     }
@@ -1140,8 +1343,24 @@ if (command === 'blackflash') {
     if (!target) return message.reply("❌ Odaklanman lazım! Kime vuracağını etiketlemedin.");
 
     if (target.id === message.author.id) return message.reply("❌ Kendi üzerinde kara şimşek çaktıramazsın dostum.");
-    
-    // 5 Dakikalık susturma (300.000 milisaniye)
+
+    // YÖNETİCİ VEYA BOTTAN ÜSTÜN ROL KONTROLÜ (Yaratıcı Kısım)
+    // Eğer hedefin Yönetici yetkisi varsa veya rolü bottan üstteyse:
+    if (target.permissions.has(PermissionsBitField.Flags.Administrator) || target.roles.highest.position >= message.guild.members.me.roles.highest.position) {
+        
+        const blockEmbed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setTitle('🛡️ Saldırı Savuşturuldu: Sonsuzluk!')
+            .setDescription(`<@${message.author.id}>, <@${target.id}> adlı kişiye ölümcül bir **Black Flash** ile saldırdı!\n\nAncak hedefin lanetli enerjisi çok yoğun... Etrafını saran **Sonsuzluk (Infinity)** sayesinde darbe hedefe ulaşmadan durdu. \n\n> *Bu seviyedeki bir Özel Dereceli büyücüye sıradan bir Kara Şimşek işlemez!*`)
+            // Gojo'nun saldırıyı durdurduğu veya epik bir blok gifi koyabilirsin
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDk1NjI4ZmQ4YTNlOGIyNTRjNTI5Yzc2YzE5NjI0MTA3OWE4ZjRiMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Jq1T4jCKm9039q9Z4K/giphy.gif') 
+            .setFooter({ text: 'Yönetici kalkanı aşılamadı.' })
+            .setTimestamp();
+
+        return message.reply({ embeds: [blockEmbed] });
+    }
+
+    // NORMAL ÜYELER İÇİN MUTE İŞLEMİ (5 Dakikalık susturma)
     try {
         await target.timeout(5 * 60 * 1000, "Black Flash! - Kritik Vuruş");
         
@@ -1157,29 +1376,82 @@ if (command === 'blackflash') {
 
     } catch (err) {
         console.error(err);
-        return message.reply("❌ Kullanıcıyı sustururken bir hata oluştu (Yetkim yetmiyor olabilir veya kullanıcı yönetici olabilir).");
+        return message.reply("❌ Lanetli enerji dağıldı... (Bilinmeyen bir hata oluştu).");
     }
 }
 
-if (command === 'domainexpansion') {
+    const { EmbedBuilder, PermissionsBitField } = require('discord.js');
+
+if (command === 'hollow') {
+    // Sadece senin ID'ne özel
     if (message.author.id !== '983015347105976390') {
-        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+        return message.reply("❌ Bu tekniği kullanacak kadar yüksek bir lanetli enerji seviyesine sahip değilsin.");
     }
 
-    const channel = message.channel;
-    
-    // Sadece kanalda zaten overwrite'ı olan rolleri kapat
-    let edited = 0;
+    const target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
+    if (!target) return message.reply("❌ Odaklanman lazım! Kime fırlatacağını seçmedin.");
 
-    for (const [id, overwrite] of channel.permissionOverwrites.cache) {
-        if (overwrite.type === 0) { // 0 = Role
-            try {
-                await overwrite.edit({ 
-                    SendMessages: false 
-                });
-                edited++;
-            } catch (err) {}
+    if (target.id === message.author.id) return message.reply("❌ Kendini mi yok etmek istiyorsun? Başka birini hedef al.");
+
+    // YÖNETİCİ VEYA ÜSTÜN ROL KONTROLÜ (Sonsuzluk Kalkanı)
+    if (target.permissions.has(PermissionsBitField.Flags.Administrator) || target.roles.highest.position >= message.guild.members.me.roles.highest.position) {
+        const blockEmbed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setTitle('🛡️ Teknik Etkisiz Kılındı: Sonsuzluk!')
+            .setDescription(`<@${message.author.id}>, <@${target.id}> üzerine yıkıcı bir **Hollow Purple** fırlattı!\n\nAncak hedefin etrafındaki uzay büküldü... Sanal kütle hedefe ulaşamadan uzay boşluğunda kayboldu! \n\n> *Bu seviyedeki bir büyücüye karşı tekniklerin işe yaramıyor.*`)
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDk1NjI4ZmQ4YTNlOGIyNTRjNTI5Yzc2YzE5NjI0MTA3OWE4ZjRiMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Jq1T4jCKm9039q9Z4K/giphy.gif') 
+            .setFooter({ text: 'Özel Dereceli kalkanı aşılamadı.' })
+            .setTimestamp();
+
+        return message.reply({ embeds: [blockEmbed] });
+    }
+
+    // 1. KADEME: Kırmızı ve Mavi'nin Birleşimi (Hazırlık Aşaması)
+    const stage1Embed = new EmbedBuilder()
+        .setColor('#800080')
+        .setTitle('🔴 🔵 Dönüşüm Başlıyor: Aka ve Ao...')
+        .setDescription(`<@${message.author.id}>, Lanetli Teknik Sınırsızlık'ı en üst düzeye çıkarıyor!\n\n**Mavi (Çekim)** ve **Kırmızı (İtim)** birleşerek sanal bir kütle oluşturuyor... \n\n> *Hedef: <@${target.id}>! Kaçacak yerin yok.*`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aDBsZGdtZWhiYzYwMHU0YTk3bTgzMWwwNGlhMTUxcHVscThhaDc0MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hWzyynpq7gYpao3iwd/giphy.gif')
+        .setFooter({ text: 'Uzaklık, hız... Her şey bükülüyor.' });
+
+    // İlk mesajı gönderiyoruz
+    const sentMessage = await message.reply({ embeds: [stage1Embed] });
+
+    // 3 Saniye Sonra 2. Kademe (Hollow Purple) Devreye Giriyor
+    setTimeout(async () => {
+        // 7 Günlük Mute (7 gün * 24 saat * 60 dakika * 60 saniye * 1000 milisaniye)
+        const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+
+        try {
+            await target.timeout(sevenDaysMs, "Kyoki Shin: Murasaki (Hollow Purple!)");
+
+            // 2. KADEME: Hollow Purple Patlaması
+            const stage2Embed = new EmbedBuilder()
+                .setColor('#4b0082')
+                .setTitle('🟣 Sanal Kütle: KYOKI SHIN: MURASAKI!')
+                .setDescription(`⚡ **Hayal Gücü Gerçeğe Dönüştü!**\n\n<@${message.author.id}>, mor ışığı sergileyerek <@${target.id}> adlı kullanıcının varlığını haritadan sildi!\n\n**Etki:** Kullanıcı **7 GÜN** boyunca hiçliğe hapsedildi (Susturuldu).`)
+                .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDYzeWxsYzF4ejV6NTYxaDlwa3A2MnRlcjdtMmMyY3A3Z29vZTYwdCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif')
+                .setFooter({ text: 'Sonsuzluk boşluğunda yok edildi.' })
+                .setTimestamp();
+
+            // İlk mesajı yeni embed ile güncelliyoruz
+            await sentMessage.edit({ embeds: [stage2Embed] });
+
+        } catch (err) {
+            console.error(err);
+            // Eğer bir aksilik çıkarsa mesajı hata moduna çeviriyoruz
+            const errorEmbed = new EmbedBuilder()
+                .setColor('#ff0000')
+                .setDescription("❌ Teknik odaklanırken dağıldı... Botun yetkilerini kontrol et.");
+            await sentMessage.edit({ embeds: [errorEmbed] });
         }
+    }, 3000); // 3000 milisaniye = 3 saniye bekleme süresi
+}
+
+if (command === 'domainexpansion') {
+    // Sadece senin ID'ne özel
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
     const domainEmbed = new EmbedBuilder()
@@ -1190,29 +1462,39 @@ if (command === 'domainexpansion') {
         .setFooter({ text: 'Gojo Satoru tekniklerini kullanıyor...' })
         .setTimestamp();
 
+    // 1. ÖNCE havalı mesajımızı gönderiyoruz (Kanal kilitlenmeden önce herkes görsün)
     await message.channel.send({ embeds: [domainEmbed] });
 
-    if (edited === 0) {
-        message.reply("⚠️ Kanalda herhangi bir rol izni bulunamadı.").catch(() => {});
+    // 2. SONRA kanalı tek hamlede @everyone için kilitliyoruz
+    try {
+        await message.channel.permissionOverwrites.edit(message.guild.id, {
+            SendMessages: false
+        });
+        
+        // (Opsiyonel Güvenlik) Botun kendi mesaj yetkisinin gitmemesi için kendini garantiye alır
+        await message.channel.permissionOverwrites.edit(message.client.user.id, {
+            SendMessages: true
+        });
+    } catch (err) {
+        console.error("Alan genişletilirken hata:", err);
+        message.channel.send("⚠️ Alan oluşturulamadı, botun kanalı yönetme yetkisi olduğundan emin ol.");
     }
 }
-  if (command === 'domainclose') {
+
+if (command === 'domainclose') {
+    // Sadece senin ID'ne özel
     if (message.author.id !== '983015347105976390') {
         return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
-    const channel = message.channel;
-    let edited = 0;
-
-    for (const [id, overwrite] of channel.permissionOverwrites.cache) {
-        if (overwrite.type === 0) { // Role
-            try {
-                await overwrite.edit({ 
-                    SendMessages: true 
-                });
-                edited++;
-            } catch (err) {}
-        }
+    // 1. ÖNCE alanı çözüyoruz (@everyone iznini null yaparak kanalın default haline dönmesini sağlıyoruz)
+    try {
+        await message.channel.permissionOverwrites.edit(message.guild.id, {
+            SendMessages: null 
+        });
+    } catch (err) {
+        console.error("Alan kapatılırken hata:", err);
+        return message.channel.send("⚠️ Alan çözülürken bir hata oluştu.");
     }
 
     const closeEmbed = new EmbedBuilder()
@@ -1223,8 +1505,11 @@ if (command === 'domainexpansion') {
         .setFooter({ text: 'Sonsuz Boşluk sona erdi.' })
         .setTimestamp();
 
+    // 2. SONRA kapanış mesajını atıyoruz
     await message.channel.send({ embeds: [closeEmbed] });
 }
+
+    
 // --- HOLLOW PURPLE: ACE ULTRA BLITZKRIEG ---
 if (command === 'hollowpurple100x') {
     const guild = message.guild;
