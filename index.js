@@ -1173,7 +1173,6 @@ if (command === 'çocukyap') {
     }, 30000);
 }
 
-const { EmbedBuilder } = require('discord.js');
 
 if (command === 'sixeyes') {
     // Sadece senin ID'ne özel
