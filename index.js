@@ -342,6 +342,68 @@ if (command === 'yardım') {
 
     sendHelp();
 }
+
+    if (command === 'kurallar') {
+    // Sadece Yöneticilerin kullanabilmesi için güvenlik kontrolü (isteğe bağlı)
+    if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        return message.reply("❌ Bu komutu sadece yöneticiler kullanabilir.");
+    }
+
+    const rulesEmbed = new EmbedBuilder()
+        .setColor('#2b2d31') // Discord'un koyu temasına uyumlu arka plan rengi
+        .setTitle('📜 Sunucu Kuralları / A R V E X Yönetimi Sunar.')
+        .setDescription(`📌 @everyone Herkesin uyması gereken kurallar aşağıda listelenmiştir. İhlal edenlere ceza uygulanır.\n\n` +
+        
+        `**🧑‍🤝‍🧑 GENEL SAYGI**\n` +
+        `🔴 1. Herkese saygılı olun. Hakaret, küfür, alay yasaktır.\n` +
+        `🟠 2. Irk, din, cinsiyet ayrımı veya aşağılayıcı dil kullanmak yasaktır.\n` +
+        `🟡 3. Yetkililere karşı gelmek, emir sorgulamak yasaktır.\n` +
+        `🔴 4. Sunucu kurucusuna saygısızlık doğrudan jail veya ban sebebidir.\n\n` +
+
+        `**💬 MESAJ DAVRANIŞLARI**\n` +
+        `🔵 5. Flood (tekrar mesaj), spam, gereksiz emoji/caps kullanımı yasaktır.\n` +
+        `🟣 6. Kanalın amacı dışında konuşmak yasaktır.\n` +
+        `🟡 7. Bot komutlarını spamlamak, trol amaçlı kullanmak yasaktır.\n\n` +
+
+        `**📢 REKLAM VE GİZLİLİK**\n` +
+        `🟤 8. Reklam yapmak (link, sosyal medya, davet vs.) yasaktır.\n` +
+        `⚫ 9. DM yoluyla rahatsızlık vermek veya reklam yapmak yasaktır.\n` +
+        `🔴 10. Kişisel bilgi ifşası (isim, fotoğraf, adres, IP Kayıt Almak vb.) kesinlikle yasaktır.\n\n` +
+
+        `**🔊 SES KANALLARI**\n` +
+        `🟣 11. Ses kanallarında bağırmak, ses bozan programlar kullanmak yasaktır.\n` +
+        `🟢 12. Müzik botunu kötüye kullanmak, diğer üyeleri rahatsız etmek yasaktır.\n\n` +
+
+        `**🔞 UYGUNSUZ VE YASA DIŞI İÇERİK**\n` +
+        `🔴 13. +18 içerik, kan, korku, mide bulandırıcı görsel ve yazılar yasaktır.\n` +
+        `⚫ 14. Crack, hile, yasa dışı yazılım paylaşımı kesinlikle yasaktır.\n` +
+        `⚫ 15. Bot açıklarını kötüye kullanmak, sistemleri suistimal etmek yasaktır.\n\n` +
+
+        `**🎭 TROL VE ROL SİSTEMİ**\n` +
+        `🟠 16. Trollük yapmak, provoke etmek yasaktır.\n` +
+        `🟡 17. Trol profil fotoğrafı Trol İsim Gibi öğeler kullanmak yasaktır.\n` +
+        `🔵 18. Yetki istemek, rol dilenmek Yetkilerinizi Kötü Amaçlı Kullanmak yasaktır.\n` +
+        `🟢 19. Yetkiniz Varsa İzinsiz Rollere Ellemek, İsim Değiştirmek vb. Kesinlikte yasaktır.\n\n` +
+
+        `**📢 TOPLUMSAL TARTIŞMA**\n` +
+        `🟣 20. Siyasi/dini tartışmalar, toplumu bölücü ifadeler yasaktır.\n` +
+        `🔵 21. Toplum hassasiyetlerine saygı gösterilmelidir.\n` +
+        `⚪ 22. Özel Meselelerinizi, Şahsi Kavgaları Sunucuya Yansıtmak Yasaktır.\n\n` +
+
+        `**✅ ONAY:**\n` +
+        `📌 Kuralları okumamış olmak mazeret değildir. Tüm üyeler Ve yetkililer Kuralları Okumuş Sayılır!\n\n` +
+
+        `**🪪 YÖNETİM**\n` +
+        `📌 Yönetim, gerekli gördüğü durumlarda kurallarda değişiklik yapma ve ek kural getirme hakkını saklı tutar.`)
+        .setFooter({ text: 'A R V E X Yönetimi', iconURL: message.guild.iconURL({ dynamic: true }) })
+        .setTimestamp();
+
+    // Kurallar kanalına everyone atarak mesajı gönderiyoruz
+    await message.channel.send({ content: '@everyone', embeds: [rulesEmbed] });
+    
+    // Komutu yazanın kendi gönderdiği mesajı siliyoruz ki kanal temiz dursun
+    await message.delete().catch(() => {});
+}
     
     // ====================== SİL VE SNIPE ======================
     if (command === 'sil') {
