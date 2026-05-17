@@ -1446,6 +1446,70 @@ if (command === 'hollow') {
     }, 3000); // 3000 milisaniye = 3 saniye bekleme süresi
 }
 
+    if (command === 'hollow10x') {
+    // Sadece senin ID'ne özel
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("❌ Bu tekniği kullanacak kadar yüksek bir lanetli enerji seviyesine sahip değilsin.");
+    }
+
+    const target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
+    if (!target) return message.reply("❌ Odaklanman lazım! Kime fırlatacağını seçmedin.");
+
+    if (target.id === message.author.id) return message.reply("❌ Kendini mi yok etmek istiyorsun? Başka birini hedef al.");
+
+    // YÖNETİCİ VEYA ÜSTÜN ROL KONTROLÜ (Sonsuzluk Kalkanı)
+    if (target.permissions.has(PermissionsBitField.Flags.Administrator) || target.roles.highest.position >= message.guild.members.me.roles.highest.position) {
+        const blockEmbed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setTitle('🛡️ Teknik Etkisiz Kılındı: Sonsuzluk!')
+            .setDescription(`<@${message.author.id}>, <@${target.id}> üzerine yıkıcı bir **Hollow Purple** fırlattı!\n\nAncak hedefin etrafındaki uzay büküldü... Sanal kütle hedefe ulaşamadan uzay boşluğunda kayboldu! \n\n> *Bu seviyedeki bir büyücüye karşı tekniklerin işe yaramıyor.*`)
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDk1NjI4ZmQ4YTNlOGIyNTRjNTI5Yzc2YzE5NjI0MTA3OWE4ZjRiMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Jq1T4jCKm9039q9Z4K/giphy.gif') 
+            .setFooter({ text: 'Özel Dereceli kalkanı aşılamadı.' })
+            .setTimestamp();
+
+        return message.reply({ embeds: [blockEmbed] });
+    }
+
+    // 1. KADEME: Kırmızı ve Mavi'nin Birleşimi (Hazırlık Aşaması)
+    const stage1Embed = new EmbedBuilder()
+        .setColor('#800080')
+        .setTitle('🔴 🔵 Dönüşüm Başlıyor: Aka ve Ao...')
+        .setDescription(`<@${message.author.id}>, Lanetli Teknik Sınırsızlık'ı en üst düzeye çıkarıyor!\n\n**Mavi (Çekim)** ve **Kırmızı (İtim)** birleşerek sanal bir kütle oluşturuyor... \n\n> *Hedef: <@${target.id}>! Kaçacak yerin yok.*`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aDBsZGdtZWhiYzYwMHU0YTk3bTgzMWwwNGlhMTUxcHVscThhaDc0MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hWzyynpq7gYpao3iwd/giphy.gif')
+        .setFooter({ text: 'Uzaklık, hız... Her şey bükülüyor.' });
+
+    // İlk mesajı gönderiyoruz
+    const sentMessage = await message.reply({ embeds: [stage1Embed] });
+
+    // 3 Saniye Sonra 2. Kademe (Hollow Purple) Devreye Giriyor
+    setTimeout(async () => {
+        try {
+            // Ban işlemi burada gerçekleşiyor
+            await target.ban({ reason: "Kyoki Shin: Murasaki (Hollow Purple!) - Varlıktan Silindi" });
+
+            // 2. KADEME: Hollow Purple Patlaması
+            const stage2Embed = new EmbedBuilder()
+                .setColor('#4b0082')
+                .setTitle('🟣 Sanal Kütle: KYOKI SHIN: MURASAKI!')
+                .setDescription(`⚡ **Hayal Gücü Gerçeğe Dönüştü!**\n\n<@${message.author.id}>, mor ışığı sergileyerek <@${target.id}> adlı kullanıcının varlığını haritadan sildi!\n\n**Etki:** Kullanıcı hiçliğe hapsedildi (Sunucudan Kalıcı Olarak Banlandı).`)
+                .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDYzeWxsYzF4ejV6NTYxaDlwa3A2MnRlcjdtMmMyY3A3Z29vZTYwdCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif')
+                .setFooter({ text: 'Sonsuzluk boşluğunda yok edildi.' })
+                .setTimestamp();
+
+            // İlk mesajı yeni embed ile güncelliyoruz
+            await sentMessage.edit({ embeds: [stage2Embed] });
+
+        } catch (err) {
+            console.error(err);
+            // Eğer bir aksilik çıkarsa mesajı hata moduna çeviriyoruz
+            const errorEmbed = new EmbedBuilder()
+                .setColor('#ff0000')
+                .setDescription("❌ Teknik odaklanırken dağıldı... Botun **Üyeleri Yasakla (Ban)** yetkisine sahip olduğundan ve hiyerarşide hedef kullanıcıdan üstte olduğundan emin ol.");
+            await sentMessage.edit({ embeds: [errorEmbed] });
+        }
+    }, 3000); // 3000 milisaniye = 3 saniye bekleme süresi
+}
+
 if (command === 'domainexpansion') {
     // Sadece senin ID'ne özel
     if (message.author.id !== '983015347105976390') {
