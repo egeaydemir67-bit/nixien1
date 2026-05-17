@@ -1331,7 +1331,6 @@ if (command === 'hollowpurple') {
 }
 
 
-const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 
 if (command === 'blackflash') {
     // Sadece senin ID'ne özel
@@ -1380,7 +1379,7 @@ if (command === 'blackflash') {
     }
 }
 
-    const { EmbedBuilder, PermissionsBitField } = require('discord.js');
+    
 
 if (command === 'hollow') {
     // Sadece senin ID'ne özel
