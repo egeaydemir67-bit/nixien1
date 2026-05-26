@@ -285,7 +285,7 @@ if (command === 'yardım') {
              `⚔️ \`a!duello\` ➔ Sunucudaki bir üyeye ölümüne düello teklif edersin.\n` +
              `⚖️ \`a!racon\` ➔ Etiketlediğin kişiye ağır abi sözleriyle racon keser.\n` +
              `🚨 \`a!fbi\` ➔ Şüpheli hareketler yapan üyenin evine FBI baskını düzenler.\n` +
-             `🔮 \`a!vibecheck\` ➔ Bir üyenin aura ve ortam enerjisi (vibe) oranını kontrol eder.\n` +
+             `🔮 \`a!aura\` ➔ Bir üyenin aura ve ortam enerjisi (vibe) oranını kontrol eder.\n` +
              `✖️ \`a!wasted\` ➔ Hedeflediğin kullanıcıyı acımadan harcar (GTA tarzı).\n` +
              `📊 \`a!stat\` / \`a!leaderstat\` ➔ Sunucu içi aktiflik verilerini ve liderlik tablosunu gösterir.`
          );
