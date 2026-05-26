@@ -269,22 +269,27 @@ if (command === 'yardım') {
                     .setTimestamp()
                     .setFooter({ text: `🛡️ Ace System • Kategori: ${i.component.label}`, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 
-                if (i.customId === 'eglence') {
-                    embed.setTitle('🎭 Üye & Eğlence Sistemi')
-                         .setDescription(
-                             `💬 **Eğlence & Etkileşim Komutları:**\n\n` +
-                             `❤️ \`a!aşkölç\` ➔ Etiketlediğin kişiyle aşk yüzdenizi ölçer.\n` +
-                             `💍 \`a!evlen\` / \`a!boşan\` ➔ Sunucudaki bir üyeyle evlenmenizi/boşanmanızı sağlar.\n` +
-                             `📜 \`a!evlilik\` ➔ Mevcut evlilik durumunu ve partnerini gösterir.\n` +
-                             `🐱 \`a!kedisev\` ➔ Rastgele tatlı bir kedi resmi gönderir.\n` +
-                             `💥 \`a!patlat\` ➔ Eğlence amaçlı kanalda patlama simülasyonu yapar.\n` +
-                             `🎲 \`a!zarat\` / \`a!yazıtura\` ➔ Zar atar veya yazı-tura oynatır.\n` +
-                             `📏 \`a!kaçcm\` ➔ Tamamen eğlence amaçlı şans ölçümü yapar.\n` +
-                             `🫂 \`a!sarıl\` / \`a!öp\` / \`a!tokat\` ➔ Belirttiğin üyeye sarılır, öper veya tokat atarsın.\n` +
-                             `⚔️ \`a!duello\` ➔ Sunucudaki bir üyeye ölümüne düello teklif edersin.\n` +
-                             `📊 \`a!stat\` / \`a!leaderstat\` ➔ Sunucu içi aktiflik verilerini ve liderlik tablosunu gösterir.`
-                         );
-                }
+               if (i.customId === 'eglence') {
+    embed.setTitle('🎭 Üye & Eğlence Sistemi')
+         .setDescription(
+             `💬 **Eğlence & Etkileşim Komutları:**\n\n` +
+             `❤️ \`a!aşkölç\` ➔ Etiketlediğin kişiyle aşk yüzdenizi ölçer.\n` +
+             `💍 \`a!evlen\` / \`a!boşan\` ➔ Sunucudaki bir üyeyle evlenmenizi/boşanmanızı sağlar.\n` +
+             `📜 \`a!evlilik\` ➔ Mevcut evlilik durumunu ve partnerini gösterir.\n` +
+             `🐱 \`a!kedisev\` ➔ Rastgele tatlı bir kedi resmi gönderir.\n` +
+             `💥 \`a!patlat\` ➔ Eğlence amaçlı kanalda patlama simülasyonu yapar.\n` +
+             `🎲 \`a!zarat\` / \`a!yazıtura\` ➔ Çift zar fırlatır veya yazı-tura oynatır.\n` +
+             `📏 \`a!kaçcm\` ➔ Tamamen eğlence amaçlı şans ölçümü yapar.\n` +
+             `🫂 \`a!sarıl\` / \`a!öp\` / \`a!tokat\` ➔ Belirttiğin üyeye sarılır, öper veya tokat atarsın.\n` +
+             `🔞 \`a!sik\` ➔ Hedeflediğin kullanıcıyı ŞAP ŞAP etkisiz hale getirir.\n` +
+             `⚔️ \`a!duello\` ➔ Sunucudaki bir üyeye ölümüne düello teklif edersin.\n` +
+             `⚖️ \`a!racon\` ➔ Etiketlediğin kişiye ağır abi sözleriyle racon keser.\n` +
+             `🚨 \`a!fbi\` ➔ Şüpheli hareketler yapan üyenin evine FBI baskını düzenler.\n` +
+             `🔮 \`a!vibecheck\` ➔ Bir üyenin aura ve ortam enerjisi (vibe) oranını kontrol eder.\n` +
+             `✖️ \`a!wasted\` ➔ Hedeflediğin kullanıcıyı acımadan harcar (GTA tarzı).\n` +
+             `📊 \`a!stat\` / \`a!leaderstat\` ➔ Sunucu içi aktiflik verilerini ve liderlik tablosunu gösterir.`
+         );
+}
                 else if (i.customId === 'moderasyon') {
                     embed.setTitle('🛡️ Moderasyon & Ceza Sistemi')
                          .setDescription(
@@ -696,105 +701,212 @@ if (command === 'yardım') {
     }
 }
     
-    // ====================== YENİ EĞLENCE: KAÇ CM, ZAR AT, YAZI TURA ======================
+  // ====================== ACE SYSTEM: EĞLENCE & ETKİLEŞİM KOMUTLARI ======================
 
-    if (command === 'duello') {
+if (command === 'duello') {
     const target = message.mentions.users.first();
     if (!target) return message.reply("❌ Düello yapacağın birini etiketlemelisin!");
     if (target.id === message.author.id) return message.reply("❌ Kendi kendine düello yapamazsın, akıl sağlığını koru.");
 
     const kazanan = Math.random() < 0.5 ? message.author : target;
     const kaybeden = kazanan.id === message.author.id ? target : message.author;
+    
+    // Düelloya biraz RPG havası katmak için rastgele silahlar
+    const silahlar = ['Kanalizasyon Borusuyla', 'Kelebek Bıçağıyla', 'Tek Atışta', 'Racon Keserek', 'Gözleriyle'];
+    const kullanılanSilah = silahlar[Math.floor(Math.random() * silahlar.length)];
 
     const duelloEmbed = new EmbedBuilder()
         .setColor('#ff0000')
-        .setTitle('⚔️ Düello Sonucu')
-        .setDescription(`**<@${kazanan.id}>**, rakiibi **<@${kaybeden.id}>** kullanıcısını tek hamlede yere serdi!`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW4wb3pmZDY4emg2dTh4Zm1naDVkb2o3bHJzOG53eHFjZzRnZGh5aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Phlda4eDmA8FX5BaLj/giphy.gif');
+        .setTitle('⚔️ Düello Meydanı')
+        .setDescription(`**<@${kazanan.id}>**, rakibi **<@${kaybeden.id}>** kullanıcısını **${kullanılanSilah}** tek hamlede yere serdi!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExamx0NnlibTJ6eDF4NHN3Y2h5eXk0c2g2cTZueWFraHNidHBtOTB5eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Phlda4eDmA8FX5BaLj/giphy.gif') // GIF LİNKİ BURAYA
+        .setFooter({ text: '🛡️ Ace System • Düello bitti.', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [duelloEmbed] });
 }
 
-    if (command === 'tokat') {
+if (command === 'tokat') {
     const target = message.mentions.users.first();
     if (!target) return message.reply("❌ Kimi tokatlayacağını seçmelisin.");
+    
+    const hasar = Math.floor(Math.random() * 90) + 10; // 10-100 arası hasar
 
     const tokatEmbed = new EmbedBuilder()
-        .setColor('#2b2d31')
-        .setDescription(`✋ <@${message.author.id}>, <@${target.id}> adlı kullanıcıya öyle bir tokat attı ki, feleği şaştı!`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MHlkbTh6cGRuOGdoMTVxejJsZmw4eThha2pycDl6eDBzbmlxOGZwbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/W13QzeK4A03AP540o9/giphy.gif');
+        .setColor('#e74c3c')
+        .setTitle('✋ Osmanlı Tokadı!')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> adlı kullanıcıya öyle bir tokat attı ki! \n> **Verilen Hasar:** \`${hasar} HP\` • Feleği şaştı!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXFkcGl2aG5lNDJ0NWgzbHYxcTdnbzI4ODcyYm1zOWdmd3pqeHY4MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/W13QzeK4A03AP540o9/giphy.gif') // GIF LİNKİ BURAYA
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [tokatEmbed] });
 }
 
-    if (command === 'öp') {
+if (command === 'öp') {
     const target = message.mentions.users.first();
     if (!target) return message.reply("❌ Kimi öpeceğini seçmelisin, havayı mı öpeceksin?");
     if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi öpeceksin? Biraz yalnız hissediyoruz galiba...");
 
     const opEmbed = new EmbedBuilder()
         .setColor('#ff69b4')
-        .setDescription(`💋 <@${message.author.id}>, <@${target.id}> kullanıcısını şap diye öptü!`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTN2YTV2Z3U3ZzA5eWRubzNoaHE4MHFpbDk0YmFjOWVqM214M3cyYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LVXUEwWACquWRFeKCl/giphy.gif');
+        .setTitle('💋 Şap!')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> kullanıcısını yanağından şap diye öptü!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDFleWo1b2U4OTFwNzd1bmtkaGpxZm4wb21qMDA2MDVjMTkweWY3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LVXUEwWACquWRFeKCl/giphy.gif') // GIF LİNKİ BURAYA
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [opEmbed] });
 }
 
-        if (command === 'sik') {
+if (command === 'sik') {
     const target = message.mentions.users.first();
-    if (!target) return message.reply("❌ Kimi sikceğini seçmelisin, havaya mı sokcaksın?");
-    if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi sikiceksin? Biraz yalnız hissediyoruz galiba...");
+    if (!target) return message.reply("❌ Kimi sikeceğini seçmelisin, havaya mı sokacaksın?");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi sikeceksin? O kadar da değil be usta...");
 
-    const opEmbed = new EmbedBuilder()
-        .setColor('#ff69b4')
-        .setDescription(`💓 <@${message.author.id}>, <@${target.id}> kullanıcısını ŞAP ŞAP Sikti!`)
-        .setImage('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWt3cWZvc3B5ajBybGE1ZDFuMzRja2N1aTJweTlhampvc2I1dXRhMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IsIyvk7zftw4H2C1Kz/giphy.gif');
+    const sikEmbed = new EmbedBuilder()
+        .setColor('#1a1a1a')
+        .setTitle('🔞 Ağır Hasar!')
+        .setDescription(`💓 <@${message.author.id}>, <@${target.id}> kullanıcısını **ŞAP ŞAP** etkisiz hale getirdi!`)
+        .setImage('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDBsMnppNTY3aTY3eGZjbmIzeDB1d3NzNTQ5bWdkdzE1OXA2MGI3ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IsIyvk7zftw4H2C1Kz/giphy.gif') // GIF LİNKİ BURAYA
+        .setFooter({ text: '🛡️ Ace System • +18', iconURL: message.client.user.displayAvatarURL() });
 
-    return message.reply({ embeds: [opEmbed] });
+    return message.reply({ embeds: [sikEmbed] });
 }
 
-    if (command === 'sarıl') {
+if (command === 'sarıl') {
     const target = message.mentions.users.first();
-    if (!target) return message.reply("❌ Sarılacak birini bulamadık mı?");
+    if (!target) return message.reply("❌ Sarılacak birini bulamadık mı? Gel ben sarılayım diyeceğim de botum ben.");
 
     const sarilEmbed = new EmbedBuilder()
         .setColor('#3498db')
-        .setDescription(`🫂 <@${message.author.id}>, <@${target.id}> kullanıcısına sımsıkı sarıldı. Her şey geçecek...`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExczV1YmJhYTIydWZ0YmQxYXR6eG1raDBlZXR0aDFuZ201YXQwaGpiaSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/nsYlsQmxYIY5jVqe6j/giphy.gif');
+        .setTitle('🫂 Sımsıkı Sarılma')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> kullanıcısına sımsıkı sarıldı. *Her şey geçecek, sakin ol...*`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjdzaWxsbzh3b2M4amlmMXJ4NGlwYmo5YTc4NmwwNGI0MXpsaW1yNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/IzXiddo2twMmdmU8Lv/giphy.gif') // GIF LİNKİ BURAYA
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [sarilEmbed] });
 }
     
-    if (command === 'kaçcm') {
-        const target = message.mentions.users.first() || message.author;
-        const uzunluk = Math.floor(Math.random() * 35) + 1; // 1 ile 35 arası
+if (command === 'kaçcm') {
+    const target = message.mentions.users.first() || message.author;
+    const uzunluk = Math.floor(Math.random() * 35) + 1;
         
-        let yorum = "";
-        if(uzunluk <= 5) yorum = "Büyü de gel aslanım... 🔬";
-        else if(uzunluk <= 10) yorum = "İdare eder kardeşim, sıkma canını. 🤏";
-        else if(uzunluk <= 16) yorum = "Ortalama, ideal. 😎";
-        else if(uzunluk <= 23) yorum = "Oha, maşallah! 😳";
-        else yorum = "Silah taşıma ruhsatı alman lazım usta! 🚀";
+    let yorum = "";
+    if(uzunluk <= 5) yorum = "Büyü de gel aslanım... 🔬";
+    else if(uzunluk <= 10) yorum = "İdare eder kardeşim, sıkma canını. 🤏";
+    else if(uzunluk <= 16) yorum = "Ortalama, ideal. 😎";
+    else if(uzunluk <= 23) yorum = "Oha, maşallah! 😳";
+    else yorum = "Silah taşıma ruhsatı alman lazım usta! 🚀";
 
-        const cmEmbed = new EmbedBuilder()
-            .setColor('Random')
-            .setTitle('📏 Ölçüm Sonucu')
-            .setDescription(`> **${target.username}** adlı kişinin aleti tam olarak **${uzunluk} CM!**\n\n${yorum}`)
-            .setFooter({ text: '🛡️ Ace System • Sadece Eğlence Amaçlıdır', iconURL: client.user.displayAvatarURL() });
+    const cmEmbed = new EmbedBuilder()
+        .setColor('Random')
+        .setTitle('📏 Kadastro ve Ölçüm Sonucu')
+        .setDescription(`> **${target.username}** adlı kişinin derinlik ölçümleri yapıldı...\n\n**Sonuç:** \`${uzunluk} CM\`\n**Analiz:** *${yorum}*`)
+        .setFooter({ text: '🛡️ Ace System • Sadece Eğlence Amaçlıdır', iconURL: message.client.user.displayAvatarURL() });
 
-        return message.reply({ embeds: [cmEmbed] });
-    }
+    return message.reply({ embeds: [cmEmbed] });
+}
 
-    if (command === 'zarat') {
-        const zar = Math.floor(Math.random() * 6) + 1;
-        return message.reply(`🎲 Zarları fırlattın ve **${zar}** geldi!\n*🛡️ Ace System*`);
-    }
+if (command === 'zarat') {
+    const zar1 = Math.floor(Math.random() * 6) + 1;
+    const zar2 = Math.floor(Math.random() * 6) + 1; // Tek zar yerine çift zar yuvarlamak her zaman daha heyecanlıdır
+    
+    const zarEmbed = new EmbedBuilder()
+        .setColor('#f1c40f')
+        .setTitle('🎲 Zarlar Fırlatıldı!')
+        .setDescription(`> Kullanıcı: <@${message.author.id}>\n\n🎰 **Gelen Zarlar:** \` ${zar1} - ${zar2} \` (Toplam: \`${zar1 + zar2}\`)`)
+        .setFooter({ text: '🛡️ Ace System • Şansın bol olsun.', iconURL: message.client.user.displayAvatarURL() });
 
-    if (command === 'yazıtura') {
-        const sonuc = Math.random() < 0.5 ? "Yazı 🪙" : "Tura 🦅";
-        return message.reply(`Havaya bir bozuk para attın...\nVe sonuç: **${sonuc}**\n*🛡️ Ace System*`);
-    }
+    return message.reply({ embeds: [zarEmbed] });
+}
 
+if (command === 'yazıtura') {
+    const sonuc = Math.random() < 0.5 ? "YAZI 🪙" : "TURA 🦅";
+    
+    const ytEmbed = new EmbedBuilder()
+        .setColor('#95a5a6')
+        .setTitle('🪙 Demir Para Havada Dönüyor...')
+        .setDescription(`> Parayı fırlatan: <@${message.author.id}>\n\n🎯 **Sonuç:** **\`${sonuc}\`**`)
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
+
+    return message.reply({ embeds: [ytEmbed] });
+}
+
+
+// ====================== YENİ EKLENEN YARATICI KOMUTLAR ======================
+
+if (command === 'racon') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kime racon keseceğini seçmelisin, kendi kendine racon kesilmez.");
+    if (target.id === message.author.id) return message.reply("❌ Kendine racon kesemezsin, aynayla aranı düzelt.");
+
+    const raconlar = [
+        "Ben racon kesmem, kafa keserim!",
+        "Bi yerde küçük insanların büyük gölgeleri oluşuyorsa, orada güneş batıyor demektir.",
+        "Saraylarda sürmedik saltanat, bir odada çektik cefayı. Biz severiz aslan gibi abiyi, sileriz arkadan iş çeviren kahpeyi!",
+        "Bizim ortamda akıllıya yer yok, deliyi zaten biz delirttik.",
+        "Geçmişi kurcalama, altından ben çıkarsam dönemezsin."
+    ];
+    const secilenRacon = raconlar[Math.floor(Math.random() * raconlar.length)];
+
+    const raconEmbed = new EmbedBuilder()
+        .setColor('#1c1c1c')
+        .setTitle('⚖️ Racon Kesildi!')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> kullanıcısının karşısına dikildi ve lafı koydu:\n\n> *"${secilenRacon}"*`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NjRycXY2MGdyZWQ0NG9zYnZiaW1yOWlsbW1pOHhha2p0ZWt5aHV1cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/tipeVV5rWmSFIo3PUa/giphy.gif') // GIF LİNKİ BURAYA (Örn: Ağır abi veya mafya gifi)
+        .setFooter({ text: '🛡️ Ace System • Hüküm verildi.', iconURL: message.client.user.displayAvatarURL() });
+
+    return message.reply({ embeds: [raconEmbed] });
+}
+
+if (command === 'fbi') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimin evini bastıracaksın? Birini ihbar et!");
+
+    const fbiEmbed = new EmbedBuilder()
+        .setColor('#002d62')
+        .setTitle('🚨 FBI OPEN THE DOOR!')
+        .setDescription(`⚠️ <@${message.author.id}>, <@${target.id}> adlı kullanıcının yasadışı hareketlerini tespit etti ve özel harekatı evine yolladı! \n\n**DURUM:** Kapı koçbaşıyla kırılıyor, kaçış yok!`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzBzMnFtOHcwMmE1aDE0cXQ2Y3J1ZmZtbmxnM3ZuNHplaDYxdDJlNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/dMn6DpYvzeKJ1UTar6/giphy.gif') // GIF LİNKİ BURAYA (Klasik kapı kırma fbi gifi)
+        .setFooter({ text: '🛡️ Ace System • Baskın Basanındır.', iconURL: message.client.user.displayAvatarURL() });
+
+    return message.reply({ embeds: [fbiEmbed] });
+}
+
+if (command === 'aura') {
+    const target = message.mentions.users.first() || message.author;
+    const oran = Math.floor(Math.random() * 101);
+    
+    let durum = "";
+    if (oran < 20) durum = "Aura yerlerde sürünüyor, acil takviye lazım... 💀";
+    else if (oran < 50) durum = "Biraz baygın bir enerji var ama düzelir. 💤";
+    else if (oran < 80) durum = "Gayet sağlam, ortamın akışına ayak uyduruyor. 🧊";
+    else durum = "Aura patlaması yaşıyor! Sinerji mükemmel. 🔥";
+
+    const vibeEmbed = new EmbedBuilder()
+        .setColor('#9b59b6')
+        .setTitle('🔮 Aura & Vibe Kontrolü')
+        .setDescription(`> **${target.username}** kullanıcısının ruh hali ve ortam aurası taranıyor...\n\n🎯 **Vibe Oranı:** \`%${oran}\` \n📊 **Durum:** *${durum}*`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanJvYzd4bGNyeXl1NWZ4dGc0dmp1YzI0N2FkZGhxbWJ3MWZsaWFzdCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/FYOsEpYK7zHs3eDXmg/giphy.gif') // GIF LİNKİ BURAYA
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
+
+    return message.reply({ embeds: [vibeEmbed] });
+}
+
+if (command === 'wasted') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi harcayacağını seçmedin.");
+
+    const sebepler = ['Yere basan yola bastı', 'Yanlış kişiye ters yaptı', 'Lag kurbanı oldu', 'Raconu kaldıramadı'];
+    const sebep = sebepler[Math.floor(Math.random() * sebepler.length)];
+
+    const wastedEmbed = new EmbedBuilder()
+        .setColor('#2c3e50')
+        .setTitle('✖️ WASTED!')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> adlı kullanıcıyı harcadı!\n\n> **Elanma Sebebi:** *${sebep}*`)
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExazBoOHo3bGJrdXAzZjBleXl3YjFpaTJtNXE1cmJkYXVobmpvb3R2eCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/w29hHnsoaqsy4/giphy.gif') // GIF LİNKİ BURAYA (GTA Wasted gifi çok iyi gider)
+        .setFooter({ text: '🛡️ Ace System • Geçmiş olsun.', iconURL: message.client.user.displayAvatarURL() });
+
+    return message.reply({ embeds: [wastedEmbed] });
+}
 
 // ====================== EĞLENCE (GELİŞTİRİLMİŞ) ======================
 
