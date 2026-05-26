@@ -37,12 +37,12 @@ const OWNER_ID = "983015347105976390";
 
 // Yetki Rolleri
 const PERMS = {
-    MUTE: "1501944298076242073",
-    VMUTE: "1501944295635161269",
-    BAN: "1501944293068111972",
-    KICK: "1502716935136350248",
-    SIL_SNIPE: "1501944302153236553",
-    SICIL: "1501944298076242073",
+    MUTE: "1507679445509738636",
+    VMUTE: "1507679445509738636",
+    BAN: "1508910494021582978",
+    KICK: "1507679446209921085",
+    SIL_SNIPE: "1507679444322619464",
+    SICIL: "1507679445509738636",
     EVLI_ROL: "1502345462940827779"
 };
 
@@ -1242,7 +1242,10 @@ if (command === 'sixeyes') {
         return message.reply("❌ Altı Göz'ün görüş alanına erişmek için gerekli lanetli enerjiye sahip değilsin.");
     }
 
-    // Etiketlenen kullanıcıyı al, yoksa ID ile bulmaya çalış, o da yoksa komutu yazanı hedefle
+    // Rolplay: Bekleme mesajı gönder
+    const loadingMessage = await message.reply("🤞 Göz bandı indiriliyor... Altı Göz bilgi akışını işliyor...");
+
+    // Etiketlenen kullanıcıyı al, yoksa ID ile bul, o da yoksa komutu yazanı hedefle
     let targetUser = message.mentions.users.first();
     if (!targetUser && args[0]) {
         targetUser = await message.client.users.fetch(args[0]).catch(() => null);
@@ -1256,54 +1259,75 @@ if (command === 'sixeyes') {
         Staff: 'Discord Yetkilisi',
         Partner: 'Partner Sunucu Sahibi',
         Hypesquad: 'HypeSquad Etkinlikleri',
-        BugHunterLevel1: 'Bug Avcısı (Bug Hunter Tier 1)',
-        BugHunterLevel2: 'Bug Avcısı (Bug Hunter Tier 2)',
-        HypeSquadOnlineHouse1: 'HypeSquad Bravery (Cesaret)',
-        HypeSquadOnlineHouse2: 'HypeSquad Brilliance (Deha)',
-        HypeSquadOnlineHouse3: 'HypeSquad Balance (Denge)',
-        PremiumEarlySupporter: 'Erken Dönem Destekçisi (Early Supporter)',
+        BugHunterLevel1: 'Bug Avcısı (Tier 1)',
+        BugHunterLevel2: 'Bug Avcısı (Tier 2)',
+        HypeSquadOnlineHouse1: 'HypeSquad Bravery',
+        HypeSquadOnlineHouse2: 'HypeSquad Brilliance',
+        HypeSquadOnlineHouse3: 'HypeSquad Balance',
+        PremiumEarlySupporter: 'Erken Dönem Destekçisi',
         VerifiedBot: 'Onaylı Bot',
-        VerifiedDeveloper: 'Erken Dönem Onaylı Geliştirici'
+        VerifiedDeveloper: 'Onaylı Geliştirici'
     };
     
     const userFlags = targetUser.flags ? targetUser.flags.toArray() : [];
-    const badges = userFlags.map(flag => badgesMap[flag] || flag).join(', ') || 'Normal Büyücü Rozeti Yok';
+    const badges = userFlags.map(flag => badgesMap[flag] || flag).join(', ') || 'Normal Büyücü (Rozet Yok)';
 
-    // Zaman Damgaları (Discord Markdown biçiminde)
+    // Zaman Damgaları
     const discordTimestamp = Math.floor(targetUser.createdTimestamp / 1000);
     const serverTimestamp = targetMember ? Math.floor(targetMember.joinedTimestamp / 1000) : null;
 
+    // Varlık Türü (Bot mu İnsan mı?)
+    const entityType = targetUser.bot ? '🤖 Yapay Lanetli Ceset (Bot)' : '👤 İnsan (Büyücü)';
+
     // Eğlenceli Gojo Evreni İstatistikleri
-    const cursedEnergy = targetUser.id === '983015347105976390' ? 'Sonsuz' : `%${Math.floor(Math.random() * 40) + 60}`;
-    const grades = ['Özel Derece (Special Grade)', '1. Derece Büyücü', '2. Derece Büyücü', 'Yarı 1. Derece'];
-    const assignedGrade = targetUser.id === '983015347105976390' ? 'Sınırsızlık Sektörü Lideri' : grades[Math.floor(Math.random() * grades.length)];
+    const isGojo = targetUser.id === '983015347105976390';
+    const cursedEnergy = isGojo ? 'Sonsuz' : `%${Math.floor(Math.random() * 40) + 60}`;
+    const grades = ['Özel Derece (Special Grade)', '1. Derece', '2. Derece', '3. Derece', 'Yarı 1. Derece'];
+    const assignedGrade = isGojo ? 'Sınırsızlık Sektörü Lideri' : grades[Math.floor(Math.random() * grades.length)];
+    
+    const techniques = ['On Gölge (Ten Shadows)', 'Kan Manipülasyonu', 'Basit Alan', 'Cennet Kısıtlaması (Fiziksel)', 'Lanetli Söz (Cursed Speech)', 'Bilinmiyor'];
+    const assignedTechnique = isGojo ? 'Sınırsızlık (Limitless)' : techniques[Math.floor(Math.random() * techniques.length)];
+
+    // Avatar URL'si
+    const avatarUrl = targetUser.displayAvatarURL({ dynamic: true, size: 1024 });
 
     const sixEyesEmbed = new EmbedBuilder()
         .setColor('#00AEFF')
-        .setTitle('👁️ Altı Göz (Six Eyes) - Bilgi Analizi')
-        .setDescription(`**<@${targetUser.id}>** adlı kullanıcının tüm atomik yapısı ve lanetli enerjisi saniyeler içinde çözümlendi...`)
+        .setTitle('👁️ Altı Göz (Six Eyes) - Analiz Raporu')
+        .setDescription(`**<@${targetUser.id}>** adlı varlığın atomik yapısı ve lanetli enerjisi çözümlendi.`)
+        .setThumbnail(avatarUrl)
         .addFields(
+            { name: '🧬 Varlık Türü', value: `\`${entityType}\``, inline: true },
+            { name: '🏷️ Hesap Etiketi', value: `\`${targetUser.tag}\``, inline: true },
             { name: '🆔 Kullanıcı ID', value: `\`${targetUser.id}\``, inline: true },
-            { name: '🏷️ Hesap Etiketi', value: `${targetUser.tag}`, inline: true },
             { name: '🏅 Profil Rozetleri', value: `${badges}`, inline: false },
-            { name: '📅 Discord\'a Katılım', value: `<t:${discordTimestamp}:F> (<t:${discordTimestamp}:R>)`, inline: false }
+            { name: '📅 Discord\'a Doğuş', value: `<t:${discordTimestamp}:D> (<t:${discordTimestamp}:R>)`, inline: true }
         )
         .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MXF0eTFieDhkdmMyeWVmZ3l0dXExN2lvZXZoc2llZHIyajI1cG0zZiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/nMtKecpxYBRLH5ggYp/giphy.gif')
-        .setFooter({ text: 'Altı Göz her şeyi görür.' })
+        .setFooter({ text: 'Altı Göz her şeyi görür.', iconURL: message.author.displayAvatarURL() })
         .setTimestamp();
 
     // Eğer kullanıcı sunucudaysa sunucu bilgilerini de ekle
     if (targetMember && serverTimestamp) {
+        // En yüksek rolü bulma (@everyone rolünü filtrele)
+        const highestRole = targetMember.roles.highest.id === message.guild.id ? 'Yok' : `<@&${targetMember.roles.highest.id}>`;
+
         sixEyesEmbed.addFields(
-            { name: '📥 Sunucuya Giriş Tarihi', value: `<t:${serverTimestamp}:F> (<t:${serverTimestamp}:R>)`, inline: false },
+            { name: '📥 Bariyerden İçeri Giriş (Sunucu)', value: `<t:${serverTimestamp}:D> (<t:${serverTimestamp}:R>)`, inline: true },
+            { name: '👑 En Yüksek Kademe (Rol)', value: highestRole, inline: true },
+            { name: '\u200B', value: '\u200B', inline: false }, // Boşluk bırakmak için
             { name: '📊 Lanetli Enerji Seviyesi', value: `\`${cursedEnergy}\``, inline: true },
-            { name: '🔮 Büyücü Derecesi', value: `\`${assignedGrade}\``, inline: true }
+            { name: '🔮 Büyücü Derecesi', value: `\`${assignedGrade}\``, inline: true },
+            { name: '🌀 Lanetli Teknik', value: `\`${assignedTechnique}\``, inline: true }
         );
     } else {
-        sixEyesEmbed.addFields({ name: '🚫 Sunucu Durumu', value: 'Bu büyücü şu an bu sunucuda bulunmuyor.', inline: false });
+        sixEyesEmbed.addFields({ name: '🚫 Bariyer Durumu', value: 'Bu varlık şu an sunucu bariyerlerinin dışında.', inline: false });
     }
 
-    return message.reply({ embeds: [sixEyesEmbed] });
+    // Bekleme mesajını Altı Göz analiziyle değiştir (Animasyonlu hissiyat)
+    setTimeout(async () => {
+        await loadingMessage.edit({ content: "Görüş alanı netleşti.", embeds: [sixEyesEmbed] });
+    }, 1500); // 1.5 saniyelik bir gecikme
 }
 
 
@@ -1459,7 +1483,7 @@ if (command === 'hollow') {
             .setColor('#ffffff')
             .setTitle('🛡️ Teknik Etkisiz Kılındı: Sonsuzluk!')
             .setDescription(`<@${message.author.id}>, <@${target.id}> üzerine yıkıcı bir **Hollow Purple** fırlattı!\n\nAncak hedefin etrafındaki uzay büküldü... Sanal kütle hedefe ulaşamadan uzay boşluğunda kayboldu! \n\n> *Bu seviyedeki bir büyücüye karşı tekniklerin işe yaramıyor.*`)
-            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDk1NjI4ZmQ4YTNlOGIyNTRjNTI5Yzc2YzE5NjI0MTA3OWE4ZjRiMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Jq1T4jCKm9039q9Z4K/giphy.gif') 
+            .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3b3dld2Vwa2w1bDlrdXN2eHE3cmppNXdtcGowdDlwN2pzd3gzajQwaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9Xx1OMQIiA9feabm70/giphy.gif') 
             .setFooter({ text: 'Özel Dereceli kalkanı aşılamadı.' })
             .setTimestamp();
 
@@ -1471,7 +1495,7 @@ if (command === 'hollow') {
         .setColor('#800080')
         .setTitle('🔴 🔵 Dönüşüm Başlıyor: Aka ve Ao...')
         .setDescription(`<@${message.author.id}>, Lanetli Teknik Sınırsızlık'ı en üst düzeye çıkarıyor!\n\n**Mavi (Çekim)** ve **Kırmızı (İtim)** birleşerek sanal bir kütle oluşturuyor... \n\n> *Hedef: <@${target.id}>! Kaçacak yerin yok.*`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aDBsZGdtZWhiYzYwMHU0YTk3bTgzMWwwNGlhMTUxcHVscThhaDc0MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hWzyynpq7gYpao3iwd/giphy.gif')
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWhkcGNhZmt4a3djcGMxN2o3OWRoN3NlazI1Y3p2M2xzb3AzazFqOCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/J5ClzFGMhiu8iuDZ4x/giphy.gif')
         .setFooter({ text: 'Uzaklık, hız... Her şey bükülüyor.' });
 
     // İlk mesajı gönderiyoruz
@@ -1490,7 +1514,7 @@ if (command === 'hollow') {
                 .setColor('#4b0082')
                 .setTitle('🟣 Sanal Kütle: KYOKI SHIN: MURASAKI!')
                 .setDescription(`⚡ **Hayal Gücü Gerçeğe Dönüştü!**\n\n<@${message.author.id}>, mor ışığı sergileyerek <@${target.id}> adlı kullanıcının varlığını haritadan sildi!\n\n**Etki:** Kullanıcı **7 GÜN** boyunca hiçliğe hapsedildi (Susturuldu).`)
-                .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDYzeWxsYzF4ejV6NTYxaDlwa3A2MnRlcjdtMmMyY3A3Z29vZTYwdCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif')
+                .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTVnNmo0bnUzMjN3MDRrMXlrZnU4eHE3aHBpaXRhcHRmcjFtb3B0dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/P2olhkZ061vEACZcSG/giphy.gif')
                 .setFooter({ text: 'Sonsuzluk boşluğunda yok edildi.' })
                 .setTimestamp();
 
@@ -1525,7 +1549,7 @@ if (command === 'hollow') {
             .setColor('#ffffff')
             .setTitle('🛡️ Teknik Etkisiz Kılındı: Sonsuzluk!')
             .setDescription(`<@${message.author.id}>, <@${target.id}> üzerine yıkıcı bir **Hollow Purple** fırlattı!\n\nAncak hedefin etrafındaki uzay büküldü... Sanal kütle hedefe ulaşamadan uzay boşluğunda kayboldu! \n\n> *Bu seviyedeki bir büyücüye karşı tekniklerin işe yaramıyor.*`)
-            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDk1NjI4ZmQ4YTNlOGIyNTRjNTI5Yzc2YzE5NjI0MTA3OWE4ZjRiMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Jq1T4jCKm9039q9Z4K/giphy.gif') 
+            .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3b3dld2Vwa2w1bDlrdXN2eHE3cmppNXdtcGowdDlwN2pzd3gzajQwaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/9Xx1OMQIiA9feabm70/giphy.gif') 
             .setFooter({ text: 'Özel Dereceli kalkanı aşılamadı.' })
             .setTimestamp();
 
@@ -1537,7 +1561,7 @@ if (command === 'hollow') {
         .setColor('#800080')
         .setTitle('🔴 🔵 Dönüşüm Başlıyor: Aka ve Ao...')
         .setDescription(`<@${message.author.id}>, Lanetli Teknik Sınırsızlık'ı en üst düzeye çıkarıyor!\n\n**Mavi (Çekim)** ve **Kırmızı (İtim)** birleşerek sanal bir kütle oluşturuyor... \n\n> *Hedef: <@${target.id}>! Kaçacak yerin yok.*`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aDBsZGdtZWhiYzYwMHU0YTk3bTgzMWwwNGlhMTUxcHVscThhaDc0MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hWzyynpq7gYpao3iwd/giphy.gif')
+        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWhkcGNhZmt4a3djcGMxN2o3OWRoN3NlazI1Y3p2M2xzb3AzazFqOCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/J5ClzFGMhiu8iuDZ4x/giphy.gif')
         .setFooter({ text: 'Uzaklık, hız... Her şey bükülüyor.' });
 
     // İlk mesajı gönderiyoruz
@@ -1554,7 +1578,7 @@ if (command === 'hollow') {
                 .setColor('#4b0082')
                 .setTitle('🟣 Sanal Kütle: KYOKI SHIN: MURASAKI!')
                 .setDescription(`⚡ **Hayal Gücü Gerçeğe Dönüştü!**\n\n<@${message.author.id}>, mor ışığı sergileyerek <@${target.id}> adlı kullanıcının varlığını haritadan sildi!\n\n**Etki:** Kullanıcı hiçliğe hapsedildi (Sunucudan Kalıcı Olarak Banlandı).`)
-                .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDYzeWxsYzF4ejV6NTYxaDlwa3A2MnRlcjdtMmMyY3A3Z29vZTYwdCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0wxRYPhdD7n3W7NQ1R/giphy.gif')
+                .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTVnNmo0bnUzMjN3MDRrMXlrZnU4eHE3aHBpaXRhcHRmcjFtb3B0dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/P2olhkZ061vEACZcSG/giphy.gif')
                 .setFooter({ text: 'Sonsuzluk boşluğunda yok edildi.' })
                 .setTimestamp();
 
@@ -1575,62 +1599,75 @@ if (command === 'hollow') {
 if (command === 'domainexpansion') {
     // Sadece senin ID'ne özel
     if (message.author.id !== '983015347105976390') {
-        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+        return message.reply("❌ Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
-    const domainEmbed = new EmbedBuilder()
-        .setColor('#000001')
-        .setTitle('🤞 Alan Genişletmesi: Sonsuz Boşluk (Infinite Void)')
-        .setDescription('**Herkes Ace’in alanına hapsoldu!**\n\n> *Burada her şey sonsuzdur, hiçbir şey hareket edemez...*')
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHFuOXZibTFvcXVnY290cGZvOHJtejNhOTRjODk0dTA0Zjl0cmVxbSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UgV8Y7bDxsZDCP01eo/giphy.gif')
-        .setFooter({ text: 'Gojo Satoru tekniklerini kullanıyor...' })
-        .setTimestamp();
+    // 1. Atmosfer Yaratma: Önce ufak bir mesaj atıyoruz
+    const initMessage = await message.channel.send("🤞 **Alan Genişletmesi...**");
 
-    // 1. ÖNCE havalı mesajımızı gönderiyoruz (Kanal kilitlenmeden önce herkes görsün)
-    await message.channel.send({ embeds: [domainEmbed] });
+    // 1.5 Saniye sonra asıl olayı patlatıyoruz
+    setTimeout(async () => {
+        // 2. Kanalı @everyone için kilitliyoruz (Kırmızı Çarpı)
+        try {
+            await message.channel.permissionOverwrites.edit(message.guild.id, {
+                SendMessages: false
+            });
+            
+            // Botun kendi yetkisini garantiye alıyoruz
+            await message.channel.permissionOverwrites.edit(message.client.user.id, {
+                SendMessages: true
+            });
+        } catch (err) {
+            console.error("Alan genişletilirken hata:", err);
+            return initMessage.edit("⚠️ Alan oluşturulamadı, botun kanalı yönetme yetkisi olduğundan emin ol.");
+        }
 
-    // 2. SONRA kanalı tek hamlede @everyone için kilitliyoruz
-    try {
-        await message.channel.permissionOverwrites.edit(message.guild.id, {
-            SendMessages: false
-        });
-        
-        // (Opsiyonel Güvenlik) Botun kendi mesaj yetkisinin gitmemesi için kendini garantiye alır
-        await message.channel.permissionOverwrites.edit(message.client.user.id, {
-            SendMessages: true
-        });
-    } catch (err) {
-        console.error("Alan genişletilirken hata:", err);
-        message.channel.send("⚠️ Alan oluşturulamadı, botun kanalı yönetme yetkisi olduğundan emin ol.");
-    }
+        // 3. İnsanları içine çekecek, geliştirilmiş Epik Embed
+        const domainEmbed = new EmbedBuilder()
+            .setColor('#050505') // Çok koyu, boşluk hissi veren bir siyah
+            .setTitle('🌌 Alan Genişletmesi: Sonsuz Boşluk (Infinite Void)')
+            .setDescription('**Ace’in alanına hapsoldunuz.**\n\n> *Burada her şey sonsuzdur.\n> Görme, duyma, hissetme... Bilgi beyninize sonsuz bir akışla doluyor.\n> Hiçbir şey yapamazsınız, sadece izleyebilirsiniz.*')
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXM3emFuamx6aG9wdXdleDNydG0xZzF5aTAzYjZwMWtwYW9qZG4zcCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/q21Admcr8OpE2r0gmA/giphy.gif')
+            .setFooter({ text: 'Sınırsızlık Sektörü aktif edildi.', iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+            .setTimestamp();
+
+        // 4. İlk attığımız mesajı efsanevi embed ile değiştiriyoruz
+        await initMessage.edit({ content: null, embeds: [domainEmbed] });
+    }, 1500);
 }
 
 if (command === 'domainclose') {
     // Sadece senin ID'ne özel
     if (message.author.id !== '983015347105976390') {
-        return message.reply("Bu teknik için gereken 'Altı Göz' sende yok.");
+        return message.reply("❌ Bu teknik için gereken 'Altı Göz' sende yok.");
     }
 
-    // 1. ÖNCE alanı çözüyoruz (@everyone iznini null yaparak kanalın default haline dönmesini sağlıyoruz)
-    try {
-        await message.channel.permissionOverwrites.edit(message.guild.id, {
-            SendMessages: null 
-        });
-    } catch (err) {
-        console.error("Alan kapatılırken hata:", err);
-        return message.channel.send("⚠️ Alan çözülürken bir hata oluştu.");
-    }
+    // 1. Atmosfer Yaratma
+    const initMessage = await message.channel.send("✨ **Alan çözülüyor...**");
 
-    const closeEmbed = new EmbedBuilder()
-        .setColor('#ffffff')
-        .setTitle('✨ Alan Kapatıldı')
-        .setDescription('**Alan çözüldü, herkes şu an özgür.**\n\n> *Zihinlerinizdeki sonsuzluk sona erdi.*')
-        .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3amh6NTI0dDIwaHpoNnRobG0yMnprank5N2h3Y2NlYmNxczNvaW80bCZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/nMtKecpxYBRLH5ggYp/giphy.gif')
-        .setFooter({ text: 'Sonsuz Boşluk sona erdi.' })
-        .setTimestamp();
+    setTimeout(async () => {
+        // 2. Alanı çözüyoruz: 'null' yerine 'true' yaparak YEŞİL TİK olmasını sağlıyoruz!
+        try {
+            await message.channel.permissionOverwrites.edit(message.guild.id, {
+                SendMessages: true 
+            });
+        } catch (err) {
+            console.error("Alan kapatılırken hata:", err);
+            return initMessage.edit("⚠️ Alan çözülürken bir hata oluştu.");
+        }
 
-    // 2. SONRA kapanış mesajını atıyoruz
-    await message.channel.send({ embeds: [closeEmbed] });
+        // 3. Geliştirilmiş Kapanış Embedi
+        const closeEmbed = new EmbedBuilder()
+            .setColor('#ffffff') // Saf beyaz, aydınlanma hissi
+            .setTitle('🕊️ Alan Kapatıldı: Gerçekliğe Dönüş')
+            .setDescription('**Alan çözüldü, herkes şu an özgür.**\n\n> *Zihinlerinizdeki sonsuz bilgi akışı sona erdi.\n> Tekrar hareket edebilir, nefes alabilir ve konuşabilirsiniz.*')
+            .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXM3emFuamx6aG9wdXdleDNydG0xZzF5aTAzYjZwMWtwYW9qZG4zcCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/pDbUdqmZtnJgaTLqQP/giphy.gif')
+            .setFooter({ text: 'Sonsuz Boşluk sona erdi. Ace merhamet etti.', iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+            .setTimestamp();
+
+        // 4. Kapanış mesajını güncelliyoruz
+        await initMessage.edit({ content: null, embeds: [closeEmbed] });
+    }, 1500);
 }
 
     
