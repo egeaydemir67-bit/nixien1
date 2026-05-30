@@ -128,16 +128,11 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 });
 
 // --- 4. SNIPE VE LOG SİSTEMİ ---
+// --- 4. SNIPE VE LOG SİSTEMİ ---
 client.on('messageDelete', async message => {
-    if (message.author?.bot || !message.guild) return;
+    if (!message.guild || message.author?.bot) return;
 
-    snipes.set(message.channel.id, {
-        content: message.content,
-        author: message.author,
-        image: message.attachments.first() ? message.attachments.first().proxyURL : null,
-        timestamp: Date.now()
-    });
-
+    // 1. Log Kanalına Bildirim
     const logChannel = message.guild.channels.cache.find(c => c.name === logKanalAdi);
     if (logChannel) {
         const logEmbed = new EmbedBuilder()
@@ -153,19 +148,12 @@ client.on('messageDelete', async message => {
         logChannel.send({ embeds: [logEmbed] }).catch(() => {});
     }
 
-
-    // snipes map'ini tanımladığın yerin altına veya event içine entegre et
-client.on('messageDelete', async (message) => {
-    if (!message.guild || message.author?.bot) return;
-
-    // Kanal için daha önce silinenler yoksa boş dizi oluştur
+    // 2. Hafızada Snipe V10 Verisi Tutma
     if (!snipes.has(message.channel.id)) {
         snipes.set(message.channel.id, []);
     }
 
     const channelSnipes = snipes.get(message.channel.id);
-
-    // Mesajın eklerini (Fotoğraf, Video, GIF) kontrol et
     let attachmentUrl = null;
     let isVideoOrGif = false;
 
@@ -173,32 +161,28 @@ client.on('messageDelete', async (message) => {
         const attachment = message.attachments.first();
         attachmentUrl = attachment.proxyURL || attachment.url;
         
-        // Uzantıya göre video veya gif ayrımı yapalım
         const contentType = attachment.contentType || "";
         if (contentType.includes('video') || contentType.includes('gif') || attachmentUrl.endsWith('.mp4') || attachmentUrl.endsWith('.gif')) {
             isVideoOrGif = true;
         }
     }
 
-    // Yeni silinen mesaj verisini objeye çevir
     const snipeData = {
         author: message.author,
         content: message.content || null,
-        image: !isVideoOrGif ? attachmentUrl : null, // Normal fotoğraflar
-        media: isVideoOrGif ? attachmentUrl : null,  // GIF veya Videolar
+        image: !isVideoOrGif ? attachmentUrl : null,
+        media: isVideoOrGif ? attachmentUrl : null,
         timestamp: message.createdTimestamp
     };
 
-    // Dizinin başına ekle (En yeni en üstte olsun)
     channelSnipes.unshift(snipeData);
 
-    // Sadece son 10 mesajı tut, fazlasını sil ki botun ram'i şişmesin
     if (channelSnipes.length > 10) {
         channelSnipes.pop();
     }
 
     snipes.set(message.channel.id, channelSnipes);
-});
+}); // <--- İŞTE BÜTÜN SORUN BUYDU! BU PARANTEZ OLMADIĞI İÇİN TÜM KOMUTLARIN YUTULUYORDU.
 
 
     
@@ -2321,8 +2305,8 @@ client.on('interactionCreate', async interaction => {
             console.log(e);
             await interaction.reply({ content: "İşlem başarısız oldu, kullanıcının rolü benim rolümden yüksek olabilir.", ephemeral: true });
         }
-    }
-});
-//
+    } 
+
+
 });
 client.login(process.env.TOKEN);
