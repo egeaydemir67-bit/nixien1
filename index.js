@@ -18,6 +18,8 @@ const mongoose = require('mongoose');
 const ms = require('ms');
 const Canvas = require('canvas');
 let sonsuzlukAktif = false;
+const messageLog = new Map(); 
+let spamKorumaAktif = true;
 
 
 
@@ -198,9 +200,7 @@ client.on('messageDelete', async (message) => {
     snipes.set(message.channel.id, channelSnipes);
 });
 
-// Kodun en üstünde boş map'ler tanımla (Eğer yukarıda tanımlı değilse)
-const messageLog = new Map(); // Kullanıcıların mesaj zamanlarını tutar
-let spamKorumaAktif = true; // Varsayılan olarak koruma açık başlasın
+
     
 // --- 5. KOMUTLAR ---
 client.on('messageCreate', async message => {
