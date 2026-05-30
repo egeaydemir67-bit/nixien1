@@ -2323,6 +2323,6 @@ client.on('interactionCreate', async interaction => {
         }
     }
 });
-JavaScript
+//
 });
 client.login(process.env.TOKEN);
