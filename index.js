@@ -387,6 +387,7 @@ if (command === 'yardım') {
                              `🛠️ **Sunucu Yönetimi ve Log Komutları:**\n\n` +
                              `📂 \`a!sicil\` ➔ Etiketlenen üyenin geçmiş ceza kayıtlarını listeler.\n` +
                              `🗑️ \`a!sil\` ➔ Belirtilen miktarda mesajı kanaldan anında temizler.\n` +
+                             `🔐 \`a!spamkoruma (aç-kapat)\` ➔ Spam Korumasını Açıp Kapatırsınız.\n` +
                              `🎯 \`a!snipe\` ➔ Kanaldan son silinen mesajı yakalar ve içeriğini gösterir.`
                          );
                 }
@@ -403,6 +404,7 @@ if (command === 'yardım') {
                              `🛡️ \`a!sonsuzluk\` ➔ Pasif korumayı açar. Seni etiketleyenler 10 Saniye ceza yer.\n` +
                              `👁️ \`a!sixeyes\` ➔ Altı Göz yeteneğiyle hedefin tüm profil ve lanetli verilerini çözer.\n` +
                              `✨ \`a!iyileştir\` ➔ Ters Lanetli Teknik ile hedefin tüm Ban ve Mute cezalarını sıfırlar.\n` +
+                             `🎩 \`a!snipeV10\` ➔ Silinen Bütün Fotoğrafları, Videoları, Mesajları Görmeyi Sağlar.\n` +
                              `💼 \`a!ceza-menü\` ➔ Gelişmiş moderasyon ceza takip arayüzünü açar.`
                          );
                 }
