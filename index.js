@@ -150,11 +150,107 @@ client.on('messageDelete', async message => {
             .setTimestamp();
         logChannel.send({ embeds: [logEmbed] }).catch(() => {});
     }
+
+
+    // snipes map'ini tanımladığın yerin altına veya event içine entegre et
+client.on('messageDelete', async (message) => {
+    if (!message.guild || message.author?.bot) return;
+
+    // Kanal için daha önce silinenler yoksa boş dizi oluştur
+    if (!snipes.has(message.channel.id)) {
+        snipes.set(message.channel.id, []);
+    }
+
+    const channelSnipes = snipes.get(message.channel.id);
+
+    // Mesajın eklerini (Fotoğraf, Video, GIF) kontrol et
+    let attachmentUrl = null;
+    let isVideoOrGif = false;
+
+    if (message.attachments.size > 0) {
+        const attachment = message.attachments.first();
+        attachmentUrl = attachment.proxyURL || attachment.url;
+        
+        // Uzantıya göre video veya gif ayrımı yapalım
+        const contentType = attachment.contentType || "";
+        if (contentType.includes('video') || contentType.includes('gif') || attachmentUrl.endsWith('.mp4') || attachmentUrl.endsWith('.gif')) {
+            isVideoOrGif = true;
+        }
+    }
+
+    // Yeni silinen mesaj verisini objeye çevir
+    const snipeData = {
+        author: message.author,
+        content: message.content || null,
+        image: !isVideoOrGif ? attachmentUrl : null, // Normal fotoğraflar
+        media: isVideoOrGif ? attachmentUrl : null,  // GIF veya Videolar
+        timestamp: message.createdTimestamp
+    };
+
+    // Dizinin başına ekle (En yeni en üstte olsun)
+    channelSnipes.unshift(snipeData);
+
+    // Sadece son 10 mesajı tut, fazlasını sil ki botun ram'i şişmesin
+    if (channelSnipes.length > 10) {
+        channelSnipes.pop();
+    }
+
+    snipes.set(message.channel.id, channelSnipes);
 });
 
+// Kodun en üstünde boş map'ler tanımla (Eğer yukarıda tanımlı değilse)
+const messageLog = new Map(); // Kullanıcıların mesaj zamanlarını tutar
+let spamKorumaAktif = true; // Varsayılan olarak koruma açık başlasın
+    
 // --- 5. KOMUTLAR ---
 client.on('messageCreate', async message => {
     if (message.author.bot || !message.guild) return;
+
+    // --- SPAM KORUMASI BAŞLANGICI ---
+    // 1. Kurucu Kilidi: Sen ne kadar hızlı yazarsan yaz, bot seni asla engellemez.
+    if (message.author.id === '983015347105976390') {
+        // Kurucu muaf, direkt geçiş veriyoruz
+    } else if (spamKorumaAktif) {
+        const currentTime = Date.now();
+        const userId = message.author.id;
+        
+        if (!messageLog.has(userId)) {
+            messageLog.set(userId, []);
+        }
+
+        const userMessages = messageLog.get(userId);
+        userMessages.push(currentTime);
+
+        // Sadece son 4 mesajın süresini kontrol etmek için filtrele (Son 3 saniyedeki mesajlar)
+        const recentMessages = userMessages.filter(timestamp => currentTime - timestamp < 3000);
+        messageLog.set(userId, recentMessages);
+
+        // 3 saniye içinde 4 veya daha fazla mesaj yazıldıysa spam olarak algıla
+        if (recentMessages.length >= 4) {
+            try {
+                // Kullanıcıya sunucuda Yönetici yetkisi varsa onu da cezalandırma (Moderatörler muaf kalır)
+                if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                    
+                    // 5 Dakika (300.000 ms) boyunca sustur (Timeout)
+                    await message.member.timeout(5 * 60 * 1000, "Ace System • Sohbeti Spam ile Sabote Etmek");
+                    
+                    // Attığı spam mesajlarını temizle
+                    await message.channel.bulkDelete(recentMessages.length).catch(() => {});
+
+                    const spamEmbed = new EmbedBuilder()
+                        .setColor('#ff0000')
+                        .setTitle('🛡️ Ace System • Spam Engellendi')
+                        .setDescription(`⚠️ ${message.author} (**${message.author.username}**), chati çok hızlı kullandığın için **5 dakika** susturuldun.\n> Saniye sınırı aşıldığı için gönderdiğin son mesajlar temizlendi.`)
+                        .setTimestamp();
+
+                    return message.channel.send({ embeds: [spamEmbed] });
+                }
+            } catch (err) {
+                console.error("Spam cezası uygulanırken hata oluştu (Yetki yetersiz olabilir):", err);
+            }
+        }
+    }
+    // --- SPAM KORUMASI BİTİŞİ ---
 
 // 1. SONSUZLUK KONTROLÜ (Prefix kontrolünden ÖNCE olmalı)
 if (sonsuzlukAktif && message.mentions.has('983015347105976390') && message.author.id !== '983015347105976390') {
@@ -434,6 +530,165 @@ if (command === 'yardım') {
         if (msg.image) snipeEmbed.setImage(msg.image);
         return message.reply({ embeds: [snipeEmbed] });
     }
+
+    if (command === 'snipev10') {
+    // Sadece senin ID'ne özel kurucu kilidi
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("❌ **Ace Özel:** Bu sınırsız arşiv komutunu sadece kurucum kullanabilir.");
+    }
+
+    const channelSnipes = snipes.get(message.channel.id) || [];
+    if (channelSnipes.length === 0) {
+        return message.reply("🔮 Bu kanalda hafızaya alınmış silinen bir veri bulunamadı.");
+    }
+
+    // Ana Embed (İlk açılışta genel durumu özetler)
+    const mainEmbed = new EmbedBuilder()
+        .setColor('#2b2d31')
+        .setAuthor({ name: `${client.user.username} • Ace Sınırsız Snipe Arşivi`, iconURL: client.user.displayAvatarURL() })
+        .setDescription(
+            `### 👁️ Kanal Geçmişi Çözülüyor (Son 10 Kayıt)\n` +
+            `> Şu anda bu kanalda silinmiş toplam **${channelSnipes.length}** adet kayıt hafızada tutuluyor.\n` +
+            `> Aşağıdaki butonları kullanarak kategorilere göre son silinen verileri inceleyebilirsin, Reis.\n\n` +
+            `📝 **Metin Mesajları:** Silinen chat yazıları\n` +
+            `📸 **Fotoğraflar:** Gönderilip silinen görseller\n` +
+            `🎬 **GIF & Videolar:** Hareketli medyalar ve klipler`
+        )
+        .setFooter({ text: `🛡️ Ace System • Sorgulayan: ${message.author.username}` })
+        .setTimestamp();
+
+    // Kategori Butonları
+    const buttons = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('snipe_text').setLabel('Mesajlar (Son 10)').setEmoji('📝').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('snipe_image').setLabel('Fotoğraflar').setEmoji('📸').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('snipe_media').setLabel('GIF & Videolar').setEmoji('🎬').setStyle(ButtonStyle.Secondary)
+    );
+
+    const msg = await message.reply({ embeds: [mainEmbed], components: [buttons] });
+
+    const collector = msg.createMessageComponentCollector({
+        filter: i => i.user.id === message.author.id, // Sadece sen basabilirsin
+        time: 120000 // 2 dakika aktif kalır
+    });
+
+    collector.on('collect', async i => {
+        const embed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setTimestamp()
+            .setFooter({ text: `🛡️ Ace System • SnipeV10 Veri Çözümü` });
+
+        // --- 1. METİN MESAJLARI KATEGORİSİ ---
+        if (i.customId === 'snipe_text') {
+            embed.setTitle('📝 Son Silinen Metin Mesajları');
+            let textLog = "";
+
+            channelSnipes.forEach((s, index) => {
+                if (s.content) {
+                    textLog += `**[${index + 1}]** ${s.author} ➔ ${s.content}\n`;
+                }
+            });
+
+            embed.setDescription(textLog || "*Bu kategoride silinmiş metin mesajı bulunamadı.*");
+            await i.update({ embeds: [embed] }).catch(() => {});
+        }
+
+        // --- 2. FOTOĞRAFLAR KATEGORİSİ ---
+        else if (i.customId === 'snipe_image') {
+            embed.setTitle('📸 Son Silinen Fotoğraflar');
+            
+            // Fotoğrafı olan kayıtları filtrele
+            const imageSnipes = channelSnipes.filter(s => s.image);
+
+            if (imageSnipes.length === 0) {
+                embed.setDescription("*Bu kanalda silinmiş fotoğraf bulunamadı.*");
+                await i.update({ embeds: [embed], files: [] }).catch(() => {});
+            } else {
+                // Döngüsel olarak fotoğrafları görmek için chate liste basabiliriz 
+                // ya da en son silinen fotoğrafı direkt embed'e yerleştirebiliriz.
+                let imgList = "**Silinen Fotoğraf Sahipleri:**\n";
+                imageSnipes.forEach((s, idx) => {
+                    imgList += `**[${idx + 1}]** ${s.author.tag} (<t:${Math.floor(s.timestamp / 1000)}:R>)\n`;
+                });
+                
+                embed.setDescription(imgList + `\n*Aşağıda en son silinen fotoğraf gösteriliyor:*`);
+                embed.setImage(imageSnipes[0].image); // En son silinen fotoğrafı gösterir
+                await i.update({ embeds: [embed] }).catch(() => {});
+            }
+        }
+
+        // --- 3. GIF & VİDEOLAR KATEGORİSİ ---
+        else if (i.customId === 'snipe_media') {
+            embed.setTitle('🎬 Son Silinen GIF & Videolar');
+            
+            const mediaSnipes = channelSnipes.filter(s => s.media);
+
+            if (mediaSnipes.length === 0) {
+                embed.setDescription("*Bu kanalda silinmiş GIF veya Video bulunamadı.*");
+                await i.update({ embeds: [embed] }).catch(() => {});
+            } else {
+                let mediaList = "**Silinen Medya Sahipleri:**\n";
+                mediaSnipes.forEach((s, idx) => {
+                    mediaList += `**[${idx + 1}]** ${s.author.tag} (<t:${Math.floor(s.timestamp / 1000)}:R>)\n`;
+                });
+
+                embed.setDescription(mediaList + `\n*Discord kısıtlamaları sebebiyle videolar link olarak listelenir, en son silinen medyaya aşağıdaki linkten veya embedden ulaşabilirsin:*\n🔗 [Medya Linki](${mediaSnipes[0].media})`);
+                
+                // Eğer GIF ise embed üzerinde oynatır, video ise link olarak kalır.
+                embed.setImage(mediaSnipes[0].media); 
+                await i.update({ embeds: [embed] }).catch(() => {});
+            }
+        }
+    });
+
+    collector.on('end', () => {
+        const disabledButtons = buttons.components.map(b => 
+            ButtonBuilder.from(b).setDisabled(true)
+        );
+        const disabledRow = new ActionRowBuilder().addComponents(disabledButtons);
+        msg.edit({ components: [disabledRow] }).catch(() => {});
+    });
+}
+
+    if (command === 'spam-koruması' || command === 'spamkoruma') {
+    // Sadece Yöneticiler (Administrator) kullanabilir
+    if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        return message.reply("❌ Bu komutu kullanabilmek için **Yönetici** yetkisine sahip olmalısın.");
+    }
+
+    const args = message.content.split(' ').slice(1);
+    const secim = args[0]?.toLowerCase();
+
+    if (!secim || (secim !== 'aç' && secim !== 'kapat')) {
+        const basarisizEmbed = new EmbedBuilder()
+            .setColor('#2b2d31')
+            .setDescription(`⚙️ **Spam Koruması Sistemi**\n\nSistemi yönetmek için lütfen bir argüman belirtin:\n➔ \`a!spamkoruma aç\`\n➔ \`a!spamkoruma kapat\``);
+        return message.reply({ embeds: [basarisizEmbed] });
+    }
+
+    if (secim === 'aç') {
+        if (spamKorumaAktif) return message.reply("🛡️ Spam koruması sistemi sunucuda zaten **aktif** durumda.");
+        spamKorumaAktif = true;
+        
+        const acikEmbed = new EmbedBuilder()
+            .setColor('#00ff00')
+            .setTitle('🛡️ Ace System • Sistem Güncellendi')
+            .setDescription('✅ **Spam koruma sistemi başarıyla aktif edildi.** Üyeler chati sabote edemeyecek.')
+            .setTimestamp();
+        return message.reply({ embeds: [acikEmbed] });
+    }
+
+    if (secim === 'kapat') {
+        if (!spamKorumaAktif) return message.reply("⚠️ Spam koruması sistemi sunucuda zaten **kapalı** durumda.");
+        spamKorumaAktif = false;
+        
+        const kapaliEmbed = new EmbedBuilder()
+            .setColor('#ff0000')
+            .setTitle('🛡️ Ace System • Sistem Güncellendi')
+            .setDescription('❌ **Spam koruma sistemi devre dışı bırakıldı.** Chatta hız sınırı kaldırıldı.')
+            .setTimestamp();
+        return message.reply({ embeds: [kapaliEmbed] });
+    }
+}
 
     // ====================== MODERASYON: MUTE & UNMUTE ======================
     if (command === 'mute') {
