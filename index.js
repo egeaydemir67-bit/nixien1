@@ -405,6 +405,8 @@ if (command === 'yardım') {
                              `👁️ \`a!sixeyes\` ➔ Altı Göz yeteneğiyle hedefin tüm profil ve lanetli verilerini çözer.\n` +
                              `✨ \`a!iyileştir\` ➔ Ters Lanetli Teknik ile hedefin tüm Ban ve Mute cezalarını sıfırlar.\n` +
                              `🎩 \`a!snipeV10\` ➔ Silinen Bütün Fotoğrafları, Videoları, Mesajları Görmeyi Sağlar.\n` +
+                             `💔 \`a!zayır\` ➔ istediğin kişinin evliliğini boz NaoyaZenin MİSALİ.\n` +
+                             `💝 \`a!zevlendir\` ➔ istediğin kişiyi evlendir.\n` +
                              `💼 \`a!ceza-menü\` ➔ Gelişmiş moderasyon ceza takip arayüzünü açar.`
                          );
                 }
@@ -1397,6 +1399,94 @@ if (command === 'çocukyap') {
         .setFooter({ text: '🛡️ Ace System' });
 
     return message.reply({ embeds: [cocukEmbed] });
+}
+
+    if (command === 'zboşan' || command === 'ayır') {
+    // Kurucu ID Kontrolü
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("🛑 Yetkisiz erişim! Bu komut sadece sunucu sahibine özeldir.");
+    }
+
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("Kimi zorla boşatmak istiyorsun? Etiketlemeyi unuttun!");
+
+    // Etiketlenen kişi evli mi diye veritabanında arıyoruz
+    const kayit = await Evlilik.findOne({ 
+        $or: [{ kullanici1: target.id }, { kullanici2: target.id }] 
+    });
+
+    if (!kayit) return message.reply(`😅 ${target.username} zaten bekar, olmayan yuvayı nasıl yıkalım?`);
+
+    // Partnerin kim olduğunu buluyoruz
+    const partnerID = kayit.kullanici1 === target.id ? kayit.kullanici2 : kayit.kullanici1;
+    const partner = await message.guild.members.fetch(partnerID).catch(() => null);
+    const targetMember = await message.guild.members.fetch(target.id).catch(() => null);
+
+    // Veritabanından siliyoruz
+    await Evlilik.deleteOne({ _id: kayit._id });
+
+    // Evli rolünü her iki taraftan da alıyoruz
+    const evliRol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
+    if (evliRol) {
+        if (targetMember) targetMember.roles.remove(evliRol).catch(() => {});
+        if (partner) partner.roles.remove(evliRol).catch(() => {});
+    }
+
+    const zBosanEmbed = new EmbedBuilder()
+        .setColor('#ff0000')
+        .setTitle('⚡ İlahi Müdahale: Yuva Yıkıldı!')
+        .setDescription(`Kurucunun yüce emriyle ${target} ve <@${partnerID}> tek celsede boşandı!\n\n*Kurucu vurdu gol oldu, herkes kendi yoluna...* 🚬`)
+        .setFooter({ text: '🛡️ Ace System - Kurucu Müdahalesi' });
+
+    return message.reply({ embeds: [zBosanEmbed] });
+}
+
+    if (command === 'zevlendir' || command === 'çöpçatan') {
+    // Kurucu ID Kontrolü
+    if (message.author.id !== '983015347105976390') {
+        return message.reply("🛑 Yetkisiz erişim! Aşka müdahale etmek sadece kurucuya mahsustur.");
+    }
+
+    // Etiketlenen tüm kullanıcıları bir diziye alıyoruz
+    const mentions = [...message.mentions.users.values()];
+    
+    if (mentions.length < 2) {
+        return message.reply("Zorla evlendirmek için **2 kişiyi** etiketlemen lazım!");
+    }
+
+    const target1 = mentions[0];
+    const target2 = mentions[1];
+
+    if (target1.id === target2.id) return message.reply("Aynı kişiyi iki kere etiketledin, klonlamayı henüz bulmadık! 😅");
+    if (target1.bot || target2.bot) return message.reply("Botları bu işe karıştırma, onların duyguları yok...");
+
+    // Hedeflerin başkasıyla evli olup olmadığını kontrol ediyoruz
+    const evli1 = await Evlilik.findOne({ $or: [{ kullanici1: target1.id }, { kullanici2: target1.id }] });
+    const evli2 = await Evlilik.findOne({ $or: [{ kullanici1: target2.id }, { kullanici2: target2.id }] });
+
+    if (evli1) return message.reply(`Aga be... ${target1.username} halihazırda başkasıyla evli! Önce onu boşatman lazım.`);
+    if (evli2) return message.reply(`Aga be... ${target2.username} halihazırda başkasıyla evli! Önce onu boşatman lazım.`);
+
+    // Evlilik kaydını oluşturuyoruz
+    await new Evlilik({ kullanici1: target1.id, kullanici2: target2.id, cocuklar: [] }).save();
+
+    // Evli rollerini veriyoruz
+    const evliRol = message.guild.roles.cache.get(PERMS.EVLI_ROL);
+    if (evliRol) {
+        const member1 = await message.guild.members.fetch(target1.id).catch(() => null);
+        const member2 = await message.guild.members.fetch(target2.id).catch(() => null);
+        
+        if (member1) member1.roles.add(evliRol).catch(() => {});
+        if (member2) member2.roles.add(evliRol).catch(() => {});
+    }
+
+    const zEvlenEmbed = new EmbedBuilder()
+        .setColor('#ff69b4')
+        .setTitle('⚡ İlahi Müdahale: Zorunlu Nikah!')
+        .setDescription(`Kurucunun mutlak yetkisiyle ${target1} ve ${target2} an itibarıyla evlendirilmiştir!\n\n*Siz isteseniz de istemeseniz de... Birbirinize çok yakıştınız!* 💍🥂`)
+        .setFooter({ text: '🛡️ Ace System - Kurucu Müdahalesi' });
+
+    return message.reply({ content: `${target1} ${target2}`, embeds: [zEvlenEmbed] });
 }
 
     
