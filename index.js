@@ -1704,12 +1704,6 @@ if (command === 'çocukyap') {
     }, 30000);
 }
 
-    // ====================== KOMUTLAR KISMI BAŞLANGIÇ ======================
-    if (message.content.startsWith(prefix)) {
-        const args = message.content.slice(prefix.length).trim().split(/ +/);
-        const command = args.shift().toLowerCase();
-        const target = message.mentions.users.first();
-
         // KUDURT KOMUTU
         if (command === 'kudurt' && target) {
             if (kudurtMod.has(target.id)) {
