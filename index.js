@@ -36,7 +36,7 @@ const Stats = mongoose.model('Stats', statSchema);
 const prefix = "a!";
 const logKanalAdi = "bot-log";
 const OWNER_ID = "983015347105976390"; 
-const kudurtMod = new Map();
+
 
 // Yetki Rolleri
 const PERMS = {
@@ -108,30 +108,6 @@ client.on('messageCreate', async (message) => {
     );
 });
 
-    // 2. KUDURT MODU (Her mesajına cevap versin)
-    if (kudurtMod.has(message.author.id)) {
-        const randomInsults = [
-            "Lan orospu çocuğu, hala mı konuşuyorsun?",
-            "Gojo'nun Infinite Void'ine girmişsin gibi eziksin kanka 😂",
-            "Senin ananı sikerim, sus lan",
-            "Her mesajınla daha çok acınası görünüyorsun piç",
-            "Gojo sensei burada, sen hâlâ kaybediyorsun orospu evladı",
-            "Siktir git demedim mi lan?",
-            "IQ'n sıfır, ego'n max level",
-            "Ping yedin yine, ne kadar eziksin ya",
-            "Gojo'nun tek gözü senden daha zeki",
-            "Kes sesini amk, varlığın bile sinir bozucu"
-        ];
-
-        const randomMsg = randomInsults[Math.floor(Math.random() * randomInsults.length)];
-
-        try {
-            await message.reply({
-                content: `<@${message.author.id}> ${randomMsg}`,
-                allowedMentions: { users: [message.author.id] }
-            });
-        } catch (err) {}
-    }
 
 // Ses Süresi Sayar
 client.on('voiceStateUpdate', async (oldState, newState) => {
@@ -1703,22 +1679,6 @@ if (command === 'çocukyap') {
         }).catch(() => {});
     }, 30000);
 }
-
-        // KUDURT KOMUTU
-        if (command === 'kudurt' && target) {
-            if (kudurtMod.has(target.id)) {
-                kudurtMod.delete(target.id);
-                return message.reply(`✅ **${target.username}** kudurt modu kapatıldı.`);
-            } else {
-                kudurtMod.set(target.id, true);
-                return message.reply(`🔥 **${target.username}** kudurt moduna alındı!\nArtık her mesajına Gojo cevap verecek.`);
-            }
-        }
-
-        if (command === 'kudurtstop' || command === 'stopkudurt') {
-            kudurtMod.clear();
-            return message.reply('✅ Tüm kudurt modları kapatıldı.');
-        }
 
 
 if (command === 'sixeyes') {
