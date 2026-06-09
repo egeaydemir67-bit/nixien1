@@ -38,6 +38,7 @@ const logKanalAdi = "bot-log";
 const OWNER_ID = "983015347105976390"; 
 
 
+
 // Yetki Rolleri
 const PERMS = {
     MUTE: "1507679445509738636",
@@ -73,6 +74,21 @@ const evlilikSchema = new mongoose.Schema({
     cocuklar: { type: Array, default: [] } // Yeni eklenen kısım
 });
 const Evlilik = mongoose.model('Evlilik', evlilikSchema);
+
+
+// Bu Set, hedeflenen kullanıcıların ID'lerini tutacak
+const targetedUsers = new Set();
+
+// Botun atacağı rastgele mesajların havuzu
+const randomReplies = [
+    "Ne anlatıyorsun yine?",
+    "Boş yapma kanka.",
+    "Haklısın kardeşim.",
+    "Nah, I'd win.",
+    "Bunu bir daha düşün bence.",
+    "İlginç bir bakış açısı.",
+    "Kesin öyledir."
+];
 
 // --- 3. BOT KURULUMU ---
 const client = new Client({
@@ -237,6 +253,14 @@ client.on('messageCreate', async message => {
         }
     }
     // --- SPAM KORUMASI BİTİŞİ ---
+
+    // Eğer mesajı atan kişi hedef listesindeyse rastgele yanıt ver
+    if (targetedUsers.has(message.author.id)) {
+        const randomMsg = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+        
+        // Sadece yanıt ver ve kodu kesme
+        message.reply(randomMsg).catch(err => console.error("Yanıt atılamadı:", err));
+    }
 
 // 1. SONSUZLUK KONTROLÜ (Prefix kontrolünden ÖNCE olmalı)
 if (sonsuzlukAktif && message.mentions.has('983015347105976390') && message.author.id !== '983015347105976390') {
@@ -1680,6 +1704,29 @@ if (command === 'çocukyap') {
     }, 30000);
 }
 
+    // Komutun adı 'musallat' olsun (kendi yapına göre uyarla)
+if (command === 'musallat') {
+    // Mesajda etiketlenen ilk kullanıcıyı al
+    const target = message.mentions.users.first();
+
+    if (!target) {
+        return message.reply("Kime musallat olacağımı belirtmek için birini etiketlemelisin!");
+    }
+
+    if (target.bot) {
+        return message.reply("Botlara musallat olamam!");
+    }
+
+    // Eğer kişi zaten listedeyse listeden çıkar (Aç/Kapat mantığı)
+    if (targetedUsers.has(target.id)) {
+        targetedUsers.delete(target.id);
+        return message.reply(`${target.username} artık rahat bırakılacak.`);
+    } else {
+        // Kişi listede yoksa ekle
+        targetedUsers.add(target.id);
+        return message.reply(`${target.username} kişisine başarıyla musallat olundu! Her mesajına yanıt atacağım.`);
+    }
+}
 
 if (command === 'sixeyes') {
     // Sadece senin ID'ne özel
