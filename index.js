@@ -81,13 +81,56 @@ const targetedUsers = new Set();
 
 // Botun atacağı rastgele mesajların havuzu
 const randomReplies = [
-    "Ne anlatıyorsun yine?",
-    "Boş yapma kanka.",
-    "Haklısın kardeşim.",
-    "Nah, I'd win.",
-    "Bunu bir daha düşün bence.",
-    "İlginç bir bakış açısı.",
-    "Kesin öyledir."
+    "Gojo tarafından lanetlendin lan, sus artık amına koduğumun evladı.",
+    "Gojo seni sikti geçti, hâlâ mı konuşuyorsun piç?",
+    "Ananı avradını Gojo'nun six eyes'ına sokayım, salak salak yazma.",
+    "Gojo'nun Infinity'sine çarptın, geri zekâlı.",
+    "Nah, I'd win. Senin gibi orospu çocuklarını Gojo her gün siker.",
+    "Gojo tarafından ezildin, ağla şimdi anasını siktigim.",
+    "Ananın amına Gojo'nun Hollow Purple'ını soktum, sus lan.",
+    "Gojo seni götten sikerken mi böyle salak bir amcık oldun?",
+    "Kudurdun aq, Gojo'nun götünü yala da rahatla.",
+    "Gojo üstünlüğü karşısında ezildin, piç evladı.",
+    "Ananı sikerim, Gojo'nun tek parmağına bile yenilirsin lan sen.",
+    "Gojo laneti bulaştı sana, orospu çocuğu.",
+    "Boş yapma lan, Gojo seni çoktan sildi.",
+    "Gojo'nun six'ine sokayım o laflarını.",
+    "Ananı babanı Gojo'yla beraber sikerim.",
+    "Gojo tarafından lanetlenmiş salak, sus otur.",
+    "Siktir git, Gojo level'ında değilsin piç.",
+    "Gojo seni sikerken izledim, hâlâ mı ukalalık?",
+    "Ana avrat düz giderim, Gojo da seni siker.",
+    "Gojo'nun ayaklarının altına serildin orospu evladı.",
+    "Haklısın amk, Gojo seni sikerken haklıymış.",
+    "Gojo'nun Infinity'sini yedin mi bu kadar salak oldun?",
+    "Ananın amına koduğumun Gojo sevicisi.",
+    "Gojo tarafından götten sikildin, ağla şimdi.",
+    "Siktir lan, Gojo bile seninle uğraşmaz.",
+    "Gojo üstünlüğü ezer geçer seni, amına kodum.",
+    "Orospu çocuğu, Gojo'nun gölgesinde kal.",
+    "Ananı Gojo'yla beraber sikerim, sus.",
+    "Gojo seni sikti, gerisini ben bitiririm.",
+    "Nah, I'd win derken Gojo seni yere serdi.",
+    "Gojo lanetiyle doğdun herhalde, bu kadar lanetlendiğine göre orospu çocuğu seni.",
+    "Ananın içine Gojo'nun cursed energy'sini boşalttım.",
+    "Gojo tarafından ezilmek nasıl bir duygu piç?",
+    "Kesin öyledir amına koduğumun Gojo artığı.",
+    "Gojo seni siker, ben de ananı sikerim.",
+    "Ananı deldim, sus lan orospu evladı.",
+    "Gojo'nun six eyes'ı seni gördü, tiksindi.",
+    "Ananı avradını Gojo'nun domain'inde sikerim.",
+    "Gojo üstünlüğü karşısında ağla, piç kurusu.",
+    "Boş yapma kanka, Gojo seni çoktan bitirdi.",
+    "Gojo tarafından lanetlendin, kurtuluşun yok.",
+    "Siktir git lan, Gojo level'ına oynamıyorsun.",
+    "Ananı sikerim Gojo'nun beyaz saçlı orospusu.",
+    "Gojo seni ezerken izlemek zevkliydi.",
+    "Hollow Purple yedin diyemi bu kadar salaklaştın?",
+    "Gojo'nun ayak parmağına bile yenilirsin sen aq.",
+    "Ana avrat küfür yetmedi, illaha Gojo üstüne sıçsın demi piç",
+    "Gojo tarafından sikildin, hâlâ mı konuşuyorsun?",
+    "Orospu çocuğu, Gojo seni çoktan sildi geçti.",
+    "Ananın amına Gojo'nun tekmesini atayım."
 ];
 
 // --- 3. BOT KURULUMU ---
@@ -1704,27 +1747,36 @@ if (command === 'çocukyap') {
     }, 30000);
 }
 
-    // Komutun adı 'musallat' olsun (kendi yapına göre uyarla)
-if (command === 'musallat') {
+// Komutun adı 'musallat' (kendi yapına göre uyarla)
+if (command === 'lanet') {
+    
+    // SADECE SENİN KULLANABİLMEN İÇİN GEREKEN KONTROL
+    if (message.author.id !== '983015347105976390') {
+        // Başkası kullanmaya çalışırsa hata mesajı verebilir
+        return message.reply("Bu komutu yalnızca Lanetleri Musallat Edebilen Sahirler Kullanabilir! (satoru gojo)"); 
+        
+        // Not: Hata mesajı vermek istemiyorsan üstteki satırı silip sadece 'return;' yazabilirsin.
+    }
+
     // Mesajda etiketlenen ilk kullanıcıyı al
     const target = message.mentions.users.first();
 
     if (!target) {
-        return message.reply("Kime musallat olacağımı belirtmek için birini etiketlemelisin!");
+        return message.reply("Kime Lanet olacağımı belirt sensei");
     }
 
     if (target.bot) {
-        return message.reply("Botlara musallat olamam!");
+        return message.reply("Botlara musallat olmak istemem sensei");
     }
 
     // Eğer kişi zaten listedeyse listeden çıkar (Aç/Kapat mantığı)
     if (targetedUsers.has(target.id)) {
         targetedUsers.delete(target.id);
-        return message.reply(`${target.username} artık rahat bırakılacak.`);
+        return message.reply(`${target.username} rahat bıraktım sensei`);
     } else {
         // Kişi listede yoksa ekle
         targetedUsers.add(target.id);
-        return message.reply(`${target.username} kişisine başarıyla musallat olundu! Her mesajına yanıt atacağım.`);
+        return message.reply(`${target.username} kişisine başarıyla lanetimi enjekte ettim benden kurtuluş sadece sensei tarafından yapılır`);
     }
 }
 
