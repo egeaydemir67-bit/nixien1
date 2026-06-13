@@ -1748,36 +1748,55 @@ if (command === 'çocukyap') {
     }, 30000);
 }
 
-// Komutun adı 'musallat' (kendi yapına göre uyarla)
+
 if (command === 'lanet') {
-    
     // SADECE SENİN KULLANABİLMEN İÇİN GEREKEN KONTROL
     if (message.author.id !== '983015347105976390') {
-        // Başkası kullanmaya çalışırsa hata mesajı verebilir
-        return message.reply("Bu komutu yalnızca Lanetleri Musallat Edebilen Sahirler Kullanabilir! (satoru gojo)"); 
-        
-        // Not: Hata mesajı vermek istemiyorsan üstteki satırı silip sadece 'return;' yazabilirsin.
+        const yetkiYokEmbed = new EmbedBuilder()
+            .setColor('Red')
+            .setDescription("🚫 **Bu komutu yalnızca Lanetleri Musallat Edebilen Sahirler Kullanabilir!** *(Satoru Gojo)*");
+        return message.reply({ embeds: [yetkiYokEmbed] }); 
     }
 
     // Mesajda etiketlenen ilk kullanıcıyı al
     const target = message.mentions.users.first();
 
     if (!target) {
-        return message.reply("Kime Lanet olacağımı belirt sensei");
+        const hedefYokEmbed = new EmbedBuilder()
+            .setColor('Orange')
+            .setDescription("Kime lanet okuyacağımı belirt, Ace Sensei!");
+        return message.reply({ embeds: [hedefYokEmbed] });
     }
 
     if (target.bot) {
-        return message.reply("Botlara musallat olmak istemem sensei");
+        const botEmbed = new EmbedBuilder()
+            .setColor('Orange')
+            .setDescription("Botlara musallat olmak istemem Sensei, onların lanetli enerjisi yok.");
+        return message.reply({ embeds: [botEmbed] });
     }
 
-    // Eğer kişi zaten listedeyse listeden çıkar (Aç/Kapat mantığı)
+    // Eğer kişi zaten listedeyse listeden çıkar (Lanet Kaldırma)
     if (targetedUsers.has(target.id)) {
         targetedUsers.delete(target.id);
-        return message.reply(`${target.username} rahat bıraktım sensei`);
+        
+        const kurtulduEmbed = new EmbedBuilder()
+            .setColor('Blue') // Gojo'nun gözleri gibi mavi
+            .setTitle('🌀 Lanet Geri Çekildi')
+            .setDescription(`${target} adlı faniyi şimdilik rahat bıraktım Ace Sensei. Sınırları zorlamasına gerek kalmadı.`);
+            
+        return message.reply({ embeds: [kurtulduEmbed] });
+        
     } else {
-        // Kişi listede yoksa ekle
+        // Kişi listede yoksa ekle (Lanetleme - Alan Genişletmesi)
         targetedUsers.add(target.id);
-        return message.reply(`${target.username} kişisine başarıyla lanetimi enjekte ettim benden kurtuluş sadece sensei tarafından yapılır`);
+        
+        const lanetEmbed = new EmbedBuilder()
+            .setColor('Purple') // Hollow Purple rengi
+            .setTitle('🤞 Lanet Musallatı / Satoru Gojo')
+            .setDescription(`${target} kişisine başarıyla **lanetli enerjimi** enjekte ettim.\n\n*Benden kurtuluş sadece Ace Sensei tarafından yapılabilir...*`)
+            .setImage('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aXp0aXR6dDZ1czRsOGllc292OHBncXNsbWczb3kyemE3Z2k3MTk3OSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/fB2IRTXd07IkcStfwU/giphy.gif');
+            
+        return message.reply({ embeds: [lanetEmbed] });
     }
 }
 
