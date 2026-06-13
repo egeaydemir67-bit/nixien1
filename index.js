@@ -424,6 +424,7 @@ if (command === 'yardım') {
              `❤️ \`a!aşkölç\` ➔ Etiketlediğin kişiyle aşk yüzdenizi ölçer.\n` +
              `💍 \`a!evlen\` / \`a!boşan\` ➔ Sunucudaki bir üyeyle evlenmenizi/boşanmanızı sağlar.\n` +
              `📜 \`a!evlilik\` ➔ Mevcut evlilik durumunu ve partnerini gösterir.\n` +
+             `👾 \`a!dc\` ➔ Sunucuda Bir Doğruluk-Cesaretlik Oyunu Başlat\n` +
              `🐱 \`a!kedisev\` ➔ Rastgele tatlı bir kedi resmi gönderir.\n` +
              `💥 \`a!patlat\` ➔ Eğlence amaçlı kanalda patlama simülasyonu yapar.\n` +
              `🎲 \`a!zarat\` / \`a!yazıtura\` ➔ Çift zar fırlatır veya yazı-tura oynatır.\n` +
@@ -471,6 +472,7 @@ if (command === 'yardım') {
                              `🟣 \`a!hollowpurple\` ➔ Kanaldaki Her Şeyi Lanetler/Siler.\n` +
                              `🛡️ \`a!sonsuzluk\` ➔ Pasif korumayı açar. Seni etiketleyenler 10 Saniye ceza yer.\n` +
                              `👁️ \`a!sixeyes\` ➔ Altı Göz yeteneğiyle hedefin tüm profil ve lanetli verilerini çözer.\n` +
+                             `☠️ \`a!lanet\` ➔ Etiketlediğin kullanıcıyı Lanetle Lanetten Kurtuluş Yoktur.\n` +
                              `✨ \`a!iyileştir\` ➔ Ters Lanetli Teknik ile hedefin tüm Ban ve Mute cezalarını sıfırlar.\n` +
                              `🎩 \`a!snipeV10\` ➔ Silinen Bütün Fotoğrafları, Videoları, Mesajları Görmeyi Sağlar.\n` +
                              `💔 \`a!zayır\` ➔ istediğin kişinin evliliğini boz NaoyaZenin MİSALİ.\n` +
@@ -1871,6 +1873,185 @@ if (command === 'sixeyes') {
     setTimeout(async () => {
         await loadingMessage.edit({ content: "Görüş alanı netleşti.", embeds: [sixEyesEmbed] });
     }, 1500); // 1.5 saniyelik bir gecikme
+}
+
+
+// Komut adını kontrol ettiğin yer (prefixsiz haliyle "dc" eşitse çalışır)
+if (command === 'dc') {
+    // Sadece belirli kanalda çalışması için kanal kontrolü
+    const ozelKanalId = '1515315036887973978';
+    if (message.channel.id !== ozelKanalId) {
+        return message.reply(`Reis, bu oyunu sadece <#${ozelKanalId}> kanalında oynayabilirsiniz!`);
+    }
+
+    // Sorular ve Görevler (Bunları istediğin gibi çoğaltabilirsin)
+    const dogrulukSorulari = [
+        "En son kime yalan söyledin ve yalanın neydi?",
+        "Buradaki oyunculardan birinin günlüğünü okuyabilecek olsan kiminkini okurdun?",
+        "Hayatındaki en utanç verici anın neydi?",
+        "Eğer görünmez olsaydın yapacağın ilk şey ne olurdu?",
+        "Kimsenin bilmediği gizli bir yeteneğin var mı?"
+    ];
+
+    const cesaretGorevleri = [
+        "Buradaki oyunculardan birine rastgele bir iltifat et.",
+        "Sesli kanaldaysan 10 saniye boyunca şarkı söyle. Değilsen buraya bir şarkı sözü yaz.",
+        "En son kopyaladığın metni (ctrl+v) buraya yapıştır.",
+        "Kendi profiline gir ve hakkımda kısmına 'Ben bir uzaylıyım' yaz (1 saat kalsın).",
+        "Sunucudaki rastgele birine DM'den 'Seni çok özledim' yazıp ekran görüntüsünü at."
+    ];
+
+    const oyuncular = new Set();
+    oyuncular.add(message.author.id); // Komutu yazan otomatik katılır
+
+    // Lobi Embed'i
+    const lobiEmbed = new EmbedBuilder()
+        .setTitle('🎯 Doğruluk mu Cesaret mi? Lobi Kuruldu!')
+        .setDescription(`Oyuna katılmak için aşağıdaki butona tıkla!\n\n**Şu anki Oyuncular:** <@${message.author.id}>`)
+        .setColor('Random');
+
+    const lobiRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('dc_katil')
+            .setLabel('Oyuna Katıl / Ayrıl')
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji('✋'),
+        new ButtonBuilder()
+            .setCustomId('dc_baslat')
+            .setLabel('Oyunu Başlat')
+            .setStyle(ButtonStyle.Success)
+            .setEmoji('▶️')
+    );
+
+    message.channel.send({ embeds: [lobiEmbed], components: [lobiRow] }).then(lobiMesaji => {
+        // Lobi Buton Koleksiyoncusu (3 dakika bekler)
+        const lobiCollector = lobiMesaji.createMessageComponentCollector({ componentType: ComponentType.Button, time: 180000 });
+
+        lobiCollector.on('collect', async interaction => {
+            if (interaction.customId === 'dc_katil') {
+                if (oyuncular.has(interaction.user.id)) {
+                    oyuncular.delete(interaction.user.id);
+                } else {
+                    oyuncular.add(interaction.user.id);
+                }
+
+                const guncelOyuncular = Array.from(oyuncular).map(id => `<@${id}>`).join('\n') || "Kimse yok :(";
+                lobiEmbed.setDescription(`Oyuna katılmak için aşağıdaki butona tıkla!\n\n**Şu anki Oyuncular:**\n${guncelOyuncular}`);
+                await interaction.update({ embeds: [lobiEmbed], components: [lobiRow] });
+            }
+
+            if (interaction.customId === 'dc_baslat') {
+                if (interaction.user.id !== message.author.id) {
+                    return interaction.reply({ content: 'Oyunu sadece başlatan kişi (`' + message.author.tag + '`) başlatabilir!', ephemeral: true });
+                }
+                if (oyuncular.size < 2) {
+                    return interaction.reply({ content: 'Reis, bu oyun tek kişiyle sarmaz. En az 2 kişi lazım!', ephemeral: true });
+                }
+
+                lobiCollector.stop('basladi');
+                oyunDöngüsü(interaction, Array.from(oyuncular));
+            }
+        });
+
+        lobiCollector.on('end', (collected, reason) => {
+            if (reason !== 'basladi') {
+                lobiEmbed.setTitle('⏳ Lobi Zaman Aşımına Uğradı').setDescription('Oyun başlatılmadığı için iptal edildi.');
+                lobiMesaji.edit({ embeds: [lobiEmbed], components: [] }).catch(() => {});
+            }
+        });
+    });
+
+    // Ana Oyun Döngüsü Fonksiyonu
+    function oyunDöngüsü(interaction, oyuncuListesi) {
+        // Rastgele 2 kişi seç
+        const karisik = oyuncuListesi.sort(() => Math.random() - 0.5);
+        const soran = karisik[0];
+        const cevaplayan = karisik[1];
+
+        const oyunEmbed = new EmbedBuilder()
+            .setTitle('🎲 Sıra Geldi!')
+            .setDescription(`🎙️ **Soran:** <@${soran}>\n🎯 **Hedef:** <@${cevaplayan}>\n\n<@${cevaplayan}>, seçimini yap: **Doğruluk mu, Cesaret mi?**`)
+            .setColor('Random');
+
+        const oyunRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('secim_dogruluk')
+                .setLabel('Doğruluk')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('🤫'),
+            new ButtonBuilder()
+                .setCustomId('secim_cesaret')
+                .setLabel('Cesaret')
+                .setStyle(ButtonStyle.Danger)
+                .setEmoji('🔥')
+        );
+
+        // Interaction update mi yoksa yeni mesaj mı kontrolü
+        const sendOptions = { embeds: [oyunEmbed], components: [oyunRow] };
+        const gonderim = interaction.replied || interaction.deferred 
+            ? interaction.channel.send(sendOptions) 
+            : interaction.update(sendOptions).then(() => interaction.message).catch(() => interaction.channel.send(sendOptions));
+
+        gonderim.then(oyunMesaji => {
+            const oyunCollector = oyunMesaji.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+
+            oyunCollector.on('collect', async i => {
+                // Sadece cevaplayan kişi butona basabilir
+                if (i.user.id !== cevaplayan) {
+                    return i.reply({ content: `Hey! Şu an sıra <@${cevaplayan}> adlı kişide. Sen karışma!`, ephemeral: true });
+                }
+
+                let sonucMetni = "";
+                let secimBaslik = "";
+
+                if (i.customId === 'secim_dogruluk') {
+                    const rastgeleSoru = dogrulukSorulari[Math.floor(Math.random() * dogrulukSorulari.length)];
+                    secimBaslik = "🤫 Doğruluğu Seçti!";
+                    sonucMetni = `**Soru:** ${rastgeleSoru}`;
+                } else if (i.customId === 'secim_cesaret') {
+                    const rastgeleGorev = cesaretGorevleri[Math.floor(Math.random() * cesaretGorevleri.length)];
+                    secimBaslik = "🔥 Cesareti Seçti!";
+                    sonucMetni = `**Görev:** ${rastgeleGorev}`;
+                }
+
+                const sonucEmbed = new EmbedBuilder()
+                    .setTitle(secimBaslik)
+                    .setDescription(`🎯 **Hedef:** <@${cevaplayan}>\n\n${sonucMetni}`)
+                    .setColor(i.customId === 'secim_dogruluk' ? 'Blue' : 'Red');
+
+                const turRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('sonraki_tur')
+                        .setLabel('Sonraki Tur')
+                        .setStyle(ButtonStyle.Success)
+                        .setEmoji('🔄')
+                );
+
+                oyunCollector.stop('cevaplandi');
+                await i.update({ embeds: [sonucEmbed], components: [turRow] });
+
+                // Sonraki Tur için yeni bir collector
+                const turCollector = oyunMesaji.createMessageComponentCollector({ componentType: ComponentType.Button, time: 120000 });
+                turCollector.on('collect', async turInteraction => {
+                    if (turInteraction.customId === 'sonraki_tur') {
+                        // Sadece oyundaki biri sonraki turu başlatabilir
+                        if (!oyuncuListesi.includes(turInteraction.user.id)) {
+                            return turInteraction.reply({ content: 'Oyunda değilsin, turu geçemezsin!', ephemeral: true });
+                        }
+                        turCollector.stop();
+                        oyunDöngüsü(turInteraction, oyuncuListesi); // Döngüyü tekrar çağır
+                    }
+                });
+            });
+
+            oyunCollector.on('end', (collected, reason) => {
+                if (reason === 'time') {
+                    oyunMesaji.edit({ components: [] }).catch(() => {});
+                    interaction.channel.send(`<@${cevaplayan}> çok yavaş kaldın, oyun duraklatıldı! Yeniden başlatmak için tekrar komutu girin.`);
+                }
+            });
+        });
+    }
 }
 
 
