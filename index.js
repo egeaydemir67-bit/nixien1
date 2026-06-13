@@ -1918,7 +1918,7 @@ if (command === 'dc') {
         "Sesli kanaldaysan 10 saniye boyunca şarkı söyle. Değilsen buraya bir şarkı sözü yaz.",
         "En son kopyaladığın metni (ctrl+v) buraya yapıştır.",
         "Kendi profiline gir ve hakkımda kısmına 'Ben malım' yaz (1 saat kalsın).",
-        "Sunucudaki rastgele birine DM'den 'Seni çok özledim' yazıp ekran görüntüsünü at."
+        "Sunucudaki rastgele birine DM'den 'Seni çok özledim' yazıp ekran görüntüsünü at.",
         "Burdaki Oyunculardan Herhangi Birine a!sik Komudu Kullan."
     ];
 
@@ -1990,7 +1990,7 @@ if (command === 'dc') {
 
         const oyunEmbed = new EmbedBuilder()
             .setTitle('🎲 Yeni Tur Başladı!')
-            .setDescription(`🎙️ **Soran:** <@${soran}>\n🎯 **Hedef:** <@${cevaplayan}>\n\n<@${cevaplayan}>, seçimini yap: **Doğruluk mu, Cesaret mi?**`)
+            .setDescription(`🎙️ **Soran:** <@${soran}>\n🎯 **Cevaplayan:** <@${cevaplayan}>\n\n<@${cevaplayan}>, seçimini yap: **Doğruluk mu, Cesaret mi?**`)
             .setColor('Random');
 
         const oyunRow = new ActionRowBuilder().addComponents(
@@ -2049,7 +2049,7 @@ if (command === 'dc') {
 
                             finalEmbed
                                 .setTitle(`🤖 Botun Sorusu/Görevi (${secilenTur})`)
-                                .setDescription(`🎙️ **Soran:** <@${soran}>\n🎯 **Hedef:** <@${cevaplayan}>\n\n**${soruMetni}**`);
+                                .setDescription(`🎙️ **Soran:** <@${soran}>\n🎯 **Cevaplayan:** <@${cevaplayan}>\n\n**${soruMetni}**`);
 
                         } else if (ki.customId === 'kaynak_kendim') {
                             // Kullanıcı kendi soracak
