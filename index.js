@@ -11,6 +11,7 @@ const {
     AttachmentBuilder, 
     ModalBuilder, 
     TextInputBuilder, 
+    ComponentType,
     TextInputStyle 
 } = require('discord.js');
 const http = require('http');
