@@ -1067,10 +1067,12 @@ if (command === 'döv') {
 
     // Verdiğin GIF'leri listeye aldık
     const dovGifler = [
-        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMndrcTA5cXd6YWtrZHJkMDI2YndoNnVhNzB2dDNidG9pdXUxZHk5OSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/1JmGiBtqTuehfYxuy9/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2VrZmFpbWZlMTIwMGhxdTg1cW01Nnl5dGQzaWZ3aml2cHlsYmg0ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26hirKDWxy7WcdU5i/giphy.gif',
         'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHI2N3BkcGE5OWgzMXVsa2M3czg5dHRibDRuOGxsOWZ5eXExcmNoaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MYTaNoPDtyQGXnCUJQ/giphy.gif',
         'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnV5dHJhNjM0enNvdzdhOTh2d3U2NHhwZXdvcmJlZHQ4czE3Y3RscCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DuVRadBbaX6A8/giphy.gif',
-        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZHhsM3N5cXh3aW03MzN6c2twaWo1c2RnbmRmOGh6dGdzNHFhdzJ4NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/rMSjN5eXy8238yChf5/giphy.gif'
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZHhsM3N5cXh3aW03MzN6c2twaWo1c2RnbmRmOGh6dGdzNHFhdzJ4NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/rMSjN5eXy8238yChf5/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2VrZmFpbWZlMTIwMGhxdTg1cW01Nnl5dGQzaWZ3aml2cHlsYmg0ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Xrg0qqPonNeKOhp8nb/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dXU5ZTZwNnU5dmxtaTEyanZnZzJtOThzbGFoZnVzcHR4bDloOXI0MyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/YhHSjXadL2eOc3T2Ww/giphy.gif'
     ];
     // Listeden rastgele bir GIF seçiyoruz
     const rastgeleGif = dovGifler[Math.floor(Math.random() * dovGifler.length)];
@@ -1096,7 +1098,8 @@ if (command === 'seviş') {
     const sevisGifler = [
         'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YzJ4Y3U4b2JiMGlrcDl0cGhtMzdjdnJzOHc2aXdrc2dmaXJqMGpicSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/5cdY3sS1BvOPC/giphy.gif',
         'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YzJ4Y3U4b2JiMGlrcDl0cGhtMzdjdnJzOHc2aXdrc2dmaXJqMGpicSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/qkPrAGqmmWSbK/giphy.gif',
-        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3N2Zsdzd2cGsyeXVoa2ZzZms3MnU4MnE5YzYzODdwcjByYTd6bzFkdiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DpN4VC7Z5jZeg7sLc2/giphy.gif'
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3N2Zsdzd2cGsyeXVoa2ZzZms3MnU4MnE5YzYzODdwcjByYTd6bzFkdiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DpN4VC7Z5jZeg7sLc2/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YnczejViNnpzMGttY2F3OHM4YWJseWRpcjQ0aTFkc3U1bm8yMTg0MCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/P1VHfCYElFTcQ/giphy.gif'
     ];
     // Listeden rastgele bir GIF seçiyoruz
     const rastgeleGif = sevisGifler[Math.floor(Math.random() * sevisGifler.length)];
