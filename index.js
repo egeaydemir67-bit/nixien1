@@ -145,7 +145,8 @@ const client = new Client({
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
 
-const snipes = new Map();
+const snipes = new Map(); // Normal snipe için kalıyor
+const snipesV10 = new Map(); // SnipeV10 için yeni özel hafıza
 
 http.createServer((req, res) => {
     res.write("Bot 7/24 Aktif! - Ace System");
@@ -209,12 +210,21 @@ client.on('messageDelete', async message => {
         logChannel.send({ embeds: [logEmbed] }).catch(() => {});
     }
 
-    // 2. Hafızada Snipe V10 Verisi Tutma
-    if (!snipes.has(message.channel.id)) {
-        snipes.set(message.channel.id, []);
+    // 2. NORMAL SNIPE SİSTEMİ (Eski komutunun düzelmesi için veriyi eski halinde tutuyoruz)
+    const normalSnipeData = {
+        author: message.author,
+        content: message.content || null,
+        image: message.attachments.first()?.proxyURL || message.attachments.first()?.url || null,
+        timestamp: message.createdTimestamp
+    };
+    snipes.set(message.channel.id, normalSnipeData);
+
+    // 3. SNIPE V10 SİSTEMİ (Kategorize edilmiş gelişmiş arşiv)
+    if (!snipesV10.has(message.channel.id)) {
+        snipesV10.set(message.channel.id, { text: [], image: [], media: [] });
     }
 
-    const channelSnipes = snipes.get(message.channel.id);
+    const v10Data = snipesV10.get(message.channel.id);
     let attachmentUrl = null;
     let isVideoOrGif = false;
 
@@ -228,23 +238,31 @@ client.on('messageDelete', async message => {
         }
     }
 
-    const snipeData = {
+    const baseData = {
         author: message.author,
-        content: message.content || null,
-        image: !isVideoOrGif ? attachmentUrl : null,
-        media: isVideoOrGif ? attachmentUrl : null,
         timestamp: message.createdTimestamp
     };
 
-    channelSnipes.unshift(snipeData);
-
-    if (channelSnipes.length > 10) {
-        channelSnipes.pop();
+    // Metin Mesajı Arşivi (Maksimum 10 adet)
+    if (message.content) {
+        v10Data.text.unshift({ ...baseData, content: message.content });
+        if (v10Data.text.length > 10) v10Data.text.pop();
     }
 
-    snipes.set(message.channel.id, channelSnipes);
-}); // <--- İŞTE BÜTÜN SORUN BUYDU! BU PARANTEZ OLMADIĞI İÇİN TÜM KOMUTLARIN YUTULUYORDU.
+    // Fotoğraf Arşivi (Maksimum 10 adet)
+    if (attachmentUrl && !isVideoOrGif) {
+        v10Data.image.unshift({ ...baseData, image: attachmentUrl });
+        if (v10Data.image.length > 10) v10Data.image.pop();
+    }
 
+    // GIF & Video Arşivi (Maksimum 10 adet)
+    if (attachmentUrl && isVideoOrGif) {
+        v10Data.media.unshift({ ...baseData, media: attachmentUrl });
+        if (v10Data.media.length > 10) v10Data.media.pop();
+    }
+
+    snipesV10.set(message.channel.id, v10Data);
+});
 
     
 // --- 5. KOMUTLAR ---
@@ -511,7 +529,7 @@ if (command === 'yardım') {
 
     const rulesEmbed = new EmbedBuilder()
         .setColor('#2b2d31') // Discord'un koyu temasına uyumlu arka plan rengi
-        .setTitle('📜 Sunucu Kuralları / N İ X İ E N Yönetimi Sunar.')
+        .setTitle('📜 Sunucu Kuralları / V O İ D Yönetimi Sunar.')
         .setDescription(`📌 @everyone Herkesin uyması gereken kurallar aşağıda listelenmiştir. İhlal edenlere ceza uygulanır.\n\n` +
         
         `**🧑‍🤝‍🧑 GENEL SAYGI**\n` +
@@ -555,7 +573,7 @@ if (command === 'yardım') {
 
         `**🪪 YÖNETİM**\n` +
         `📌 Yönetim, gerekli gördüğü durumlarda kurallarda değişiklik yapma ve ek kural getirme hakkını saklı tutar.`)
-        .setFooter({ text: 'N İ X İ E N Yönetimi', iconURL: message.guild.iconURL({ dynamic: true }) })
+        .setFooter({ text: 'V O İ DYönetimi', iconURL: message.guild.iconURL({ dynamic: true }) })
         .setTimestamp();
 
     // Kurallar kanalına everyone atarak mesajı gönderiyoruz
@@ -590,14 +608,17 @@ if (command === 'yardım') {
         return message.reply({ embeds: [snipeEmbed] });
     }
 
-    if (command === 'snipev10') {
+   if (command === 'snipev10') {
     // Sadece senin ID'ne özel kurucu kilidi
     if (message.author.id !== '983015347105976390') {
         return message.reply("❌ **Ace Özel:** Bu sınırsız arşiv komutunu sadece kurucum kullanabilir.");
     }
 
-    const channelSnipes = snipes.get(message.channel.id) || [];
-    if (channelSnipes.length === 0) {
+    // Yeni snipesV10 map'inden verileri çekiyoruz
+    const channelSnipes = snipesV10.get(message.channel.id) || { text: [], image: [], media: [] };
+    const totalLogs = channelSnipes.text.length + channelSnipes.image.length + channelSnipes.media.length;
+
+    if (totalLogs === 0) {
         return message.reply("🔮 Bu kanalda hafızaya alınmış silinen bir veri bulunamadı.");
     }
 
@@ -606,19 +627,19 @@ if (command === 'yardım') {
         .setColor('#2b2d31')
         .setAuthor({ name: `${client.user.username} • Ace Sınırsız Snipe Arşivi`, iconURL: client.user.displayAvatarURL() })
         .setDescription(
-            `### 👁️ Kanal Geçmişi Çözülüyor (Son 10 Kayıt)\n` +
-            `> Şu anda bu kanalda silinmiş toplam **${channelSnipes.length}** adet kayıt hafızada tutuluyor.\n` +
+            `### 👁️ Kanal Geçmişi Çözülüyor (Her Kategoride Son 10 Kayıt)\n` +
+            `> Şu anda bu kanalda silinmiş toplam **${totalLogs}** adet aktif kayıt hafızada tutuluyor.\n` +
             `> Aşağıdaki butonları kullanarak kategorilere göre son silinen verileri inceleyebilirsin, Reis.\n\n` +
-            `📝 **Metin Mesajları:** Silinen chat yazıları\n` +
-            `📸 **Fotoğraflar:** Gönderilip silinen görseller\n` +
-            `🎬 **GIF & Videolar:** Hareketli medyalar ve klipler`
+            `📝 **Metin Mesajları:** Silinen chat yazıları (${channelSnipes.text.length}/10)\n` +
+            `📸 **Fotoğraflar:** Gönderilip silinen görseller (${channelSnipes.image.length}/10)\n` +
+            `🎬 **GIF & Videolar:** Hareketli medyalar ve klipler (${channelSnipes.media.length}/10)`
         )
         .setFooter({ text: `🛡️ Ace System • Sorgulayan: ${message.author.username}` })
         .setTimestamp();
 
     // Kategori Butonları
     const buttons = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('snipe_text').setLabel('Mesajlar (Son 10)').setEmoji('📝').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('snipe_text').setLabel('Mesajlar').setEmoji('📝').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId('snipe_image').setLabel('Fotoğraflar').setEmoji('📸').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId('snipe_media').setLabel('GIF & Videolar').setEmoji('🎬').setStyle(ButtonStyle.Secondary)
     );
@@ -641,10 +662,8 @@ if (command === 'yardım') {
             embed.setTitle('📝 Son Silinen Metin Mesajları');
             let textLog = "";
 
-            channelSnipes.forEach((s, index) => {
-                if (s.content) {
-                    textLog += `**[${index + 1}]** ${s.author} ➔ ${s.content}\n`;
-                }
+            channelSnipes.text.forEach((s, index) => {
+                textLog += `**[${index + 1}]** ${s.author} ➔ ${s.content}\n`;
             });
 
             embed.setDescription(textLog || "*Bu kategoride silinmiş metin mesajı bulunamadı.*");
@@ -654,16 +673,12 @@ if (command === 'yardım') {
         // --- 2. FOTOĞRAFLAR KATEGORİSİ ---
         else if (i.customId === 'snipe_image') {
             embed.setTitle('📸 Son Silinen Fotoğraflar');
-            
-            // Fotoğrafı olan kayıtları filtrele
-            const imageSnipes = channelSnipes.filter(s => s.image);
+            const imageSnipes = channelSnipes.image;
 
             if (imageSnipes.length === 0) {
                 embed.setDescription("*Bu kanalda silinmiş fotoğraf bulunamadı.*");
-                await i.update({ embeds: [embed], files: [] }).catch(() => {});
+                await i.update({ embeds: [embed] }).catch(() => {});
             } else {
-                // Döngüsel olarak fotoğrafları görmek için chate liste basabiliriz 
-                // ya da en son silinen fotoğrafı direkt embed'e yerleştirebiliriz.
                 let imgList = "**Silinen Fotoğraf Sahipleri:**\n";
                 imageSnipes.forEach((s, idx) => {
                     imgList += `**[${idx + 1}]** ${s.author.tag} (<t:${Math.floor(s.timestamp / 1000)}:R>)\n`;
@@ -678,8 +693,7 @@ if (command === 'yardım') {
         // --- 3. GIF & VİDEOLAR KATEGORİSİ ---
         else if (i.customId === 'snipe_media') {
             embed.setTitle('🎬 Son Silinen GIF & Videolar');
-            
-            const mediaSnipes = channelSnipes.filter(s => s.media);
+            const mediaSnipes = channelSnipes.media;
 
             if (mediaSnipes.length === 0) {
                 embed.setDescription("*Bu kanalda silinmiş GIF veya Video bulunamadı.*");
@@ -691,9 +705,7 @@ if (command === 'yardım') {
                 });
 
                 embed.setDescription(mediaList + `\n*Discord kısıtlamaları sebebiyle videolar link olarak listelenir, en son silinen medyaya aşağıdaki linkten veya embedden ulaşabilirsin:*\n🔗 [Medya Linki](${mediaSnipes[0].media})`);
-                
-                // Eğer GIF ise embed üzerinde oynatır, video ise link olarak kalır.
-                embed.setImage(mediaSnipes[0].media); 
+                embed.setImage(mediaSnipes[0].media); // Eğer GIF ise oynatır
                 await i.update({ embeds: [embed] }).catch(() => {});
             }
         }
@@ -1017,6 +1029,88 @@ if (command === 'yardım') {
     
   // ====================== ACE SYSTEM: EĞLENCE & ETKİLEŞİM KOMUTLARI ======================
 
+    // === SEV KOMUTU ===
+if (command === 'sev') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi seveceğini seçmelisin, kendi kendini mi şımartacaksın?");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendini sevmek güzeldir ama bence bir başkasını etiketle, usta.");
+
+    // Verdiğin GIF'leri listeye aldık
+    const sevGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMndrcTA5cXd6YWtrZHJkMDI2YndoNnVhNzB2dDNidG9pdXUxZHk5OSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/1JmGiBtqTuehfYxuy9/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMndrcTA5cXd6YWtrZHJkMDI2YndoNnVhNzB2dDNidG9pdXUxZHk5OSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xR5cPyPoL5HVXSphqA/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JwNDRpZnRmZXh1eXRuZGU0MjhiMnN2amgwbDluZnBjbXdtbWFoYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/CNUb51EbTxuRG/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JwNDRpZnRmZXh1eXRuZGU0MjhiMnN2amgwbDluZnBjbXdtbWFoYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ythHeq4Qgx2De/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JwNDRpZnRmZXh1eXRuZGU0MjhiMnN2amgwbDluZnBjbXdtbWFoYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/FgWNX7NK6SpzqwmOWe/giphy.gif'
+        
+    ];
+    // Listeden rastgele bir GIF seçiyoruz
+    const rastgeleGif = sevGifler[Math.floor(Math.random() * sevGifler.length)];
+
+    const sevEmbed = new EmbedBuilder()
+        .setColor('#2ecc71')
+        .setTitle('❤️ Sevgi Yumağı!')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> kullanıcısını pamuklara sardı ve çok tatlı bir şekilde sevdi! 🥰`)
+        .setImage(rastgeleGif)
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() })
+        .setTimestamp();
+
+    return message.reply({ embeds: [sevEmbed] });
+}
+
+// === DÖV KOMUTU ===
+if (command === 'döv') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi döveceğini seçmelisin, havayı mı yumruklayacaksın?");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi döveceksin? Kendine zarar verme usta...");
+
+    // Verdiğin GIF'leri listeye aldık
+    const dovGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMndrcTA5cXd6YWtrZHJkMDI2YndoNnVhNzB2dDNidG9pdXUxZHk5OSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/1JmGiBtqTuehfYxuy9/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHI2N3BkcGE5OWgzMXVsa2M3czg5dHRibDRuOGxsOWZ5eXExcmNoaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MYTaNoPDtyQGXnCUJQ/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnV5dHJhNjM0enNvdzdhOTh2d3U2NHhwZXdvcmJlZHQ4czE3Y3RscCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DuVRadBbaX6A8/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3ZHhsM3N5cXh3aW03MzN6c2twaWo1c2RnbmRmOGh6dGdzNHFhdzJ4NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/rMSjN5eXy8238yChf5/giphy.gif'
+    ];
+    // Listeden rastgele bir GIF seçiyoruz
+    const rastgeleGif = dovGifler[Math.floor(Math.random() * dovGifler.length)];
+
+    const dovEmbed = new EmbedBuilder()
+        .setColor('#c0392b')
+        .setTitle('🥊 Mahalle Kavgası!')
+        .setDescription(`<@${message.author.id}>, <@${target.id}> adlı kullanıcıyı evire çevire dövdü! Hastanelik etti! 🤕`)
+        .setImage(rastgeleGif)
+        .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() })
+        .setTimestamp();
+
+    return message.reply({ embeds: [dovEmbed] });
+}
+
+// === SEVİŞ KOMUTU ===
+if (command === 'seviş') {
+    const target = message.mentions.users.first();
+    if (!target) return message.reply("❌ Kimi... neyse, yanına partner olarak birini etiketlemelisin usta.");
+    if (target.id === message.author.id) return message.reply("❌ Kendi kendinle mi? O kadar da yalnız olma be usta, üzülürüz...");
+
+    // Verdiğin GIF'leri listeye aldık
+    const sevisGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YzJ4Y3U4b2JiMGlrcDl0cGhtMzdjdnJzOHc2aXdrc2dmaXJqMGpicSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/5cdY3sS1BvOPC/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3YzJ4Y3U4b2JiMGlrcDl0cGhtMzdjdnJzOHc2aXdrc2dmaXJqMGpicSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/qkPrAGqmmWSbK/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3N2Zsdzd2cGsyeXVoa2ZzZms3MnU4MnE5YzYzODdwcjByYTd6bzFkdiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DpN4VC7Z5jZeg7sLc2/giphy.gif'
+    ];
+    // Listeden rastgele bir GIF seçiyoruz
+    const rastgeleGif = sevisGifler[Math.floor(Math.random() * sevisGifler.length)];
+
+    const sevisEmbed = new EmbedBuilder()
+        .setColor('#9b59b6')
+        .setTitle('🔞 Ortam Alev Aldı!')
+        .setDescription(`🔥 <@${message.author.id}> ve <@${target.id}> arasındaki çekim tavan yaptı! Odadan garip sesler geliyor...`)
+        .setImage(rastgeleGif)
+        .setFooter({ text: '🛡️ Ace System • +18', iconURL: message.client.user.displayAvatarURL() })
+        .setTimestamp();
+
+    return message.reply({ embeds: [sevisEmbed] });
+}
+
 if (command === 'duello') {
     const target = message.mentions.users.first();
     if (!target) return message.reply("❌ Düello yapacağın birini etiketlemelisin!");
@@ -1029,11 +1123,20 @@ if (command === 'duello') {
     const silahlar = ['Kanalizasyon Borusuyla', 'Kelebek Bıçağıyla', 'Tek Atışta', 'Racon Keserek', 'Gözleriyle'];
     const kullanılanSilah = silahlar[Math.floor(Math.random() * silahlar.length)];
 
+    const duelloGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExamx0NnlibTJ6eDF4NHN3Y2h5eXk0c2g2cTZueWFraHNidHBtOTB5eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Phlda4eDmA8FX5BaLj/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3Ymc5ZHN4ZGNoNmhwNWwwdmRwczBlZ3p0NHNycWVpYjJ1dWFpaWpvbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/QUKqSLmE7vmZP2PkZk/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3Ymc5ZHN4ZGNoNmhwNWwwdmRwczBlZ3p0NHNycWVpYjJ1dWFpaWpvbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/BGZTfUlsBmgaPLmKiN/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHI2N3BkcGE5OWgzMXVsa2M3czg5dHRibDRuOGxsOWZ5eXExcmNoaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NuiEoMDbstN0J2KAiH/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGp0aXc3Nmg1MzhnMzhmY2F0amZtZnU2cmhpcWF6OGlxZGI3cDFhMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/vXyIMuWbGTMtO/giphy.gif'
+    ];
+    const rastgeleGif = duelloGifler[Math.floor(Math.random() * duelloGifler.length)];
+
     const duelloEmbed = new EmbedBuilder()
         .setColor('#ff0000')
         .setTitle('⚔️ Düello Meydanı')
         .setDescription(`**<@${kazanan.id}>**, rakibi **<@${kaybeden.id}>** kullanıcısını **${kullanılanSilah}** tek hamlede yere serdi!`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExamx0NnlibTJ6eDF4NHN3Y2h5eXk0c2g2cTZueWFraHNidHBtOTB5eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Phlda4eDmA8FX5BaLj/giphy.gif') // GIF LİNKİ BURAYA
+        .setImage(rastgeleGif)
         .setFooter({ text: '🛡️ Ace System • Düello bitti.', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [duelloEmbed] });
@@ -1045,11 +1148,18 @@ if (command === 'tokat') {
     
     const hasar = Math.floor(Math.random() * 90) + 10; // 10-100 arası hasar
 
+    const tokatGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXFkcGl2aG5lNDJ0NWgzbHYxcTdnbzI4ODcyYm1zOWdmd3pqeHY4MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/W13QzeK4A03AP540o9/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dmtuOGYyYjA0Z2I2cWJpbGEybWlqeG10ejI4NTI2enJnbjN1emg1OCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/p3ICcrHjUQo47BMdkG/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cjBnd3B3ZnhyYnVnM3djaGRnaTU3MHgzcW1ibzQxdGJ3OXE5YXUxaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3fNmJ20ErpkjK/giphy.gif'
+    ];
+    const rastgeleGif = tokatGifler[Math.floor(Math.random() * tokatGifler.length)];
+
     const tokatEmbed = new EmbedBuilder()
         .setColor('#e74c3c')
         .setTitle('✋ Osmanlı Tokadı!')
         .setDescription(`<@${message.author.id}>, <@${target.id}> adlı kullanıcıya öyle bir tokat attı ki! \n> **Verilen Hasar:** \`${hasar} HP\` • Feleği şaştı!`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXFkcGl2aG5lNDJ0NWgzbHYxcTdnbzI4ODcyYm1zOWdmd3pqeHY4MiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/W13QzeK4A03AP540o9/giphy.gif') // GIF LİNKİ BURAYA
+        .setImage(rastgeleGif)
         .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [tokatEmbed] });
@@ -1060,11 +1170,22 @@ if (command === 'öp') {
     if (!target) return message.reply("❌ Kimi öpeceğini seçmelisin, havayı mı öpeceksin?");
     if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi öpeceksin? Biraz yalnız hissediyoruz galiba...");
 
+    const opGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDFleWo1b2U4OTFwNzd1bmtkaGpxZm4wb21qMDA2MDVjMTkweWY3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LVXUEwWACquWRFeKCl/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JwNDRpZnRmZXh1eXRuZGU0MjhiMnN2amgwbDluZnBjbXdtbWFoYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/vaSA1fpCkY06I/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2JwNDRpZnRmZXh1eXRuZGU0MjhiMnN2amgwbDluZnBjbXdtbWFoYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/zkppEMFvRX5FC/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NTZqOThkYTkzMzB3NWxxMndsaXJpNXA0NWhucHpmd2UydTd0M2ZoNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/QGc8RgRvMonFm/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NTZqOThkYTkzMzB3NWxxMndsaXJpNXA0NWhucHpmd2UydTd0M2ZoNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/2fLX7xDEhleyubyBmv/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3emlsYndwOWRhN2toM2cxYm5wOTBpZHpnYmc1amw1M2NydW9haXFkMiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0r4i1pGnSGQsBNrLpm/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3emlsYndwOWRhN2toM2cxYm5wOTBpZHpnYmc1amw1M2NydW9haXFkMiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Yu6sCV0314IdOwEkxM/giphy.gif'
+    ];
+    const rastgeleGif = opGifler[Math.floor(Math.random() * opGifler.length)];
+
     const opEmbed = new EmbedBuilder()
         .setColor('#ff69b4')
         .setTitle('💋 Şap!')
         .setDescription(`<@${message.author.id}>, <@${target.id}> kullanıcısını yanağından şap diye öptü!`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDFleWo1b2U4OTFwNzd1bmtkaGpxZm4wb21qMDA2MDVjMTkweWY3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LVXUEwWACquWRFeKCl/giphy.gif') // GIF LİNKİ BURAYA
+        .setImage(rastgeleGif)
         .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [opEmbed] });
@@ -1075,11 +1196,22 @@ if (command === 'sik') {
     if (!target) return message.reply("❌ Kimi sikeceğini seçmelisin, havaya mı sokacaksın?");
     if (target.id === message.author.id) return message.reply("❌ Kendi kendini mi sikeceksin? O kadar da değil be usta...");
 
+    const sikGifler = [
+        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDBsMnppNTY3aTY3eGZjbmIzeDB1d3NzNTQ5bWdkdzE1OXA2MGI3ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IsIyvk7zftw4H2C1Kz/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXlkM2YwbnRoeHY5a2lqeWtwbWMxNXI1M2c1czhsZ2syaTQyaWozZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/5XZatgyewAMaQ/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXlkM2YwbnRoeHY5a2lqeWtwbWMxNXI1M2c1czhsZ2syaTQyaWozZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/k3c1eZexGrYaYPYXJg/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXlkM2YwbnRoeHY5a2lqeWtwbWMxNXI1M2c1czhsZ2syaTQyaWozZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26xBFZ8XA4g0SVzoc/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanY4b2dyemRtemNuZXQ4YzU4bGUzMHJhaG1wb2h2a2Z6d2Nja29iYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/OGXilB8foNFIs/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanY4b2dyemRtemNuZXQ4YzU4bGUzMHJhaG1wb2h2a2Z6d2Nja29iYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/45bM1j8EvHOduYf6Qd/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanY4b2dyemRtemNuZXQ4YzU4bGUzMHJhaG1wb2h2a2Z6d2Nja29iYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/MwtHY03ldRPgc/giphy.gif'
+    ];
+    const rastgeleGif = sikGifler[Math.floor(Math.random() * sikGifler.length)];
+
     const sikEmbed = new EmbedBuilder()
         .setColor('#1a1a1a')
         .setTitle('🔞 Ağır Hasar!')
         .setDescription(`💓 <@${message.author.id}>, <@${target.id}> kullanıcısını **ŞAP ŞAP** etkisiz hale getirdi!`)
-        .setImage('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDBsMnppNTY3aTY3eGZjbmIzeDB1d3NzNTQ5bWdkdzE1OXA2MGI3ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IsIyvk7zftw4H2C1Kz/giphy.gif') // GIF LİNKİ BURAYA
+        .setImage(rastgeleGif)
         .setFooter({ text: '🛡️ Ace System • +18', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [sikEmbed] });
@@ -1089,11 +1221,23 @@ if (command === 'sarıl') {
     const target = message.mentions.users.first();
     if (!target) return message.reply("❌ Sarılacak birini bulamadık mı? Gel ben sarılayım diyeceğim de botum ben.");
 
+    const sarilGifler = [
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjdzaWxsbzh3b2M4amlmMXJ4NGlwYmo5YTc4NmwwNGI0MXpsaW1yNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/IzXiddo2twMmdmU8Lv/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NTZqOThkYTkzMzB3NWxxMndsaXJpNXA0NWhucHpmd2UydTd0M2ZoNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/z1HeERIKKcRjG7Ke5x/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NTZqOThkYTkzMzB3NWxxMndsaXJpNXA0NWhucHpmd2UydTd0M2ZoNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0jzI2Z6rHSHR10VL2w/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aGh4eXR5Z3docTN6YmxlaXptZHZzNWlxczhmOHdlaTh4bDU4OHkyMiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/eHvTEDvKPjdc4ovRUb/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aGh4eXR5Z3docTN6YmxlaXptZHZzNWlxczhmOHdlaTh4bDU4OHkyMiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/du8yT5dStTeMg/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dzZxZTBjdWZoa3JmZ3pkOGNoZzh0Ymh2dnQydjJycmU5Z3p6aG81byZlcD12MV9naWZzX3NlYXJjaCZjdD1n/FYNiNRf3u3UX7rIgkT/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3aWNtNmFuaXhkNzlmaGIzY2JycmMwYXMwZnNjOGYxd3VyY3FydjZ4dSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/BXrwTdoho6hkQ/giphy.gif',
+        'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MHpza25oNXNxaXVpbXFxNXRrc2trOGlwYjhvaDhzbzFqcDI1OXdiYSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l2QDM9Jnim1YVILXa/giphy.gif'
+    ];
+    const rastgeleGif = sarilGifler[Math.floor(Math.random() * sarilGifler.length)];
+
     const sarilEmbed = new EmbedBuilder()
         .setColor('#3498db')
         .setTitle('🫂 Sımsıkı Sarılma')
         .setDescription(`<@${message.author.id}>, <@${target.id}> kullanıcısına sımsıkı sarıldı. *Her şey geçecek, sakin ol...*`)
-        .setImage('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjdzaWxsbzh3b2M4amlmMXJ4NGlwYmo5YTc4NmwwNGI0MXpsaW1yNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/IzXiddo2twMmdmU8Lv/giphy.gif') // GIF LİNKİ BURAYA
+        .setImage(rastgeleGif)
         .setFooter({ text: '🛡️ Ace System', iconURL: message.client.user.displayAvatarURL() });
 
     return message.reply({ embeds: [sarilEmbed] });
