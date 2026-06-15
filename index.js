@@ -449,6 +449,7 @@ if (command === 'yardım') {
              `🎲 \`a!zarat\` / \`a!yazıtura\` ➔ Çift zar fırlatır veya yazı-tura oynatır.\n` +
              `📏 \`a!kaçcm\` ➔ Tamamen eğlence amaçlı şans ölçümü yapar.\n` +
              `🫂 \`a!sarıl\` / \`a!öp\` / \`a!tokat\` ➔ Belirttiğin üyeye sarılır, öper veya tokat atarsın.\n` +
+             `💘 \`a!sev\` / \`a!döv\` / \`a!seviş\` ➔ Belirttiğin üyeyi Sever, Döver veya Sevişirsin.\n` +
              `🔞 \`a!sik\` ➔ Hedeflediğin kullanıcıyı ŞAP ŞAP etkisiz hale getirir.\n` +
              `⚔️ \`a!duello\` ➔ Sunucudaki bir üyeye ölümüne düello teklif edersin.\n` +
              `⚖️ \`a!racon\` ➔ Etiketlediğin kişiye ağır abi sözleriyle racon keser.\n` +
